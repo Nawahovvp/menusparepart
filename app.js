@@ -114,6 +114,7 @@
   let isMenuListExpanded = true;
   let autoCollapseToOrb = true;
   let openInNewTab = true;
+  let isLaunchingTab = false;
   let toastTimer = null;
 
   const el = {
@@ -148,11 +149,10 @@
     logoutBtn: document.getElementById('logoutBtn'),
 
     welcomeStage: document.getElementById('welcomeStage'),
+    stageCard: document.querySelector('#welcomeStage .stage-card'),
     stagePlantBadge: document.getElementById('stagePlantBadge'),
     stageHeroIcon: document.getElementById('stageHeroIcon'),
     stageHeroTitle: document.getElementById('stageHeroTitle'),
-    stageHeroSubtitle: document.getElementById('stageHeroSubtitle'),
-    stageLaunchBtn: document.getElementById('stageLaunchBtn'),
 
     appViewport: document.getElementById('appViewport'),
     contentFrame: document.getElementById('contentFrame'),
@@ -343,17 +343,13 @@
     previewedMenu = item;
     if (!item) {
       el.stageHeroIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>`;
+      el.stageHeroIcon.title = 'เลือกเมนูจากแถบด้านซ้าย';
       el.stageHeroTitle.textContent = 'เลือกเมนูจากแถบด้านซ้าย';
-      el.stageHeroSubtitle.textContent = 'เลือกเมนูด้านซ้ายเพื่อเปิดระบบงานในแท็บใหม่';
-      el.stageLaunchBtn.classList.add('hidden');
-      el.stageLaunchBtn.href = '#';
       return;
     }
     el.stageHeroIcon.innerHTML = item.icon;
+    el.stageHeroIcon.title = `คลิกโลโก้เพื่อเปิด ${item.title} ในแท็บใหม่`;
     el.stageHeroTitle.textContent = item.title;
-    el.stageHeroSubtitle.textContent = item.subtitle;
-    el.stageLaunchBtn.href = item.url;
-    el.stageLaunchBtn.classList.remove('hidden');
   }
 
   /* ------------------------------------------------------------------------
@@ -383,17 +379,13 @@
       btn.style.setProperty('--item-c2', item.color2);
       btn.style.setProperty('--item-glow', item.glow);
 
-      const externalIcon = openInNewTab
-        ? `<span class="nav-external-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>`
-        : '';
-
       btn.innerHTML = `
         <span class="nav-item-icon">${item.icon}</span>
         <span class="nav-item-text">
           <span class="nav-item-title">${escapeHtml(item.title)}</span>
           <span class="nav-item-sub">${escapeHtml(item.subtitle)}</span>
         </span>
-        ${activeMenu && activeMenu.id === item.id ? '<span class="nav-active-dot" title="กำลังเปิดใช้งาน"></span>' : externalIcon}
+        ${activeMenu && activeMenu.id === item.id ? '<span class="nav-active-dot" title="กำลังเปิดใช้งาน"></span>' : ''}
       `;
 
       btn.addEventListener('pointermove', (e) => {
@@ -456,29 +448,56 @@
     }, 320);
   }
 
-  function selectMenuItem(item) {
-    if (openInNewTab) {
-      activeMenu = item;
-      applyAdaptiveTheme(item);
-      updateWelcomeStage(item);
+  function launchMenuInNewTab(item) {
+    if (isLaunchingTab) return;
+    isLaunchingTab = true;
 
-      // Ensure iframe viewport & orb stay hidden in new-tab mode
-      el.contentFrame.src = 'about:blank';
-      el.appViewport.classList.add('hidden');
-      el.floatingOrbWrap.classList.add('hidden');
-      el.collapseToOrbBtn.classList.add('hidden');
-      el.sidebarBackdrop.classList.add('hidden');
-      el.sidebarBackdrop.classList.remove('visible');
-      el.welcomeStage.classList.remove('hidden');
+    activeMenu = item;
+    applyAdaptiveTheme(item);
+    updateWelcomeStage(item);
 
-      renderSidebarMenu(el.menuSearchInput.value);
+    // Ensure iframe viewport & orb stay hidden in new-tab mode
+    el.contentFrame.src = 'about:blank';
+    el.appViewport.classList.add('hidden');
+    el.floatingOrbWrap.classList.add('hidden');
+    el.collapseToOrbBtn.classList.add('hidden');
+    el.sidebarBackdrop.classList.add('hidden');
+    el.sidebarBackdrop.classList.remove('visible');
+    el.welcomeStage.classList.remove('hidden');
 
+    renderSidebarMenu(el.menuSearchInput.value);
+
+    // Trigger 3D screen-rotate portal launch animation
+    if (el.stageCard) {
+      el.stageCard.classList.remove('is-returning', 'is-launching');
+      el.welcomeStage.classList.remove('is-launching');
+      void el.stageCard.offsetWidth; // force reflow for repeated clicks
+      el.welcomeStage.classList.add('is-launching');
+      el.stageCard.classList.add('is-launching');
+    }
+
+    setTimeout(() => {
       const opened = window.open(item.url, '_blank', 'noopener,noreferrer');
       showToast(
         opened
           ? `เปิด ${item.title} ในแท็บใหม่แล้ว`
-          : 'เบราว์เซอร์บล็อกป๊อปอัป กรุณากดปุ่ม "เปิดในแท็บใหม่"'
+          : 'เบราว์เซอร์บล็อกป๊อปอัป กรุณากดที่โลโก้กลางจอเพื่อเปิดในแท็บใหม่'
       );
+    }, 380);
+
+    setTimeout(() => {
+      el.welcomeStage.classList.remove('is-launching');
+      if (el.stageCard) {
+        el.stageCard.classList.remove('is-launching');
+        el.stageCard.classList.add('is-returning');
+      }
+      isLaunchingTab = false;
+    }, 560);
+  }
+
+  function selectMenuItem(item) {
+    if (openInNewTab) {
+      launchMenuInNewTab(item);
       return;
     }
 
@@ -703,14 +722,6 @@
     // Clicking the center stage logo launches the previewed menu
     el.stageHeroIcon.addEventListener('click', () => {
       if (previewedMenu) selectMenuItem(previewedMenu);
-    });
-
-    el.stageLaunchBtn.addEventListener('click', () => {
-      if (!previewedMenu) return;
-      activeMenu = previewedMenu;
-      applyAdaptiveTheme(previewedMenu);
-      renderSidebarMenu(el.menuSearchInput.value);
-      showToast(`เปิด ${previewedMenu.title} ในแท็บใหม่แล้ว`);
     });
 
     // Bottom Settings & Theme Switch
