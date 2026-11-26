@@ -680,7 +680,7 @@
 
     el.loginScreen.classList.add('hidden');
     el.welcomeStage.classList.remove('hidden');
-    openSidebar();
+    openSidebar(true);
   }
 
   function logout() {
