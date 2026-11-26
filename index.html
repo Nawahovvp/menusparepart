@@ -257,10 +257,14 @@
 
       <!-- User Profile & Logout -->
       <div class="sidebar-user-card">
-        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-avatar" id="userAvatar" aria-label="User Avatar">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="13.5" r="5.5" fill="currentColor" fill-opacity="0.95"/>
+            <path d="M7.5 30.5C8.6 24.8 12.8 21.5 18 21.5C23.2 21.5 27.4 24.8 28.5 30.5" fill="currentColor" fill-opacity="0.9"/>
+          </svg>
+        </div>
         <div class="user-meta">
           <strong id="userDisplayName">ผู้ใช้งาน</strong>
-          <span id="userSubInfo">IDUser: -</span>
         </div>
         <button type="button" class="logout-icon-btn" id="logoutBtn" title="ออกจากระบบ" aria-label="ออกจากระบบ">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>

@@ -94,7 +94,7 @@
     },
     {
       id: 'tank-recharge',
-      title: 'รับส่งถังบรรจุกาซ์',
+      title: 'รับส่งถังบรรจุก๊าซ',
       subtitle: 'Gas Cylinder Recharge & Logistics',
       url: 'https://tank-recharge.vercel.app/',
       color1: '#f43f5e',
@@ -115,6 +115,7 @@
   let autoCollapseToOrb = true;
   let openInNewTab = true;
   let isLaunchingTab = false;
+  let stageHideTimer = null;
   let toastTimer = null;
 
   const el = {
@@ -315,21 +316,43 @@
   /* ------------------------------------------------------------------------
      User Profile & Stage Preview
      ------------------------------------------------------------------------ */
+  const USER_AVATAR_SVG = `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="avatarSkin" x1="20" y1="12" x2="46" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFE0C2"/>
+          <stop offset="1" stop-color="#F3B890"/>
+        </linearGradient>
+        <linearGradient id="avatarShirt" x1="12" y1="42" x2="52" y2="64" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFFFFF" stop-opacity="0.95"/>
+          <stop offset="1" stop-color="#DBEAFE" stop-opacity="0.88"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 64C13.5 49.5 21 43 32 43C43 43 50.5 49.5 52 64H12Z" fill="url(#avatarShirt)"/>
+      <path d="M26 43.5L32 50L38 43.5" fill="#93C5FD" fill-opacity="0.55"/>
+      <rect x="27.5" y="34" width="9" height="11" rx="4.5" fill="#E8A87C"/>
+      <circle cx="32" cy="25.5" r="11.5" fill="url(#avatarSkin)"/>
+      <path d="M20.5 24.5C20.5 16.5 25.5 11.5 32.5 11.5C39.2 11.5 43.8 15.8 43.8 23.2C41.2 19.6 37.4 18.2 32 18.2C27 18.2 23.2 20.4 20.5 24.5Z" fill="#1E293B"/>
+      <circle cx="28" cy="26" r="1.4" fill="#1E293B"/>
+      <circle cx="36" cy="26" r="1.4" fill="#1E293B"/>
+      <path d="M28.8 30.8C30.4 32.2 33.6 32.2 35.2 30.8" stroke="#9A5B3A" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  `;
+
   function renderUserProfile(user) {
     const displayName = user.Nicname
       ? `${user.Name || user.IDUser} (${user.Nicname})`
       : user.Name || user.IDUser;
-    const initial = (user.Nicname || user.Name || user.IDUser || 'U').trim().charAt(0).toUpperCase();
     const plantLabel = [user.Plant, user.PlantCode].filter(Boolean).join(' · ') || 'Operations Menu';
 
-    el.userAvatar.textContent = initial;
+    el.userAvatar.innerHTML = USER_AVATAR_SVG;
     el.userDisplayName.textContent = displayName;
-    el.userSubInfo.textContent = `ID: ${user.IDUser}`;
+    if (el.userSubInfo) el.userSubInfo.textContent = `ID: ${user.IDUser}`;
     el.brandPlantSub.textContent = plantLabel;
     el.stagePlantBadge.textContent = plantLabel;
 
     // Populate User-Focused Settings Modal
-    el.settingsAvatarLg.textContent = initial;
+    el.settingsAvatarLg.innerHTML = USER_AVATAR_SVG;
     el.settingsHeroName.textContent = displayName;
     el.settingsHeroPlant.textContent = plantLabel;
 
@@ -337,6 +360,21 @@
     el.infoNicname.textContent = user.Nicname || '-';
     el.infoPlant.textContent = user.Plant || '-';
     el.infoPlantCode.textContent = user.PlantCode || '-';
+  }
+
+  function showStagePreview() {
+    clearTimeout(stageHideTimer);
+    el.welcomeStage.classList.add('is-stage-visible');
+  }
+
+  function scheduleHideStagePreview() {
+    if (isLaunchingTab) return;
+    clearTimeout(stageHideTimer);
+    stageHideTimer = setTimeout(() => {
+      if (!isLaunchingTab) {
+        el.welcomeStage.classList.remove('is-stage-visible');
+      }
+    }, 260);
   }
 
   function updateWelcomeStage(item) {
@@ -397,6 +435,7 @@
       btn.addEventListener('mouseenter', () => {
         applyAdaptiveTheme(item);
         if (!activeMenu || openInNewTab) updateWelcomeStage(item);
+        showStagePreview();
       });
 
       btn.addEventListener('click', () => {
@@ -416,11 +455,11 @@
     document.body.classList.toggle('sidebar-mini', mini);
   }
 
-  function openSidebar() {
+  function openSidebar(mini = false) {
     isSidebarVisible = true;
     el.floatingOrbWrap.classList.add('hidden');
     el.sidebar.classList.remove('hidden', 'is-collapsing-to-orb');
-    setSidebarMini(false);
+    setSidebarMini(mini);
 
     if (activeMenu && !openInNewTab) {
       el.sidebarBackdrop.classList.remove('hidden');
@@ -432,9 +471,26 @@
     }
   }
 
+  const DEFAULT_HUB_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>`;
+
   function collapseSidebarToOrb() {
-    if (!activeMenu || openInNewTab) return;
+    if (!currentUser || !isSidebarVisible) return;
     isSidebarVisible = false;
+    clearTimeout(stageHideTimer);
+    el.welcomeStage.classList.remove('is-stage-visible');
+
+    // Sync orb icon & pill info
+    const orbItem = activeMenu || previewedMenu;
+    el.floatingOrbIcon.innerHTML = orbItem ? orbItem.icon : DEFAULT_HUB_ICON;
+    el.orbActiveName.textContent = orbItem ? orbItem.title : 'Plant Hub';
+    el.orbReloadBtn.classList.toggle('hidden', openInNewTab || !activeMenu);
+    if (orbItem) {
+      el.orbExternalLink.href = orbItem.url;
+      el.orbExternalLink.classList.remove('hidden');
+    } else {
+      el.orbExternalLink.classList.add('hidden');
+    }
+
     el.sidebar.classList.add('is-collapsing-to-orb');
     el.sidebarBackdrop.classList.remove('visible');
 
@@ -468,6 +524,7 @@
     renderSidebarMenu(el.menuSearchInput.value);
 
     // Trigger 3D screen-rotate portal launch animation
+    showStagePreview();
     if (el.stageCard) {
       el.stageCard.classList.remove('is-returning', 'is-launching');
       el.welcomeStage.classList.remove('is-launching');
@@ -492,6 +549,9 @@
         el.stageCard.classList.add('is-returning');
       }
       isLaunchingTab = false;
+      if (!el.sidebar.matches(':hover') && !(el.stageCard && el.stageCard.matches(':hover'))) {
+        scheduleHideStagePreview();
+      }
     }, 560);
   }
 
@@ -700,8 +760,8 @@
       el.toggleAllLabel.textContent = isMenuListExpanded ? 'ซ่อนเมนู' : 'แสดงทั้งหมด';
     });
 
-    // Floating Top-Left Circle Orb -> Re-open Left Sidebar
-    el.floatingOrbBtn.addEventListener('click', openSidebar);
+    // Floating Top-Left Circle Orb -> Re-open Left Sidebar in Mini Mode
+    el.floatingOrbBtn.addEventListener('click', () => openSidebar(true));
     el.collapseToOrbBtn.addEventListener('click', collapseSidebarToOrb);
     el.sidebarBackdrop.addEventListener('click', () => {
       if (activeMenu) collapseSidebarToOrb();
@@ -717,6 +777,28 @@
 
     el.contentFrame.addEventListener('load', () => {
       el.iframeLoader.classList.remove('visible');
+    });
+
+    // Show center stage card only while hovering the sidebar (or the card itself)
+    el.sidebar.addEventListener('mouseenter', showStagePreview);
+    el.sidebar.addEventListener('mouseleave', scheduleHideStagePreview);
+    if (el.stageCard) {
+      el.stageCard.addEventListener('mouseenter', showStagePreview);
+      el.stageCard.addEventListener('mouseleave', scheduleHideStagePreview);
+    }
+
+    // Clicking on the empty background collapses the sidebar into the top-left circle orb
+    document.addEventListener('click', (e) => {
+      if (!currentUser || !isSidebarVisible) return;
+      if (!el.settingsModal.classList.contains('hidden')) return;
+      if (
+        el.sidebar.contains(e.target) ||
+        el.floatingOrbWrap.contains(e.target) ||
+        (el.stageCard && el.stageCard.contains(e.target))
+      ) {
+        return;
+      }
+      collapseSidebarToOrb();
     });
 
     // Clicking the center stage logo launches the previewed menu
@@ -778,7 +860,7 @@
       if (e.key === 'Escape') {
         if (!el.settingsModal.classList.contains('hidden')) {
           closeSettingsModal();
-        } else if (isSidebarVisible && activeMenu && !openInNewTab) {
+        } else if (isSidebarVisible) {
           collapseSidebarToOrb();
         }
       } else if (e.key === '/' && isSidebarVisible && document.activeElement !== el.menuSearchInput) {
