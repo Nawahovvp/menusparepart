@@ -838,6 +838,29 @@ html[data-theme="light"] .ambient-vignette {
   flex-shrink: 0;
 }
 
+.nav-external-icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  opacity: 0.65;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-external-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.nav-item:hover .nav-external-icon {
+  opacity: 1;
+  color: var(--text-primary);
+  transform: translate(1px, -1px);
+}
+
 .sidebar-empty {
   text-align: center;
   padding: 20px 8px;
@@ -1015,6 +1038,7 @@ html[data-theme="dark"] .mode-switch-knob {
 .sidebar.is-mini .sidebar-section-head,
 .sidebar.is-mini .nav-item-text,
 .sidebar.is-mini .nav-active-dot,
+.sidebar.is-mini .nav-external-icon,
 .sidebar.is-mini .footer-item-label,
 .sidebar.is-mini .mode-switch,
 .sidebar.is-mini .user-meta,
@@ -1146,6 +1170,7 @@ body.sidebar-mini .welcome-stage {
   font-family: inherit;
   font-size: 0.92rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   box-shadow: 0 12px 28px var(--accent-glow);
   transition: transform 0.25s var(--bounce), filter 0.2s ease;

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plant Hub — Interactive Sidebar Menu</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23695cfe' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='2'/%3E%3Crect x='14' y='3' width='7' height='7' rx='2'/%3E%3Crect x='14' y='14' width='7' height='7' rx='2'/%3E%3Crect x='3' y='14' width='7' height='7' rx='2'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -283,6 +284,17 @@
         aria-label="คลิกที่โลโก้เพื่อเปิดระบบนี้"
       ></button>
       <h2 id="stageHeroTitle">เลือกเมนูจากแถบด้านซ้าย</h2>
+      <p id="stageHeroSubtitle">เลือกเมนูด้านซ้ายเพื่อเปิดระบบงานในแท็บใหม่</p>
+      <a
+        id="stageLaunchBtn"
+        class="stage-primary-btn hidden"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span>เปิดในแท็บใหม่</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+      </a>
     </div>
   </section>
 
@@ -340,8 +352,19 @@
         <!-- Compact Behavior Setting -->
         <div class="setting-row">
           <div class="setting-info">
+            <strong>เปิดเมนูในแท็บใหม่ (แนะนำ)</strong>
+            <span>เปิดระบบงานในแท็บใหม่เพื่อไม่ให้เบราว์เซอร์บล็อก Cookie การเข้าสู่ระบบ</span>
+          </div>
+          <label class="toggle-control">
+            <input type="checkbox" id="openNewTabCheckbox" checked />
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
             <strong>หุบเมนูเป็นวงกลมมุมซ้ายบนอัตโนมัติ</strong>
-            <span>เมื่อเลือกเมนู ให้หุบแถบด้านซ้ายเป็นปุ่มวงกลมลอยมุมซ้ายบน</span>
+            <span>เมื่อเลือกเมนูในโหมดหน้าต่างเดิม ให้หุบแถบด้านซ้ายเป็นปุ่มวงกลมลอยมุมซ้ายบน</span>
           </div>
           <label class="toggle-control">
             <input type="checkbox" id="autoOrbCheckbox" checked />

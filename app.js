@@ -22,6 +22,7 @@
     SESSION: 'plant_hub_user_session_v1',
     THEME: 'plant_hub_theme_v1',
     AUTO_ORB: 'plant_hub_auto_orb_v1',
+    OPEN_NEW_TAB: 'plant_hub_open_new_tab_v1',
   };
 
   const MENU_ITEMS = [
@@ -112,6 +113,7 @@
   let isSidebarMini = false;
   let isMenuListExpanded = true;
   let autoCollapseToOrb = true;
+  let openInNewTab = true;
   let toastTimer = null;
 
   const el = {
@@ -149,6 +151,8 @@
     stagePlantBadge: document.getElementById('stagePlantBadge'),
     stageHeroIcon: document.getElementById('stageHeroIcon'),
     stageHeroTitle: document.getElementById('stageHeroTitle'),
+    stageHeroSubtitle: document.getElementById('stageHeroSubtitle'),
+    stageLaunchBtn: document.getElementById('stageLaunchBtn'),
 
     appViewport: document.getElementById('appViewport'),
     contentFrame: document.getElementById('contentFrame'),
@@ -168,6 +172,7 @@
     closeSettingsBtn: document.getElementById('closeSettingsBtn'),
     settingsDoneBtn: document.getElementById('settingsDoneBtn'),
     settingsLogoutBtn: document.getElementById('settingsLogoutBtn'),
+    openNewTabCheckbox: document.getElementById('openNewTabCheckbox'),
     autoOrbCheckbox: document.getElementById('autoOrbCheckbox'),
     settingsAvatarLg: document.getElementById('settingsAvatarLg'),
     settingsHeroName: document.getElementById('settingsHeroName'),
@@ -339,10 +344,16 @@
     if (!item) {
       el.stageHeroIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>`;
       el.stageHeroTitle.textContent = 'เลือกเมนูจากแถบด้านซ้าย';
+      el.stageHeroSubtitle.textContent = 'เลือกเมนูด้านซ้ายเพื่อเปิดระบบงานในแท็บใหม่';
+      el.stageLaunchBtn.classList.add('hidden');
+      el.stageLaunchBtn.href = '#';
       return;
     }
     el.stageHeroIcon.innerHTML = item.icon;
     el.stageHeroTitle.textContent = item.title;
+    el.stageHeroSubtitle.textContent = item.subtitle;
+    el.stageLaunchBtn.href = item.url;
+    el.stageLaunchBtn.classList.remove('hidden');
   }
 
   /* ------------------------------------------------------------------------
@@ -372,13 +383,17 @@
       btn.style.setProperty('--item-c2', item.color2);
       btn.style.setProperty('--item-glow', item.glow);
 
+      const externalIcon = openInNewTab
+        ? `<span class="nav-external-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span>`
+        : '';
+
       btn.innerHTML = `
         <span class="nav-item-icon">${item.icon}</span>
         <span class="nav-item-text">
           <span class="nav-item-title">${escapeHtml(item.title)}</span>
           <span class="nav-item-sub">${escapeHtml(item.subtitle)}</span>
         </span>
-        ${activeMenu && activeMenu.id === item.id ? '<span class="nav-active-dot" title="กำลังเปิดใช้งาน"></span>' : ''}
+        ${activeMenu && activeMenu.id === item.id ? '<span class="nav-active-dot" title="กำลังเปิดใช้งาน"></span>' : externalIcon}
       `;
 
       btn.addEventListener('pointermove', (e) => {
@@ -389,7 +404,7 @@
 
       btn.addEventListener('mouseenter', () => {
         applyAdaptiveTheme(item);
-        if (!activeMenu) updateWelcomeStage(item);
+        if (!activeMenu || openInNewTab) updateWelcomeStage(item);
       });
 
       btn.addEventListener('click', () => {
@@ -415,7 +430,7 @@
     el.sidebar.classList.remove('hidden', 'is-collapsing-to-orb');
     setSidebarMini(false);
 
-    if (activeMenu) {
+    if (activeMenu && !openInNewTab) {
       el.sidebarBackdrop.classList.remove('hidden');
       requestAnimationFrame(() => el.sidebarBackdrop.classList.add('visible'));
       applyAdaptiveTheme(activeMenu);
@@ -426,7 +441,7 @@
   }
 
   function collapseSidebarToOrb() {
-    if (!activeMenu) return;
+    if (!activeMenu || openInNewTab) return;
     isSidebarVisible = false;
     el.sidebar.classList.add('is-collapsing-to-orb');
     el.sidebarBackdrop.classList.remove('visible');
@@ -442,6 +457,31 @@
   }
 
   function selectMenuItem(item) {
+    if (openInNewTab) {
+      activeMenu = item;
+      applyAdaptiveTheme(item);
+      updateWelcomeStage(item);
+
+      // Ensure iframe viewport & orb stay hidden in new-tab mode
+      el.contentFrame.src = 'about:blank';
+      el.appViewport.classList.add('hidden');
+      el.floatingOrbWrap.classList.add('hidden');
+      el.collapseToOrbBtn.classList.add('hidden');
+      el.sidebarBackdrop.classList.add('hidden');
+      el.sidebarBackdrop.classList.remove('visible');
+      el.welcomeStage.classList.remove('hidden');
+
+      renderSidebarMenu(el.menuSearchInput.value);
+
+      const opened = window.open(item.url, '_blank', 'noopener,noreferrer');
+      showToast(
+        opened
+          ? `เปิด ${item.title} ในแท็บใหม่แล้ว`
+          : 'เบราว์เซอร์บล็อกป๊อปอัป กรุณากดปุ่ม "เปิดในแท็บใหม่"'
+      );
+      return;
+    }
+
     const isSame = activeMenu && activeMenu.id === item.id;
     activeMenu = item;
     applyAdaptiveTheme(item);
@@ -478,6 +518,7 @@
      Settings Modal
      ------------------------------------------------------------------------ */
   function openSettingsModal() {
+    el.openNewTabCheckbox.checked = openInNewTab;
     el.autoOrbCheckbox.checked = autoCollapseToOrb;
     el.settingsModal.classList.remove('hidden');
   }
@@ -664,12 +705,44 @@
       if (previewedMenu) selectMenuItem(previewedMenu);
     });
 
+    el.stageLaunchBtn.addEventListener('click', () => {
+      if (!previewedMenu) return;
+      activeMenu = previewedMenu;
+      applyAdaptiveTheme(previewedMenu);
+      renderSidebarMenu(el.menuSearchInput.value);
+      showToast(`เปิด ${previewedMenu.title} ในแท็บใหม่แล้ว`);
+    });
+
     // Bottom Settings & Theme Switch
     el.settingsBtn.addEventListener('click', openSettingsModal);
     el.closeSettingsBtn.addEventListener('click', closeSettingsModal);
     el.settingsDoneBtn.addEventListener('click', closeSettingsModal);
     el.settingsBackdrop.addEventListener('click', closeSettingsModal);
     el.settingsLogoutBtn.addEventListener('click', logout);
+
+    el.openNewTabCheckbox.addEventListener('change', (e) => {
+      openInNewTab = e.target.checked;
+      localStorage.setItem(STORAGE_KEYS.OPEN_NEW_TAB, openInNewTab ? '1' : '0');
+      renderSidebarMenu(el.menuSearchInput.value);
+
+      if (openInNewTab && !el.appViewport.classList.contains('hidden')) {
+        el.contentFrame.src = 'about:blank';
+        el.appViewport.classList.add('hidden');
+        el.floatingOrbWrap.classList.add('hidden');
+        el.collapseToOrbBtn.classList.add('hidden');
+        el.sidebarBackdrop.classList.add('hidden');
+        el.sidebarBackdrop.classList.remove('visible');
+        el.welcomeStage.classList.remove('hidden');
+        if (activeMenu) updateWelcomeStage(activeMenu);
+        openSidebar();
+      }
+
+      showToast(
+        openInNewTab
+          ? 'เปิดโหมดเปิดเมนูในแท็บใหม่ทั้งหมดแล้ว'
+          : 'เปลี่ยนเป็นโหมดเปิดเมนูในหน้าต่างเดิม (iframe)'
+      );
+    });
 
     el.autoOrbCheckbox.addEventListener('change', (e) => {
       autoCollapseToOrb = e.target.checked;
@@ -694,7 +767,7 @@
       if (e.key === 'Escape') {
         if (!el.settingsModal.classList.contains('hidden')) {
           closeSettingsModal();
-        } else if (isSidebarVisible && activeMenu) {
+        } else if (isSidebarVisible && activeMenu && !openInNewTab) {
           collapseSidebarToOrb();
         }
       } else if (e.key === '/' && isSidebarVisible && document.activeElement !== el.menuSearchInput) {
@@ -711,6 +784,9 @@
 
     const savedAutoOrb = localStorage.getItem(STORAGE_KEYS.AUTO_ORB);
     autoCollapseToOrb = savedAutoOrb === null ? true : savedAutoOrb === '1';
+
+    const savedOpenNewTab = localStorage.getItem(STORAGE_KEYS.OPEN_NEW_TAB);
+    openInNewTab = savedOpenNewTab === null ? true : savedOpenNewTab === '1';
 
     // Set initial toggle label
     el.toggleAllLabel.textContent = 'ซ่อนเมนู';
