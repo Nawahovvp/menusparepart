@@ -543,16 +543,13 @@
     }, 380);
 
     setTimeout(() => {
-      el.welcomeStage.classList.remove('is-launching');
+      clearTimeout(stageHideTimer);
+      el.welcomeStage.classList.remove('is-launching', 'is-stage-visible');
       if (el.stageCard) {
-        el.stageCard.classList.remove('is-launching');
-        el.stageCard.classList.add('is-returning');
+        el.stageCard.classList.remove('is-launching', 'is-returning');
       }
       isLaunchingTab = false;
-      if (!el.sidebar.matches(':hover') && !(el.stageCard && el.stageCard.matches(':hover'))) {
-        scheduleHideStagePreview();
-      }
-    }, 560);
+    }, 540);
   }
 
   function selectMenuItem(item) {
@@ -786,6 +783,20 @@
       el.stageCard.addEventListener('mouseenter', showStagePreview);
       el.stageCard.addEventListener('mouseleave', scheduleHideStagePreview);
     }
+
+    // Hide center stage card cleanly whenever returning to this tab
+    const hideStageOnReturn = () => {
+      if (isLaunchingTab) return;
+      clearTimeout(stageHideTimer);
+      el.welcomeStage.classList.remove('is-stage-visible', 'is-launching');
+      if (el.stageCard) {
+        el.stageCard.classList.remove('is-launching', 'is-returning');
+      }
+    };
+    window.addEventListener('focus', hideStageOnReturn);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) hideStageOnReturn();
+    });
 
     // Clicking on the empty background collapses the sidebar into the top-left circle orb
     document.addEventListener('click', (e) => {
