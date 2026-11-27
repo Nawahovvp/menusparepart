@@ -1,0 +1,239 @@
+/* ==========================================================================
+   StockDay — Unified Raindrop Dark Glassmorphism Theme
+   (Scoped to @media screen so A4 landscape print layout stays crisp)
+   ========================================================================== */
+
+@media screen {
+  html,
+  body {
+    background: transparent !important;
+    background-image: none !important;
+    color: #f4f6fb !important;
+    font-family: 'Plus Jakarta Sans', 'Noto Sans Thai', 'Prompt', system-ui, sans-serif !important;
+  }
+
+  #root {
+    background: transparent !important;
+    padding-top: 16px !important;
+  }
+
+  /* Leave space on top-left for Hub Floating Orb */
+  #root > div > div:first-child {
+    padding-left: 64px;
+  }
+
+  /* Convert Tailwind light cards & surfaces to Dark Frosted Glass
+     (Do NOT put backdrop-filter on #root > .bg-white or it traps position:fixed popups!) */
+  #root > .bg-white {
+    background: rgba(12, 18, 34, 0.56) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(148, 163, 184, 0.26) !important;
+    color: #f4f6fb !important;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  .bg-white,
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-slate-50,
+  .bg-slate-100 {
+    background: rgba(12, 18, 34, 0.5) !important;
+    border: 1px solid rgba(148, 163, 184, 0.26) !important;
+    color: #f4f6fb !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  }
+
+  /* On Process rows/cells (bg-gray-200) — sleek dark translucent slate-amber with high contrast */
+  .bg-gray-200,
+  .bg-slate-200,
+  tbody td.bg-gray-200 {
+    background: rgba(51, 65, 85, 0.62) !important;
+    border-color: rgba(148, 163, 184, 0.28) !important;
+    color: #fde68a !important;
+  }
+
+  /* Soft Tinted Translucent KPI Cards */
+  .bg-blue-50,
+  .bg-blue-100 {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.34), rgba(37, 99, 235, 0.3)) !important;
+    border: 1px solid rgba(125, 211, 252, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  .bg-green-50,
+  .bg-green-100,
+  .bg-green-200,
+  .bg-emerald-50 {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.34), rgba(5, 150, 105, 0.3)) !important;
+    border: 1px solid rgba(110, 231, 183, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  .bg-yellow-50,
+  .bg-yellow-100,
+  .bg-amber-50,
+  .bg-orange-100 {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.34), rgba(217, 119, 6, 0.3)) !important;
+    border: 1px solid rgba(253, 230, 138, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  .bg-red-50,
+  .bg-red-100 {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.34), rgba(185, 28, 28, 0.3)) !important;
+    border: 1px solid rgba(252, 165, 165, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  .bg-purple-50,
+  .bg-purple-100,
+  .bg-indigo-50 {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.34), rgba(109, 40, 217, 0.3)) !important;
+    border: 1px solid rgba(221, 214, 254, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  /* High-Contrast Dark Mode Text Overrides for Tailwind utility classes */
+  .text-gray-900,
+  .text-gray-800,
+  .text-slate-900,
+  .text-slate-800,
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #f8fafc !important;
+  }
+
+  .text-gray-700,
+  .text-gray-600,
+  .text-gray-500,
+  .text-slate-600,
+  label {
+    color: #cbd5e1 !important;
+  }
+
+  .text-blue-900,
+  .text-blue-800,
+  .text-blue-700,
+  .text-blue-600 {
+    color: #7dd3fc !important;
+  }
+
+  .text-green-800,
+  .text-green-700,
+  .text-green-600 {
+    color: #6ee7b7 !important;
+  }
+
+  .text-red-700,
+  .text-red-600,
+  .text-red-500 {
+    color: #fca5a5 !important;
+  }
+
+  .text-yellow-700,
+  .text-yellow-600,
+  .text-amber-700 {
+    color: #fde68a !important;
+  }
+
+  .text-purple-700,
+  .text-purple-600 {
+    color: #d8b4fe !important;
+  }
+
+  /* Borders */
+  .border,
+  .border-gray-200,
+  .border-gray-300 {
+    border-color: rgba(148, 163, 184, 0.24) !important;
+  }
+
+  /* Inputs & Selects */
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="password"],
+  select,
+  textarea {
+    background: rgba(15, 23, 42, 0.68) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.34) !important;
+    border-radius: 10px !important;
+  }
+
+  select option {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  /* Tables */
+  table {
+    background: transparent !important;
+    color: #f1f5f9 !important;
+  }
+
+  thead,
+  thead tr,
+  thead th {
+    background: rgba(15, 23, 42, 0.86) !important;
+    color: #ffffff !important;
+    border-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  tbody tr {
+    background: rgba(15, 23, 42, 0.38) !important;
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.44) !important;
+  }
+
+  tbody tr:hover {
+    background: rgba(56, 189, 248, 0.2) !important;
+  }
+
+  tbody td {
+    color: #f1f5f9 !important;
+    border-color: rgba(148, 163, 184, 0.16) !important;
+  }
+
+  /* Recharts Dark-Mode Axis, Legend, Grid & Tooltip (preserve custom LabelList colors) */
+  .recharts-cartesian-axis-tick-value,
+  .recharts-cartesian-axis-tick text,
+  .recharts-yAxis .recharts-label,
+  .recharts-legend-item-text {
+    fill: #e2e8f0 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .recharts-cartesian-grid line {
+    stroke: rgba(148, 163, 184, 0.2) !important;
+  }
+
+  .recharts-tooltip-wrapper .bg-white {
+    background: rgba(12, 18, 34, 0.92) !important;
+    border: 1px solid rgba(125, 211, 252, 0.45) !important;
+    color: #f8fafc !important;
+  }
+
+  /* Modals (HistoryPopup, SummaryHistoryPopup, UserPopup) */
+  .fixed.inset-0 {
+    background: rgba(5, 9, 18, 0.72) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    z-index: 9999 !important;
+    padding: 16px !important;
+  }
+
+  .fixed.inset-0 > .bg-white {
+    background: rgba(12, 18, 34, 0.92) !important;
+    backdrop-filter: blur(20px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.34) !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+}

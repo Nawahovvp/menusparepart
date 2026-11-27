@@ -29,6 +29,8 @@ function apiDevServerPlugin() {
             handlerModule = await import('./functions/api/save.js');
           } else if (route === 'outside-request') {
             handlerModule = await import('./functions/api/outside-request.js');
+          } else if (route === 'web-data') {
+            handlerModule = await import('./functions/api/web-data.js');
           } else {
             return next();
           }
@@ -109,7 +111,8 @@ export default defineConfig(({ mode }) => {
         ignored: [
           '**/callsparepart-cloudflare/**',
           '**/ABC-Analysis-New-Plant-All/**',
-          '**/Barcode-Nawanakorn-Web/**'
+          '**/Barcode-Nawanakorn-Web/**',
+          '**/Stockday_Auth/**'
         ]
       }
     }

@@ -4,6 +4,7 @@ import * as dataApi from './functions/api/data.js';
 import * as quickDataApi from './functions/api/quick-data.js';
 import * as saveApi from './functions/api/save.js';
 import * as outsideRequestApi from './functions/api/outside-request.js';
+import * as webDataApi from './functions/api/web-data.js';
 
 const API_ROUTES = {
   login: loginApi,
@@ -12,6 +13,7 @@ const API_ROUTES = {
   'quick-data': quickDataApi,
   save: saveApi,
   'outside-request': outsideRequestApi,
+  'web-data': webDataApi,
 };
 
 export default {

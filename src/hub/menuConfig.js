@@ -59,7 +59,8 @@ export const MENU_ITEMS = [
   },
   {
     id: 'stockday',
-    type: 'none',
+    type: 'embedded',
+    embedUrl: '/apps/stockday/index.html',
     title: 'StockDay',
     subtitle: 'ติดตามวันคงเหลือสต็อกสินค้า',
     color1: '#3b82f6',
