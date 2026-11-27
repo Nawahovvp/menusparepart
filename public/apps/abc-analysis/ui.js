@@ -732,15 +732,41 @@ function updateActualOrderSummary(baseData) {
 }
 
 function getStatusClass(status) {
-    if (!status || status.trim() === '') return "status-other";
-    const s = status.toLowerCase();
-    if (s.includes('bycase') || s.includes('pending') || s.includes('รอดำเนินการ')) return "status-pending";
-    if (s.includes('ยกเลิก') || s.includes('cancel') || s.includes('rejected') || s.includes('ปฏิเสธ') || s.includes('reject')) return "status-rejected";
-    if (s.includes('order')) return "status-order";
-    if (s.includes('approved') || s.includes('อนุมัติ') || s.includes('approve')) return "status-approved";
-    if (s.includes('complete') || s.includes('เสร็จสิ้น') || s.includes('completed')) return "status-approved";
-    if (s.includes('active') || s.includes('ใช้งาน')) return "status-approved";
-    return "status-other";
+    if (!status || status.trim() === '' || status.trim() === '-') return "status-empty";
+    const s = status.toLowerCase().trim();
+    const compact = s.replace(/[\s_-]+/g, '');
+    if (s.includes('ยกเลิก') || s.includes('cancel') || s.includes('rejected') || s.includes('ปฏิเสธ') || s.includes('reject')) {
+        return "status-rejected";
+    }
+    if (compact.includes('inactive') || compact.includes('nonactive') || s.includes('เลิกใช้') || s.includes('dead') || s.includes('stop') || s.includes('ไม่ใช้')) {
+        return "status-rose";
+    }
+    if (compact.includes('bycase')) {
+        return "status-pending";
+    }
+    if (s.includes('pending') || s.includes('รอดำเนินการ') || s.includes('รอ') || s.includes('hold') || s.includes('wait')) {
+        return "status-orange";
+    }
+    if (s.includes('order') || s.includes('สั่ง') || s.includes('ขอซื้อ') || s.includes('เบิก') || s === 'po' || s === 'pr') {
+        return "status-order";
+    }
+    if (s.includes('ทดแทน') || s.includes('rebuilt') || s.includes('เปลี่ยน')) {
+        return "status-lime";
+    }
+    if (s.includes('return') || s.includes('คืน')) {
+        return "status-purple";
+    }
+    if (s.includes('active') || s.includes('ใช้งาน') || s.includes('ปกติ') || s.includes('approved') || s.includes('อนุมัติ') || s.includes('approve') || s.includes('complete') || s.includes('เสร็จสิ้น') || s.includes('สำเร็จ')) {
+        return "status-approved";
+    }
+    // Distinct deterministic color for every other unique Status string
+    const palette = ["status-cyan", "status-pink", "status-indigo", "status-teal", "status-yellow", "status-coral"];
+    let hash = 0;
+    for (let i = 0; i < compact.length; i++) {
+        hash = ((hash << 5) - hash) + compact.charCodeAt(i);
+        hash |= 0;
+    }
+    return palette[Math.abs(hash) % palette.length];
 }
 
 let poModalBound = false;

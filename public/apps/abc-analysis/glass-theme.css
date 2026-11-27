@@ -63,22 +63,31 @@ h1 {
 .slowly { background: linear-gradient(135deg, rgba(148, 163, 184, 0.5), rgba(100, 116, 139, 0.42)) !important; }
 .dead { background: linear-gradient(135deg, rgba(71, 85, 105, 0.62), rgba(30, 41, 59, 0.52)) !important; }
 
-/* Control Groups & Plant Cards */
+/* Control Groups, Responsible Filter & Plant Cards */
 .control-group,
+#responsibleFilterContainer,
 .plant-card,
 .plant-btn,
 .plant-grid button {
   background: rgba(15, 23, 42, 0.5) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
   color: #f8fafc !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24) !important;
 }
 
 .control-group label,
-.control-group span {
+.control-group span,
+#responsibleFilterContainer label,
+#responsibleFilterContainer span {
   color: #e2e8f0 !important;
+}
+
+#responsibleFilter {
+  background: rgba(15, 23, 42, 0.62) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
 }
 
 input[type="text"],
@@ -325,12 +334,122 @@ textarea::placeholder {
   text-underline-offset: 3px;
 }
 
+.status-purple,
+.table-container .status-purple {
+  background: transparent !important;
+  border: none !important;
+  color: #c084fc !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-rose,
+.table-container .status-rose {
+  background: transparent !important;
+  border: none !important;
+  color: #fb7185 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-orange,
+.table-container .status-orange {
+  background: transparent !important;
+  border: none !important;
+  color: #fb923c !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-lime,
+.table-container .status-lime {
+  background: transparent !important;
+  border: none !important;
+  color: #a3e635 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-cyan,
+.table-container .status-cyan {
+  background: transparent !important;
+  border: none !important;
+  color: #22d3ee !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-pink,
+.table-container .status-pink {
+  background: transparent !important;
+  border: none !important;
+  color: #f472b6 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-indigo,
+.table-container .status-indigo {
+  background: transparent !important;
+  border: none !important;
+  color: #818cf8 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-teal,
+.table-container .status-teal {
+  background: transparent !important;
+  border: none !important;
+  color: #2dd4bf !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-yellow,
+.table-container .status-yellow {
+  background: transparent !important;
+  border: none !important;
+  color: #fde047 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-coral,
+.table-container .status-coral {
+  background: transparent !important;
+  border: none !important;
+  color: #fda4af !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
 .status-other,
 .table-container .status-other {
   background: transparent !important;
   border: none !important;
-  color: #cbd5e1 !important;
-  font-weight: 600 !important;
+  color: #67e8f9 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-empty,
+.table-container .status-empty {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
 }
 
 .moving-fast,
@@ -401,4 +520,31 @@ textarea::placeholder {
   background: rgba(56, 189, 248, 0.22) !important;
   border: 1px solid rgba(125, 211, 252, 0.5) !important;
   color: #bae6fd !important;
+}
+
+/* Prominent Last-Update Timestamp & Summary Labels */
+#lastUpdateLabel {
+  color: #e0f2fe !important;
+  background: rgba(15, 23, 42, 0.68) !important;
+  border: 1px solid rgba(125, 211, 252, 0.48) !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  display: inline-flex !important;
+  align-items: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+#lastUpdateLabel:empty {
+  display: none !important;
+}
+
+#actualOrderSummary,
+#tableInfo,
+.pagination-info {
+  color: #e2e8f0 !important;
+  font-weight: 600 !important;
 }
