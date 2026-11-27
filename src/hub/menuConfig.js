@@ -71,7 +71,8 @@ export const MENU_ITEMS = [
   },
   {
     id: 'tank-recharge',
-    type: 'none',
+    type: 'embedded',
+    embedUrl: '/apps/tank-recharge/index.html',
     title: 'รับส่งถังบรรจุก๊าซ',
     subtitle: 'Gas Cylinder Recharge & Logistics',
     color1: '#f43f5e',

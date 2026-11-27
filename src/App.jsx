@@ -62,6 +62,7 @@ function clearSession() {
   localStorage.removeItem('rememberedUser');
   sessionStorage.removeItem('loggedUser');
   localStorage.removeItem('barcode-login');
+  localStorage.removeItem('tankRechargeUser');
 }
 
 function getInitialMenu() {

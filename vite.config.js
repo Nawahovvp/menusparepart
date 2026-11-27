@@ -112,7 +112,8 @@ export default defineConfig(({ mode }) => {
           '**/callsparepart-cloudflare/**',
           '**/ABC-Analysis-New-Plant-All/**',
           '**/Barcode-Nawanakorn-Web/**',
-          '**/Stockday_Auth/**'
+          '**/Stockday_Auth/**',
+          '**/TankRecharge/**'
         ]
       }
     }

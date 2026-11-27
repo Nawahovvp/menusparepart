@@ -1,0 +1,132 @@
+/* ==========================================================================
+   TankRecharge — Unified Raindrop Dark Glassmorphism Theme
+   (Scoped to @media screen so print receipts/reports stay clean)
+   ========================================================================== */
+
+@media screen {
+  :root {
+    --bg-primary: transparent;
+    --bg-secondary: rgba(12, 18, 34, 0.52);
+    --bg-card: rgba(14, 20, 36, 0.5);
+    --bg-card2: rgba(24, 34, 58, 0.56);
+    --border: rgba(148, 163, 184, 0.24);
+    --border-glow: rgba(125, 211, 252, 0.48);
+    --text-primary: #f8fafc;
+    --text-muted: #cbd5e1;
+    --text-dim: #94a3b8;
+  }
+
+  html,
+  body {
+    background: transparent !important;
+    color: #f8fafc !important;
+  }
+
+  body::before {
+    display: none !important;
+  }
+
+  .app-wrapper {
+    padding-top: 16px !important;
+  }
+
+  /* Header — Frosted Glass + Left padding for Hub Floating Orb */
+  .app-header {
+    background: linear-gradient(135deg, rgba(12, 20, 38, 0.6), rgba(30, 58, 138, 0.44)) !important;
+    backdrop-filter: blur(18px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.28) !important;
+    padding-left: 82px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  }
+
+  /* Translucent Glass Cards, Panels, Tables, Modals */
+  .card,
+  .kpi-card,
+  .summary-card,
+  .stock-card,
+  .stat-card,
+  .table-card,
+  .table-wrap,
+  .filter-bar,
+  .controls-bar,
+  .timeline-card,
+  .timeline-section,
+  .section-card,
+  .panel {
+    background: rgba(14, 20, 36, 0.5) !important;
+    backdrop-filter: blur(16px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(165%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.24) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* Modals & Overlays */
+  .modal-overlay,
+  .overlay,
+  #loginOverlay,
+  #settingOverlay,
+  #helpOverlay {
+    background: rgba(5, 9, 18, 0.72) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  .modal,
+  .modal-box,
+  .modal-content,
+  .modal-dialog {
+    background: rgba(14, 20, 36, 0.9) !important;
+    backdrop-filter: blur(22px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f8fafc !important;
+  }
+
+  /* Tables */
+  table {
+    background: transparent !important;
+    color: #f1f5f9 !important;
+  }
+
+  thead th {
+    background: rgba(15, 23, 42, 0.84) !important;
+    color: #ffffff !important;
+    border-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  tbody tr {
+    background: rgba(15, 23, 42, 0.38) !important;
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.44) !important;
+  }
+
+  tbody tr:hover {
+    background: rgba(56, 189, 248, 0.18) !important;
+  }
+
+  tbody td {
+    color: #f1f5f9 !important;
+    border-color: rgba(148, 163, 184, 0.16) !important;
+  }
+
+  /* Inputs & Selects */
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea {
+    background: rgba(15, 23, 42, 0.68) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  }
+
+  select option {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+  }
+}

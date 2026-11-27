@@ -1,0 +1,3533 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบส่งอัดท่อ</title>
+  <meta name="description" content="ระบบบันทึกการส่งอัดท่อ ไนโตรเจน ออกซิเจน" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://script.google.com" />
+  <link rel="preconnect" href="https://drive.google.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --bg-primary: #0d0f1a;
+      --bg-secondary: #131627;
+      --bg-card: #1a1e33;
+      --bg-card2: #1f2440;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 179, 237, 0.35);
+      --accent1: #63b3ed;
+      --accent2: #76e4f7;
+      --accent-n2: #2dd4bf;
+      /* Mint/Teal */
+      --accent-o2: #fb7185;
+      /* Rose/Crimson */
+      --accent-o2s: #fbbf24;
+      /* Amber/Gold */
+      --accent-rec: #ea580c;
+      /* Dark Orange for Return */
+      --text-primary: #e8eaf0;
+      --text-muted: #8b92b8;
+      --text-dim: #5a6080;
+      --success: #68d391;
+      --danger: #fc8181;
+      --warning: #f6ad55;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+      --shadow-glow: 0 0 24px rgba(99, 179, 237, 0.18);
+      --transition: 0.22s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ===== RESET & BASE ===== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent1);
+      border-radius: 99px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(99, 179, 237, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 80% 80%, rgba(118, 228, 247, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .header-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(99, 179, 237, 0.35);
+    }
+
+    .header-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .header-text p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      margin-left: auto;
+    }
+
+    /* ===== BTN ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #0d192e;
+      box-shadow: 0 4px 18px rgba(99, 179, 237, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(99, 179, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card2);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--accent1);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, rgba(252, 129, 129, 0.1), rgba(252, 129, 129, 0.2));
+      color: #ff8e8e;
+      border: 1px solid rgba(252, 129, 129, 0.4);
+      box-shadow: 0 2px 8px rgba(252, 129, 129, 0.15);
+    }
+
+    .btn-danger:hover {
+      background: rgba(252, 129, 129, 0.3);
+      border-color: #fc8181;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(252, 129, 129, 0.25);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, rgba(104, 211, 145, 0.1), rgba(104, 211, 145, 0.2));
+      color: #89f5b2;
+      border: 1px solid rgba(104, 211, 145, 0.4);
+      box-shadow: 0 2px 8px rgba(104, 211, 145, 0.15);
+    }
+
+    .btn-success:hover {
+      background: rgba(104, 211, 145, 0.3);
+      border-color: #68d391;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(104, 211, 145, 0.25);
+    }
+
+    .btn-print-dark,
+    .btn-date-print {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      border-radius: 6px !important;
+      color: #e2e8f0 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 5px !important;
+      padding: 3px 8px !important;
+      font-size: 0.78rem !important;
+      font-weight: 500 !important;
+      line-height: 1.2 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      user-select: none !important;
+      vertical-align: middle !important;
+    }
+
+    .btn-print-dark svg,
+    .btn-date-print svg {
+      color: #38bdf8 !important;
+      stroke-width: 2.2 !important;
+      transition: transform 0.15s ease, color 0.15s ease !important;
+      flex-shrink: 0 !important;
+    }
+
+    .btn-print-dark:hover,
+    .btn-date-print:hover {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%) !important;
+      border-color: #38bdf8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 10px rgba(56, 189, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-print-dark:hover svg,
+    .btn-date-print:hover svg {
+      color: #7dd3fc !important;
+      transform: scale(1.08) !important;
+    }
+
+    .btn-print-dark:active,
+    .btn-date-print:active {
+      transform: translateY(0) scale(0.97) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ===== FILTER PANEL ===== */
+    .filter-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      margin-bottom: 20px;
+    }
+
+    .filter-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-chip {
+      padding: 8px 18px;
+      border-radius: 99px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--accent1);
+      color: var(--text-primary);
+    }
+
+    .filter-chip.active {
+      background: rgba(99, 179, 237, 0.15);
+      border-color: var(--accent1);
+      color: var(--accent1);
+      box-shadow: 0 0 15px rgba(99, 179, 237, 0.1);
+    }
+
+    .filter-chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ===== STATS PANEL CARD ===== */
+    .stats-panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .stats-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      padding: 16px 18px;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 220px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      transition: var(--transition);
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+    }
+
+    .stat-card:hover {
+      border-color: rgba(99, 179, 237, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 26px rgba(0, 0, 0, 0.38);
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .stat-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    /* Hero section: ค้างส่ง (ใหญ่ เด่น กึ่งกลาง) */
+    .stat-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 0 2px;
+      width: 100%;
+    }
+
+    .stat-hero-lbl {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .stat-hero-val {
+      font-size: 2.75rem;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    /* Sub row: รวม และ คงเหลือ อยู่บรรทัดต่อมา */
+    .stat-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 2px;
+      flex-wrap: wrap;
+    }
+
+    .stat-sub-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      font-size: 0.82rem;
+      transition: var(--transition);
+      cursor: default;
+    }
+
+    .stat-sub-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(99, 179, 237, 0.3);
+    }
+
+    .sub-lbl {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+
+    .sub-val {
+      color: var(--text-primary);
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    .stat-remain-val {
+      color: var(--success);
+    }
+
+    #statN2,
+    #lblN2 {
+      color: var(--accent-n2);
+    }
+
+    #statO2L,
+    #lblO2L {
+      color: var(--accent-o2);
+    }
+
+    #statO2S,
+    #lblO2S {
+      color: var(--accent-o2s);
+    }
+
+    @keyframes blinkAnim {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.15;
+      }
+    }
+
+    .blink {
+      animation: blinkAnim 1.2s infinite;
+    }
+
+    /* ===== TABLE CARD ===== */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .table-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.85rem;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .data-table tbody tr {
+      transition: var(--transition);
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(99, 179, 237, 0.05);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .badge-n2 {
+      background: rgba(104, 211, 145, 0.15);
+      color: var(--accent-n2);
+    }
+
+    .badge-o2 {
+      background: rgba(252, 129, 129, 0.15);
+      color: var(--accent-o2);
+    }
+
+    .badge-o2s {
+      background: rgba(246, 173, 85, 0.15);
+      color: var(--accent-o2s);
+    }
+
+    .data-table th .badge {
+      font-size: 1.1rem;
+      padding: 8px 18px;
+    }
+
+    .img-thumb {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .img-thumb:hover {
+      transform: scale(1.1);
+      border-color: var(--accent1);
+    }
+
+    .no-image {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .expand-btn {
+      background: rgba(99, 179, 237, 0.12);
+      border: 1px solid rgba(99, 179, 237, 0.2);
+      color: var(--accent1);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .expand-btn:hover {
+      background: rgba(99, 179, 237, 0.22);
+    }
+
+    /* Detail row */
+    .detail-row td {
+      padding: 0 !important;
+    }
+
+    .detail-inner {
+      background: rgba(13, 15, 26, 0.6);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease;
+    }
+
+    .detail-inner.open {
+      max-height: 500px;
+    }
+
+    .detail-table-wrap {
+      padding: 12px 24px 16px;
+    }
+
+    .detail-sub-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .detail-sub-table th {
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-dim);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .detail-sub-table td {
+      padding: 8px 12px;
+      font-size: 0.87rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .detail-sub-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 54px;
+      margin-bottom: 14px;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 680px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), var(--shadow-glow);
+      transform: translateY(30px);
+      transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 26px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      z-index: 10;
+    }
+
+    .modal-head h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 24px 26px;
+    }
+
+    .modal-foot {
+      padding: 16px 26px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-card);
+    }
+
+    /* Form */
+    .form-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .form-group input,
+    .form-group select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent1);
+      box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.15);
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--accent1);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Image upload */
+    .img-upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--bg-secondary);
+      position: relative;
+    }
+
+    .img-upload-zone:hover,
+    .img-upload-zone.drag-over {
+      border-color: var(--accent1);
+      background: rgba(99, 179, 237, 0.06);
+    }
+
+    .img-upload-zone input[type="file"] {
+      display: none;
+    }
+
+    .img-upload-zone .upload-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .img-upload-zone p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .img-upload-zone span {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .img-preview-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: 12px;
+    }
+
+    .img-preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .img-preview-item {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      overflow: visible;
+    }
+
+    .img-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .img-preview {
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      object-fit: contain;
+    }
+
+    .img-remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Product rows */
+    .product-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .product-row {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 12px;
+      align-items: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+
+    .product-row .product-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .product-row .product-badge {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .product-row input[type="number"] {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      width: 100%;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .product-row input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent1);
+      box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.15);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .lightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .lightbox-nav:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    .lightbox-prev {
+      left: 20px;
+    }
+
+    .lightbox-next {
+      right: 20px;
+    }
+
+    .lightbox-counter {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .lightbox-close,
+    .lightbox-nav {
+      z-index: 2;
+    }
+
+    .lightbox img {
+      touch-action: none;
+      transform-origin: center center;
+      transition: transform 0.12s ease-out;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .lightbox-zoom-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .lightbox-zoom-btn.active {
+      background: rgba(99, 179, 237, 0.35);
+      border-color: var(--accent1);
+    }
+
+    /* Toast */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 220px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+      animation: toastIn 0.3s ease;
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #2d8f5a, #38a169);
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #9b2335, #e53e3e);
+    }
+
+    .toast.info {
+      background: linear-gradient(135deg, #2b5f9e, #3182ce);
+    }
+
+    @keyframes toastIn {
+      from {
+        transform: translateX(60px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Loading */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(13, 15, 26, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .loading-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(99, 179, 237, 0.2);
+      border-top-color: var(--accent1);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-overlay p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Confirm */
+    .confirm-box {
+      background: var(--bg-card);
+      border: 1px solid rgba(252, 129, 129, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .confirm-box .confirm-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+    }
+
+    .confirm-box h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .confirm-box p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    /* ===== TABS ===== */
+    .tabs-wrapper {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg-card2);
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #0d192e;
+      border-color: transparent;
+      box-shadow: 0 4px 18px rgba(99, 179, 237, 0.35);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .app-wrapper {
+        padding: 10px;
+      }
+
+      .app-header {
+        flex-direction: row;
+        align-items: center;
+        padding: 14px 16px;
+        gap: 12px;
+      }
+
+      .header-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+      }
+
+      .header-text h1 {
+        font-size: 1.15rem;
+      }
+
+      .header-text p {
+        font-size: 0.78rem;
+      }
+
+      .header-actions {
+        width: auto;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+      }
+
+      .app-wrapper {
+        padding: 10px 10px 90px;
+      }
+
+      .stats-panel-card {
+        margin-bottom: 14px;
+        border-radius: 14px;
+      }
+
+      .stats-panel-header {
+        padding: 10px 14px;
+      }
+
+      .stats-panel-title {
+        font-size: 0.9rem;
+      }
+
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 10px;
+        margin-bottom: 0;
+      }
+
+      .stat-card {
+        min-width: 0;
+        padding: 10px 5px 8px;
+        gap: 4px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .stat-card-header {
+        gap: 4px;
+        padding-bottom: 3px;
+      }
+
+      .stat-icon {
+        font-size: 15px;
+      }
+
+      .stat-title {
+        font-size: 0.72rem;
+        line-height: 1.2;
+      }
+
+      .stat-hero {
+        padding: 2px 0 1px;
+      }
+
+      .stat-hero-lbl {
+        font-size: 0.64rem;
+        margin-bottom: 0px;
+      }
+
+      .stat-hero-val {
+        font-size: 1.65rem;
+      }
+
+      .stat-sub-row {
+        flex-direction: column;
+        gap: 3px;
+        width: 100%;
+        margin-top: 1px;
+      }
+
+      .stat-sub-pill {
+        width: 100%;
+        justify-content: space-between;
+        padding: 2px 5px;
+        font-size: 0.68rem;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+
+      .sub-lbl {
+        font-size: 0.64rem;
+      }
+
+      .sub-val {
+        font-size: 0.78rem;
+      }
+
+      .tabs-wrapper {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+      }
+
+      .tab-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 10px 8px;
+        font-size: 0.82rem;
+      }
+
+      .hide-mobile {
+        display: none !important;
+      }
+
+      .data-table th {
+        white-space: nowrap;
+      }
+
+      .data-table td {
+        white-space: nowrap;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .modal-box {
+        max-height: 95vh;
+        border-radius: var(--radius-md);
+      }
+
+      .modal-head {
+        padding: 16px;
+      }
+
+      .modal-body {
+        padding: 16px;
+      }
+
+      .modal-foot {
+        padding: 16px;
+        flex-wrap: wrap;
+      }
+
+      .modal-foot .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .product-rows .product-row {
+        grid-template-columns: 1fr 96px;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+
+      .img-upload-zone {
+        padding: 16px 12px;
+      }
+
+      .modal-overlay {
+        padding: 8px;
+      }
+
+      #settingsBtn {
+        flex: 0 0 auto;
+        min-width: 48px;
+        padding: 10px 14px;
+      }
+
+      .confirm-box {
+        padding: 20px;
+      }
+    }
+
+    /* Dual Add Form Cards */
+    .sys-form-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .sys-form-card.sys-tank {
+      border-color: rgba(99, 179, 237, 0.3);
+    }
+
+    .sys-form-card.sys-rec {
+      border-color: rgba(234, 88, 12, 0.35);
+      margin-bottom: 0;
+    }
+
+    .sys-form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      gap: 10px;
+    }
+
+    .sys-form-card.sys-tank .sys-form-header {
+      background: rgba(99, 179, 237, 0.1);
+      border-bottom: 1px solid rgba(99, 179, 237, 0.2);
+    }
+
+    .sys-form-card.sys-rec .sys-form-header {
+      background: rgba(234, 88, 12, 0.1);
+      border-bottom: 1px solid rgba(234, 88, 12, 0.2);
+    }
+
+    .sys-form-card.collapsed .sys-form-header {
+      border-bottom-color: transparent;
+    }
+
+    .sys-form-card.collapsed .sys-form-body {
+      display: none;
+    }
+
+    .sys-form-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sys-form-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sys-form-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .sys-form-badge.ready {
+      background: rgba(104, 211, 145, 0.15);
+      color: var(--success);
+      border-color: rgba(104, 211, 145, 0.4);
+    }
+
+    .sys-form-chevron {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .sys-form-card.collapsed .sys-form-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .sys-form-body {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .compact-date-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+
+    .compact-date-bar label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent1);
+      white-space: nowrap;
+      margin: 0;
+    }
+
+    .compact-date-bar input[type="date"] {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      min-width: 0;
+    }
+
+    .compact-date-bar input[type="date"]:focus {
+      outline: none;
+      border-color: var(--accent1);
+    }
+
+    .compact-upload-bar {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      background: var(--bg-card);
+      transition: var(--transition);
+    }
+
+    .compact-upload-bar.drag-over {
+      border-color: var(--accent1);
+      background: rgba(99, 179, 237, 0.08);
+    }
+
+    .compact-upload-bar input[type="file"] {
+      display: none;
+    }
+
+    .compact-upload-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .compact-upload-controls .btn {
+      flex: 1;
+      min-width: 105px;
+      justify-content: center;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+
+    .compact-upload-bar .img-preview-grid {
+      justify-content: flex-start;
+      margin-top: 8px;
+      gap: 8px;
+    }
+
+    .compact-upload-bar .img-preview-item {
+      width: 64px;
+      height: 64px;
+    }
+
+    .qty-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .qty-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .qty-box-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .qty-box input[type="number"] {
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 4px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .qty-box input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent1);
+      box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.2);
+    }
+
+    .upload-btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .upload-btn-row .btn {
+      flex: 1;
+      min-width: 120px;
+      justify-content: center;
+    }
+
+    /* Floating Action Button (+) */
+    .fab-add-btn {
+      position: fixed;
+      right: 20px;
+      bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #0d192e;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(99, 179, 237, 0.45);
+      z-index: 800;
+      transition: var(--transition);
+      padding: 0;
+    }
+
+    .fab-add-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 28px rgba(99, 179, 237, 0.6);
+    }
+
+    .fab-add-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* Summary Tab Styling */
+    .row-tank {
+      background: rgba(99, 179, 237, 0.05) !important;
+      border-left: 2px solid rgba(99, 179, 237, 0.5) !important;
+    }
+
+    .row-recripte {
+      background: rgba(234, 88, 12, 0.05) !important;
+      border-left: 2px solid rgba(234, 88, 12, 0.5) !important;
+    }
+
+    .compact-table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .compact-table td {
+      padding: 7px 10px !important;
+    }
+
+    .compact-table tr.date-group-header td {
+      background: rgba(99, 179, 237, 0.12) !important;
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 12px !important;
+      border-bottom: 1px solid rgba(99, 179, 237, 0.22);
+    }
+
+    @media (max-width: 768px) {
+
+      .compact-table th,
+      .compact-table td {
+        padding: 6px 5px !important;
+        font-size: 0.78rem !important;
+      }
+
+      .compact-table tr.date-group-header td {
+        padding: 6px 10px !important;
+        font-size: 0.82rem !important;
+      }
+    }
+
+    .compact-table tr.date-spacer td {
+      height: 14px;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+
+    .compact-table tr.date-row-first td {
+      border-top: 1.5px solid rgba(99, 179, 237, 0.35);
+    }
+
+    .compact-table tr.date-row-first td:first-child {
+      border-top-left-radius: 12px;
+    }
+
+    .compact-table tr.date-row-first td:nth-child(8) {
+      border-top-right-radius: 12px;
+    }
+
+    .compact-table tr.date-row td:first-child {
+      border-left: 3px solid rgba(99, 179, 237, 0.55);
+    }
+
+    .compact-table tr.date-row td:nth-child(8) {
+      border-right: 1.5px solid rgba(99, 179, 237, 0.35);
+    }
+
+    .compact-table tr.detail-row.date-row td {
+      border-left: 3px solid rgba(99, 179, 237, 0.55);
+      border-right: 1.5px solid rgba(99, 179, 237, 0.35);
+    }
+
+    .compact-table tr.date-row-last td {
+      border-bottom: 1.5px solid rgba(99, 179, 237, 0.35);
+    }
+
+    .compact-table tr.date-row-last td:first-child {
+      border-bottom-left-radius: 12px;
+    }
+
+    .compact-table tr.date-row-last td:nth-child(8),
+    .compact-table tr.date-row-last.detail-row td {
+      border-bottom-right-radius: 12px;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-card2);
+      transition: .4s;
+      border: 1px solid var(--border);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: rgba(99, 179, 237, 0.25);
+      border-color: var(--accent1);
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px var(--accent1);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(22px);
+      background-color: var(--accent1);
+    }
+
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+    /* ===== OVER RETURN REPORT MODAL & TIMELINE JUMP HIGHLIGHT ===== */
+    #overReportOverlay {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      pointer-events: none !important;
+      visibility: hidden;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 18px;
+      z-index: 880;
+    }
+
+    #overReportOverlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: none !important;
+    }
+
+    #overReportOverlay .over-report-box {
+      pointer-events: none;
+      max-width: 520px;
+      width: 94vw;
+      max-height: 46vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(252, 129, 129, 0.45);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(252, 129, 129, 0.15);
+    }
+
+    #overReportOverlay.open .over-report-box {
+      pointer-events: auto;
+    }
+
+    .over-report-row.active {
+      background: rgba(252, 129, 129, 0.22);
+      box-shadow: inset 3px 0 0 #fc8181;
+    }
+
+    .over-report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    .over-report-table th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 10px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .over-report-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+      color: var(--text-primary);
+    }
+
+    .over-report-row {
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .over-report-row:hover {
+      background: rgba(252, 129, 129, 0.12);
+    }
+
+    .over-report-row:active {
+      background: rgba(252, 129, 129, 0.22);
+    }
+
+    @keyframes overRowPulse {
+      0% {
+        background: rgba(252, 129, 129, 0.34);
+      }
+      50% {
+        background: rgba(252, 129, 129, 0.14);
+      }
+      100% {
+        background: rgba(252, 129, 129, 0.3);
+      }
+    }
+
+    @keyframes overBtnPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(252, 129, 129, 0.85), 0 0 14px rgba(252, 129, 129, 0.65);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 8px rgba(252, 129, 129, 0), 0 0 22px rgba(252, 129, 129, 0.95);
+      }
+    }
+
+    @keyframes overPointerBounce {
+      0%, 100% {
+        transform: translate(-50%, 0);
+      }
+      50% {
+        transform: translate(-50%, -7px);
+      }
+    }
+
+    tr.over-jump-highlight td {
+      animation: overRowPulse 0.9s ease-in-out 4 !important;
+      background: rgba(252, 129, 129, 0.18) !important;
+    }
+
+    .btn-over-tag.over-btn-spotlight {
+      position: relative !important;
+      z-index: 20 !important;
+      background: rgba(252, 129, 129, 0.38) !important;
+      border: 2px solid #fc8181 !important;
+      animation: overBtnPulse 0.9s ease-in-out 4 !important;
+    }
+
+    .btn-over-tag.over-btn-spotlight::before {
+      content: '👇';
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.25rem;
+      line-height: 1;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
+      animation: overPointerBounce 0.65s ease-in-out infinite;
+    }
+
+    /* ===== EXPORT REFILL FORM MODAL & PRINT ===== */
+    .export-modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      max-width: 860px;
+      width: 95%;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      animation: modalIn 0.25s ease-out;
+    }
+
+    .export-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .export-paper-wrap {
+      padding: 24px;
+      overflow-y: auto;
+      background: #232c3d;
+      display: flex;
+      justify-content: center;
+    }
+
+    .export-paper {
+      background: #ffffff;
+      color: #1a202c;
+      width: 100%;
+      max-width: 780px;
+      padding: 36px 40px;
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      line-height: 1.5;
+    }
+
+    .export-header {
+      text-align: center;
+      border-bottom: 2px solid #005691;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .export-company-th {
+      color: #005691;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .export-company-en {
+      color: #005691;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      margin: 2px 0 6px;
+    }
+
+    .export-branch {
+      color: #0077c2;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .export-addr {
+      color: #4a5568;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin: 1px 0;
+    }
+
+    .export-doc-title {
+      text-align: center;
+      margin: 18px 0 40px;
+    }
+
+    .export-doc-title h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #1a202c;
+      margin: 0;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .export-doc-title span {
+      font-size: 0.85rem;
+      color: #718096;
+      font-weight: 600;
+    }
+
+    .export-meta-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 0.9fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 44px;
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 0.88rem;
+    }
+
+    .export-meta-item {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .export-meta-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .export-meta-label {
+      font-weight: 700;
+      color: #2d3748;
+      width: 126px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .export-meta-col-left .export-meta-label {
+      width: 80px;
+    }
+
+    .export-meta-val {
+      color: #1a202c;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .export-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      font-size: 0.95rem;
+    }
+
+    .export-table th,
+    .export-table td {
+      border: 1px solid #cbd5e0;
+      padding: 9px 8px;
+    }
+
+    .export-table th {
+      background: #edf2f7;
+      color: #2d3748;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.88rem;
+    }
+
+    .export-table th.col-no {
+      width: 45px;
+    }
+
+    .export-table th.col-desc {
+      text-align: left;
+    }
+
+    .export-table th.col-qty {
+      width: 105px;
+      text-align: center;
+    }
+
+    .export-table th.col-total {
+      width: 120px;
+      text-align: center;
+    }
+
+    .export-table td.col-desc {
+      white-space: nowrap;
+      font-weight: 700;
+      color: #2d3748;
+      padding-left: 12px;
+    }
+
+    .export-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .export-num-input {
+      width: 65px;
+      padding: 4px 6px;
+      border: 1px solid #cbd5e0;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a202c;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    .export-num-input:focus {
+      outline: none;
+      border-color: #3182ce;
+      box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+    }
+
+    .export-total-row {
+      background: #edf2f7;
+      font-weight: 800;
+    }
+
+    .export-table th.exp-grp-left {
+      background: #e2e8f0;
+      color: #2d3748;
+      font-size: 0.82rem;
+    }
+
+    .export-table th.exp-grp-right {
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.82rem;
+    }
+
+    .export-table th.exp-col-sent {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+
+    .export-table th.exp-col-final {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .export-table .exp-sub-tag {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-top: 1px;
+    }
+
+    .export-table th.exp-col-sent .exp-sub-tag {
+      color: #1e40af;
+    }
+
+    .export-table th.exp-col-final .exp-sub-tag {
+      color: #991b1b;
+    }
+
+    .export-signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 108px;
+      padding-top: 10px;
+    }
+
+    .signature-box {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #2d3748;
+    }
+
+    .signature-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .signature-company {
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 45px;
+    }
+
+    .signature-line {
+      border-bottom: 1px dotted #718096;
+      width: 200px;
+      margin: 0 auto 8px;
+      height: 1px;
+    }
+
+    .signature-name {
+      color: #718096;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .signature-date {
+      color: #718096;
+      font-size: 0.82rem;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: 295mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+      }
+
+      body::before,
+      body::after {
+        display: none !important;
+      }
+
+      body > *:not(#exportOverlay) {
+        display: none !important;
+      }
+
+      #exportOverlay {
+        position: static !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        z-index: 999999 !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        overflow: visible !important;
+      }
+
+      #exportOverlay * {
+        visibility: visible !important;
+      }
+
+      .export-modal-box {
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        animation: none !important;
+        transform: none !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      .export-toolbar,
+      .no-print {
+        display: none !important;
+      }
+
+      .export-paper-wrap {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+        display: block !important;
+        height: auto !important;
+      }
+
+      .export-paper {
+        padding: 12mm 15mm !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        box-sizing: border-box !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+
+      .export-doc-title {
+        margin: 0 0 34px !important;
+      }
+
+      .export-meta-grid {
+        grid-template-columns: 1.55fr 0.9fr !important;
+        gap: 12px !important;
+        margin-bottom: 36px !important;
+        padding: 10px 14px !important;
+        font-size: 0.84rem !important;
+      }
+
+      .export-meta-col-left .export-meta-label {
+        width: 76px !important;
+      }
+
+      .export-meta-label {
+        width: 118px !important;
+      }
+
+      .export-meta-val {
+        white-space: nowrap !important;
+      }
+
+      .export-table {
+        margin-bottom: 12px !important;
+        width: 100% !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .export-table th,
+      .export-table td {
+        border-color: #4a5568 !important;
+        padding: 6px 4px !important;
+      }
+
+      .export-table th.col-no,
+      .export-table td.col-no {
+        width: 35px !important;
+        text-align: center !important;
+      }
+
+      .export-table th.col-desc,
+      .export-table td.col-desc {
+        white-space: nowrap !important;
+        width: auto !important;
+        font-size: 0.95rem !important;
+        padding-left: 10px !important;
+      }
+
+      .export-table th.col-qty,
+      .export-table td.col-qty {
+        width: 82px !important;
+        max-width: 90px !important;
+        font-size: 0.8rem !important;
+        line-height: 1.2 !important;
+        padding: 6px 2px !important;
+        text-align: center !important;
+      }
+
+      .export-table th.col-total,
+      .export-table td.col-total {
+        width: 95px !important;
+        max-width: 105px !important;
+        font-size: 0.8rem !important;
+        line-height: 1.2 !important;
+        padding: 6px 2px !important;
+        text-align: center !important;
+      }
+
+      .export-table.export-table-v2 th,
+      .export-table.export-table-v2 td {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .export-table.export-table-v2 th.col-desc,
+      .export-table.export-table-v2 td.col-desc {
+        font-size: 0.88rem !important;
+        padding-left: 8px !important;
+      }
+
+      .export-table.export-table-v2 th.col-v2-num,
+      .export-table.export-table-v2 td.col-v2-num {
+        width: 72px !important;
+        max-width: 78px !important;
+        line-height: 1.2 !important;
+        padding: 5px 2px !important;
+        text-align: center !important;
+      }
+
+      .export-table.export-table-v2 th.col-v2-num {
+        font-size: 0.76rem !important;
+      }
+
+      .export-table.export-table-v2 td.col-v2-num {
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+      }
+
+      .export-table.export-table-v2 th.col-v2-final,
+      .export-table.export-table-v2 td.col-v2-final {
+        width: 84px !important;
+        max-width: 90px !important;
+        font-size: 0.76rem !important;
+        line-height: 1.2 !important;
+        padding: 5px 2px !important;
+        text-align: center !important;
+      }
+
+      .export-table.export-table-v2 .exp-sub-tag {
+        font-size: 0.68rem !important;
+      }
+
+      .export-num-input {
+        border: none !important;
+        background: transparent !important;
+        color: #000000 !important;
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        text-align: center !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: textfield !important;
+      }
+
+      .export-num-input::-webkit-outer-spin-button,
+      .export-num-input::-webkit-inner-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0 !important;
+      }
+
+      .export-signatures {
+        margin-top: 96px !important;
+        padding-top: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .signature-line {
+        margin: 40px auto 6px !important;
+        border-bottom: 1px dotted #4a5568 !important;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="glass-theme.css?v=20261128" />
+</head>
+
+<body>
+
+  <!-- LOADING -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p id="loadingText">กำลังโหลดข้อมูล...</p>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-wrap" id="toastContainer"></div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="if(event.target === this) closeLightbox();">
+    <button class="lightbox-zoom-btn" id="lightboxZoomBtn" onclick="toggleLightboxZoom(); event.stopPropagation();"
+      title="ซูมเข้า/ออก">🔍 ซูม</button>
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev" style="display:none;"
+      onclick="stepLightbox(-1); event.stopPropagation();">‹</button>
+    <img src="" id="lightboxImg" alt="Invoice Image" referrerpolicy="no-referrer" draggable="false"
+      onclick="onLightboxImgClick(event)" />
+    <button class="lightbox-nav lightbox-next" id="lightboxNext" style="display:none;"
+      onclick="stepLightbox(1); event.stopPropagation();">›</button>
+    <div class="lightbox-counter" id="lightboxCounter" style="display:none;">1 / 1</div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <h3>ยืนยันการลบ?</h3>
+      <p id="confirmText">ข้อมูลนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeConfirm()">ยกเลิก</button>
+        <button class="btn btn-danger btn-sm" id="confirmOkBtn">ลบเลย</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MODAL -->
+  <div class="modal-overlay" id="mainModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 id="modalTitle">➕ เพิ่มข้อมูล</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="ปิด">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- DUAL ADD FORM (Tank + Recripte) -->
+        <div id="dualAddForm" style="display:none;">
+          <!-- Shared Date (Entered Once) -->
+          <div class="compact-date-bar">
+            <label for="dualDate">📅 วันที่ *</label>
+            <input type="date" id="dualDate" />
+          </div>
+
+          <!-- Card 1: ระบบส่งอัดท่อ -->
+          <div class="sys-form-card sys-tank" id="cardTankForm">
+            <div class="sys-form-header" onclick="toggleDualCard('Tank')">
+              <div class="sys-form-title">🚀 ส่งอัดท่อ</div>
+              <div class="sys-form-meta">
+                <span class="sys-form-badge" id="tankFormStatus">ยังไม่กรอก</span>
+                <span class="sys-form-chevron">▼</span>
+              </div>
+            </div>
+            <div class="sys-form-body">
+              <div class="form-group" style="margin:0;">
+                <label for="tankInvID">เลขที่ใบส่งอัด *</label>
+                <input type="text" id="tankInvID" placeholder="เช่น INV-2024-001"
+                  oninput="this.value = this.value.toUpperCase(); updateDualCardStatus('Tank')" />
+              </div>
+
+              <div class="compact-upload-bar" id="tankUploadZone">
+                <input type="file" id="tankImgCamera" accept="image/*" capture="environment"
+                  onchange="handleDualImageSelect('Tank', event)" />
+                <input type="file" id="tankImgGallery" accept="image/*" multiple
+                  onchange="handleDualImageSelect('Tank', event)" />
+                <div class="compact-upload-controls">
+                  <button type="button" class="btn btn-primary"
+                    onclick="document.getElementById('tankImgCamera').click(); event.stopPropagation();">
+                    📸 ถ่ายรูปใบส่งอัด
+                  </button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('tankImgGallery').click(); event.stopPropagation();">
+                    🖼️ คลังภาพ
+                  </button>
+                </div>
+                <div id="tankImgPreviewGrid" class="img-preview-grid" style="display:none;"></div>
+              </div>
+
+              <div class="qty-grid-3">
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-n2);">💠 N₂ 1.5Q</div>
+                  <input type="number" inputmode="numeric" id="tank-qty-N2" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Tank')" />
+                </div>
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-o2);">🔴 O₂ 1.5Q</div>
+                  <input type="number" inputmode="numeric" id="tank-qty-O2L" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Tank')" />
+                </div>
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-o2s);">🟡 O₂ 0.5Q</div>
+                  <input type="number" inputmode="numeric" id="tank-qty-O2S" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Tank')" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: ระบบรับคืนท่อ -->
+          <div class="sys-form-card sys-rec" id="cardRecForm">
+            <div class="sys-form-header" onclick="toggleDualCard('Recripte')">
+              <div class="sys-form-title">📥 รับคืนท่อ</div>
+              <div class="sys-form-meta">
+                <span class="sys-form-badge" id="recFormStatus">ยังไม่กรอก</span>
+                <span class="sys-form-chevron">▼</span>
+              </div>
+            </div>
+            <div class="sys-form-body">
+              <div class="form-group" style="margin:0;">
+                <label for="recInvID">เลขที่ใบรับคืน *</label>
+                <input type="text" id="recInvID" placeholder="เช่น REC-2024-001"
+                  oninput="this.value = this.value.toUpperCase(); updateDualCardStatus('Recripte')" />
+              </div>
+
+              <div class="compact-upload-bar" id="recUploadZone">
+                <input type="file" id="recImgCamera" accept="image/*" capture="environment"
+                  onchange="handleDualImageSelect('Recripte', event)" />
+                <input type="file" id="recImgGallery" accept="image/*" multiple
+                  onchange="handleDualImageSelect('Recripte', event)" />
+                <div class="compact-upload-controls">
+                  <button type="button" class="btn btn-primary"
+                    style="background:linear-gradient(135deg, var(--accent-rec), #f97316); color:#fff; box-shadow:0 4px 14px rgba(234,88,12,0.3);"
+                    onclick="document.getElementById('recImgCamera').click(); event.stopPropagation();">
+                    📸 ถ่ายรูปใบรับคืน
+                  </button>
+                  <button type="button" class="btn btn-secondary"
+                    onclick="document.getElementById('recImgGallery').click(); event.stopPropagation();">
+                    🖼️ คลังภาพ
+                  </button>
+                </div>
+                <div id="recImgPreviewGrid" class="img-preview-grid" style="display:none;"></div>
+              </div>
+
+              <div class="qty-grid-3">
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-n2);">💠 N₂ 1.5Q</div>
+                  <input type="number" inputmode="numeric" id="rec-qty-N2" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Recripte')" />
+                </div>
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-o2);">🔴 O₂ 1.5Q</div>
+                  <input type="number" inputmode="numeric" id="rec-qty-O2L" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Recripte')" />
+                </div>
+                <div class="qty-box">
+                  <div class="qty-box-label" style="color:var(--accent-o2s);">🟡 O₂ 0.5Q</div>
+                  <input type="number" inputmode="numeric" id="rec-qty-O2S" placeholder="0" min="0" step="1"
+                    oninput="updateDualCardStatus('Recripte')" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SINGLE EDIT FORM (Used when editing existing record) -->
+        <div id="singleEditForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fldInvID" id="fldInvLabel">เลขที่ใบส่งอัด *</label>
+              <input type="text" id="fldInvID" placeholder="เช่น INV-2024-001"
+                oninput="this.value = this.value.toUpperCase()" />
+            </div>
+            <div class="form-group">
+              <label for="fldDate">วันที่ *</label>
+              <input type="date" id="fldDate" />
+            </div>
+          </div>
+
+          <div class="section-label" id="fldImgSectionLabel">รูปภาพใบส่งอัด / ใบรับคืน (เพิ่มได้หลายรูป)</div>
+          <div class="img-upload-zone" id="uploadZone">
+            <input type="file" id="imgFileInputCamera" accept="image/*" capture="environment"
+              onchange="handleImageSelect(event)" />
+            <input type="file" id="imgFileInputGallery" accept="image/*" multiple onchange="handleImageSelect(event)" />
+            <div id="uploadPlaceholder">
+              <div class="upload-icon">📷</div>
+              <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.95rem;">เลือกช่องทางการอัปโหลด
+                (เลือกได้หลายรูป)</p>
+              <div class="upload-btn-row">
+                <button type="button" class="btn btn-primary"
+                  onclick="document.getElementById('imgFileInputCamera').click(); event.stopPropagation();">
+                  📸 ถ่ายภาพ
+                </button>
+                <button type="button" class="btn btn-secondary"
+                  onclick="document.getElementById('imgFileInputGallery').click(); event.stopPropagation();">
+                  🖼️ คลังภาพ (หลายรูป)
+                </button>
+              </div>
+              <span>JPG, PNG, WEBP | สูงสุดรูปละ 5 MB</span>
+            </div>
+            <div id="imgPreviewGrid" class="img-preview-grid" style="display:none;"></div>
+          </div>
+          <div id="existingImgWrap" style="margin-top:10px;"></div>
+
+          <div class="section-label" style="margin-top:22px;">รายการสินค้า (จำนวนส่ง)</div>
+          <div class="product-rows">
+            <div class="product-row">
+              <div>
+                <div class="product-name">💠 ไนโตรเจน 1.5 Q</div>
+                <div class="product-badge">Nitrogen 1.5 Q</div>
+              </div>
+              <input type="number" inputmode="numeric" id="qty-N2" placeholder="0" min="0" step="1" />
+            </div>
+            <div class="product-row">
+              <div>
+                <div class="product-name">🔴 ออกซิเจน 1.5 Q</div>
+                <div class="product-badge">Oxygen 1.5 Q</div>
+              </div>
+              <input type="number" inputmode="numeric" id="qty-O2L" placeholder="0" min="0" step="1" />
+            </div>
+            <div class="product-row">
+              <div>
+                <div class="product-name">🟡 ออกซิเจน 0.5 Q</div>
+                <div class="product-badge">Oxygen 0.5 Q</div>
+              </div>
+              <input type="number" inputmode="numeric" id="qty-O2S" placeholder="0" min="0" step="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveRecord()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="loginOverlay" style="background: var(--bg-primary);">
+    <div class="modal-box" style="max-width: 400px; margin: auto; transform: none; box-shadow: var(--shadow-card);">
+      <div class="modal-head">
+        <h2>🔑 เข้าสู่ระบบ</h2>
+      </div>
+      <form onsubmit="event.preventDefault(); submitLogin();">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label for="loginUsername">ผู้ใช้ (IDUser)</label>
+            <input type="text" id="loginUsername" placeholder="กรอก IDUser"
+              onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('loginPassword').focus(); }"
+              autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">รหัสผ่าน</label>
+            <input type="password" id="loginPassword" placeholder="****" autocomplete="current-password" />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="submit" class="btn btn-primary"
+            style="width: 100%; justify-content: center;">เข้าสู่ระบบ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HELP / INSTRUCTIONS MODAL -->
+  <div class="modal-overlay" id="helpOverlay">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-head">
+        <h2>📖 คำอธิบายสี & วิธีใช้งาน</h2>
+        <button class="modal-close" onclick="closeHelpModal()" aria-label="ปิด">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div style="margin-bottom: 18px;">
+          <div
+            style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent1); margin-bottom: 10px;">
+            ความหมายของสีตัวเลขในตาราง</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div
+              style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm);">
+              <span
+                style="border: 2px solid var(--success); background: rgba(104,211,145,0.15); border-radius: 20px; padding: 3px 12px; color: var(--success); font-weight: 700; font-size: 0.9rem; white-space: nowrap;">14</span>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--success);">สีเขียว — คืนครบแล้ว</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  ยอดรับคืนสะสมจนถึงรอบนี้ตัดยอดคงค้างหมดพอดี (ค้างส่งคืน = 0)</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm);">
+              <span
+                style="border: 2px solid var(--danger); background: rgba(252,129,129,0.15); border-radius: 20px; padding: 3px 12px; color: var(--danger); font-weight: 700; font-size: 0.9rem; white-space: nowrap;">8</span>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--danger);">สีแดง — ยอดไม่ตรง /
+                  ยังค้างส่งคืน / ส่งเกิน</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  ยอดรับคืนไม่ครบตามยอดส่งอัด หรือมีการรับคืนเกินยอดสะสม (จะแสดงข้อความ "จำนวนส่งเกิน")</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm);">
+              <span
+                style="color: var(--accent-rec); font-weight: 700; font-size: 0.9rem; padding: 3px 12px; white-space: nowrap;">5</span>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-rec);">สีส้ม — ปกติในรอบ</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  จำนวนรับคืนตรงกับยอดส่งอัดในรอบนั้น แต่ยอดสะสมรวมทั้งหมดยังคงค้างอยู่</div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm);">
+              <span class="stat-stock-badge" style="margin-top: 0; white-space: nowrap;"><span
+                  class="stock-title">รวม</span> <span class="stock-num">25</span></span>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">หัวข้อ รวม —
+                  ยอดสต็อกคงเหลือในคลัง</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  แสดงจำนวนถังคงเหลือพร้อมใช้งาน (Unrestricted) จากฐานข้อมูลคลัง (Sheet1) ตามรหัส Material
+                  ของถังก๊าซแต่ละประเภท (N₂ 1.5Q = 30011061, O₂ 1.5Q = 30011063, O₂ 0.5Q = 30014237)
+                </div>
+              </div>
+            </div>
+            <div
+              style="display: flex; align-items: center; gap: 12px; background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm);">
+              <span class="stat-stock-badge" style="margin-top: 0; white-space: nowrap;"><span
+                  class="stock-title">คงเหลือ</span> <span class="stock-num"
+                  style="color:var(--success);">14</span></span>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">หัวข้อ คงเหลือ —
+                  ถังพร้อมใช้ในคลัง (รวม - ค้างส่ง)</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                  คำนวณจากยอดรวมในคลัง ลบด้วยยอดค้างส่งที่ยังอยู่กับ Supplier
+                  สะท้อนจำนวนถังจริงที่ยังเหลืออยู่ในคลังพร้อมหยิบใช้งาน
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div
+            style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent1); margin-bottom: 12px;">
+            คู่มือวิธีใช้งานระบบ</div>
+          <div
+            style="display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;">
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">1</span>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:2px;">ภาพรวมและการแบ่งกลุ่มข้อมูล
+                  (ตามวันที่)</strong>
+                ข้อมูลในตารางจัดเป็นกลุ่มตามวันที่จัดส่ง แถบหัวกลุ่มสีฟ้าแสดงวันที่และจำนวนรายการ
+                โดยภายในรอบจะแบ่งเป็นแถว <strong style="color:var(--accent1);">"ส่งอัด"</strong> (สีฟ้า) และแถว <strong
+                  style="color:var(--accent-rec);">"รับคืน"</strong> (สีส้ม)
+              </div>
+            </div>
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">2</span>
+              <div>
+                <strong
+                  style="color:var(--text-primary); display:block; margin-bottom:2px;">การดูรูปภาพเอกสารแนบ</strong>
+                สามารถดูรูปภาพได้โดยกดที่ <strong>ตัวเลขจำนวนสินค้า</strong> (ทั้งแถวส่งอัดและรับคืน)
+                เพื่อเปิดดูรูปของเอกสารชุดนั้นทันที หรือกดที่รูปขนาดย่อในคอลัมน์ "รูปภาพ"
+              </div>
+            </div>
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">3</span>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:2px;">การซูมและเลื่อนดูรูปภาพ
+                  (Lightbox)</strong>
+                <ul style="margin:4px 0 0 16px; padding:0; list-style-type:disc;">
+                  <li><strong>บนมือถือ:</strong> แตะปุ่ม <strong>🔍 ซูม</strong> หรือใช้ <strong>2 นิ้วจีบ/ถ่าง
+                      (Pinch-to-zoom)</strong> ซูมได้ 1x–4x และลากเลื่อนดูภาพ หรือปัดซ้าย-ขวาเพื่อเปลี่ยนรูป</li>
+                  <li><strong>บนคอมพิวเตอร์:</strong> แตะปุ่มซูมแล้ว <strong>คลิกเมาส์ค้างเพื่อลากเลื่อน (Drag)</strong>
+                    หรือหมุน <strong>ลูกกลิ้งเมาส์ (Scroll Wheel)</strong> เพื่อซูมเข้า/ออก</li>
+                </ul>
+              </div>
+            </div>
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">4</span>
+              <div>
+                <strong
+                  style="color:var(--text-primary); display:block; margin-bottom:2px;">การเปิด/ปิดแสดงเลขที่เอกสาร</strong>
+                ใช้สวิตช์ <strong style="color:var(--text-primary);">"แสดงเลขที่เอกสาร"</strong> มุมบนขวาของตาราง
+                เพื่อสลับซ่อนหรือแสดงคอลัมน์เลขที่ใบส่งอัด / ใบรับคืน
+                (กรณีมีหลายใบรับคืนในวันเดียวกันจะแสดงเรียงซ้อนกัน)
+              </div>
+            </div>
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">5</span>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:2px;">การขยายดูรายละเอียด แก้ไข
+                  หรือลบรายการ (Admin)</strong>
+                แตะที่แถว <strong style="color:var(--text-primary);">ส่งอัด</strong> หรือ <strong
+                  style="color:var(--text-primary);">รับคืน</strong> เพื่อคลี่รายละเอียดสินค้าออก จะมีปุ่ม <span
+                  style="color:var(--success); font-weight:700;">✏️ แก้ไข</span> และ <span
+                  style="color:var(--danger); font-weight:700;">🗑️ ลบ</span> ปรากฏขึ้นในแต่ละใบ
+              </div>
+            </div>
+
+            <div
+              style="display: flex; gap: 10px; align-items: flex-start; background: var(--bg-secondary); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <span
+                style="background:var(--accent1); color:#0d192e; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink: 0; margin-top:2px;">6</span>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:2px;">การบันทึกเพิ่มข้อมูลใหม่
+                  (ปุ่ม + ลอยมุมล่างขวา)</strong>
+                กดปุ่ม <strong style="color:var(--accent1);">+</strong> เพื่อเปิดแบบฟอร์มบันทึกข้อมูล
+                สามารถเลือกกรอกระบบส่งอัดท่อ และ/หรือ ระบบรับคืนท่อ พร้อมกันได้ในครั้งเดียวโดย
+                <strong>กรอกวันที่เพียงครั้งเดียว</strong> ด้านบน
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" onclick="closeHelpModal()"
+          style="width:100%; justify-content:center;">เข้าใจแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingOverlay">
+    <div class="modal-box" style="max-width: 420px; overflow: hidden;">
+      <!-- Profile Header with Gradient -->
+      <div
+        style="position: relative; background: linear-gradient(135deg, #1a3a5c 0%, #0d2240 50%, #132640 100%); padding: 32px 24px 48px; text-align: center;">
+        <button class="modal-close" onclick="closeSettingModal()" aria-label="ปิด"
+          style="position: absolute; top: 14px; right: 14px; z-index: 2;">✕</button>
+        <!-- Decorative circles -->
+        <div
+          style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(99,179,237,0.08);">
+        </div>
+        <div
+          style="position: absolute; bottom: -30px; right: -10px; width: 80px; height: 80px; border-radius: 50%; background: rgba(118,228,247,0.06);">
+        </div>
+        <!-- Avatar -->
+        <div id="profileAvatar"
+          style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent1), var(--accent2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 1.6rem; font-weight: 800; color: #0d192e; box-shadow: 0 4px 20px rgba(99,179,237,0.4); border: 3px solid rgba(255,255,255,0.15);">
+        </div>
+        <div id="profileName" style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 4px;"></div>
+        <div id="profileRole"
+          style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">
+        </div>
+      </div>
+
+      <!-- Info Cards -->
+      <div style="padding: 24px; margin-top: -24px; position: relative; z-index: 1;">
+        <div
+          style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.3);">
+
+          <!-- Hidden spans for JS access -->
+          <span id="infoIDUser" style="display:none;">—</span>
+          <span id="infoName" style="display:none;">—</span>
+
+          <div
+            style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border);">
+            <div
+              style="width: 36px; height: 36px; border-radius: 10px; background: rgba(246,173,85,0.12); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+              🏭</div>
+            <div style="flex: 1; min-width: 0;">
+              <div
+                style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; font-weight: 600;">
+                คลัง / สาขา</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1px;"
+                id="infoPlant">—</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px;">
+            <div
+              style="width: 36px; height: 36px; border-radius: 10px; background: rgba(118,228,247,0.12); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+              📍</div>
+            <div style="flex: 1; min-width: 0;">
+              <div
+                style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; font-weight: 600;">
+                ทีม / คลัง (Team / Plant)</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1px;"
+                id="infoPlantCode">—</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Hidden Auth field for JS access -->
+        <span id="infoAuth" style="display:none;">—</span>
+
+        <!-- Show Hidden History Toggle (Admin only) -->
+        <div id="adminHistoryToggleCard"
+          style="display: none; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 12px 16px; background: var(--bg-card); border: 1px solid rgba(99,179,237,0.28); border-radius: var(--radius-sm);">
+          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+            <div
+              style="width: 32px; height: 32px; border-radius: 8px; background: rgba(99,179,237,0.12); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
+              🗂️</div>
+            <div style="min-width: 0;">
+              <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">แสดงข้อมูลที่ซ่อนไว้</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">ประวัติก่อนวันที่ 24/11/2026 (🛡️ Admin)</div>
+            </div>
+          </div>
+          <label class="switch" style="flex-shrink: 0;">
+            <input type="checkbox" id="showHiddenHistoryToggle" onchange="toggleHiddenHistory(this.checked)">
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- Over Return Report Button (Admin only) -->
+        <button class="btn" id="btnOverReportMenu" onclick="openOverReportModal()"
+          style="display: none; width: 100%; justify-content: center; margin-top: 14px; padding: 12px; background: linear-gradient(135deg, rgba(246,173,85,0.12), rgba(252,129,129,0.18)); color: #fbd38d; border: 1px solid rgba(246,173,85,0.38); border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; gap: 8px;">
+          📊 รายงานส่งเกิน
+        </button>
+
+        <!-- Logout Button -->
+        <button class="btn" onclick="logout()"
+          style="width: 100%; justify-content: center; margin-top: 10px; padding: 13px; background: linear-gradient(135deg, rgba(252,129,129,0.08), rgba(252,129,129,0.18)); color: #ff8e8e; border: 1px solid rgba(252,129,129,0.3); border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 700; gap: 8px;">
+          🚪 ออกจากระบบ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT REFILL FORM MODAL -->
+  <div class="modal-overlay" id="exportOverlay">
+    <div class="export-modal-box">
+      <!-- Top Action Toolbar (No Print) -->
+      <div class="export-toolbar no-print">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span
+            style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; display: inline-flex; align-items: center; gap: 5px;">
+            <span>🖨️</span> ใบรับ-ส่งถังบรรจุก๊าซ
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn-print-dark" onclick="printExportForm()" title="พิมพ์หรือบันทึกเป็น PDF" style="padding: 6px 14px; font-size: 0.84rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>พิมพ์เอกสาร</span>
+          </button>
+          <button class="modal-close" onclick="closeExportModal()" aria-label="ปิด"
+            style="width: 32px; height: 32px; font-size: 1rem;">✕</button>
+        </div>
+      </div>
+
+      <!-- Printable Document Paper -->
+      <div class="export-paper-wrap">
+        <div class="export-paper" id="exportPrintArea">
+          <!-- Document Title -->
+          <div class="export-doc-title" style="margin-top: 0; padding-top: 0;">
+            <h2
+              style="font-size: 1.45rem; font-weight: 800; color: #1a202c; margin: 0 0 4px; text-decoration: underline; text-underline-offset: 5px;">
+              ใบรับ-ส่งถังบรรจุก๊าซ
+            </h2>
+            <span style="font-size: 0.9rem; color: #4a5568; font-weight: 600; letter-spacing: 0.5px;">
+              GAS CYLINDER REFILL DELIVERY NOTE
+            </span>
+          </div>
+
+          <!-- Metadata Grid -->
+          <div class="export-meta-grid">
+            <div class="export-meta-col-left">
+              <div class="export-meta-item">
+                <span class="export-meta-label">Sender:</span>
+                <span class="export-meta-val" style="color: #2b6cb0; font-weight: 700;">บริษัท ซีพี รีเทลลิงค์ จำกัด (ศูนย์วิภาวดี62)</span>
+              </div>
+              <div class="export-meta-item">
+                <span class="export-meta-label">Recipient:</span>
+                <span class="export-meta-val">บริษัท ไทยสเปเชียลแก๊ส จำกัด</span>
+              </div>
+            </div>
+            <div class="export-meta-col-right">
+              <div class="export-meta-item">
+                <span class="export-meta-label">เลขที่เอกสารอ้างอิง:</span>
+                <span class="export-meta-val" id="expDocNo" style="font-weight: 700; color: #1a202c;">—</span>
+              </div>
+              <div class="export-meta-item">
+                <span class="export-meta-label">วันที่ส่งสินค้า:</span>
+                <span class="export-meta-val" id="expDocDate">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail Table -->
+          <table class="export-table" id="exportTable">
+            <thead id="exportTableHead">
+              <tr>
+                <th class="col-no" style="width: 45px;">ลำดับ</th>
+                <th class="col-desc" style="text-align: left;">รายการ</th>
+                <th class="col-qty" style="width: 105px;">จำนวนส่ง</th>
+                <th class="col-qty" style="width: 105px;">ค้างส่งคืน</th>
+                <th class="col-total" style="width: 120px;">รวมค้างส่งคืน</th>
+              </tr>
+            </thead>
+            <tbody id="exportTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot id="exportTableFoot">
+              <tr class="export-total-row">
+                <td colspan="2" style="text-align: right; padding-right: 16px;">รวมทั้งหมด</td>
+                <td style="text-align: center;" id="expTotalSent">-</td>
+                <td style="text-align: center;" id="expTotalPending">-</td>
+                <td style="text-align: center; color: #c53030;" id="expGrandTotal">-</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- Remarks / Note -->
+          <div id="exportRemarks" style="margin-top: 12px; font-size: 0.84rem; color: #4a5568; line-height: 1.45;">
+            <strong>หมายเหตุ:</strong>
+            <div style="margin-top: 2px;">- ข้อมูลคงค้างส่งคืน เป็นจำนวนถังที่ยังคงค้างถังที่ยังอยู่ระหว่างรอการส่งคืนให้กับบริษัท</div>
+            <div>- รวมค้างส่งคืน เป็นจำนวนรวมรายการทั้งหมดที่ยังรอการส่งถังส่งอัด คืนให้กับบริษัท ณ ปัจจุบัน</div>
+          </div>
+
+          <!-- Signatures -->
+          <div class="export-signatures">
+            <div class="signature-box">
+              <div class="signature-title">บริษัท</div>
+              <div class="signature-line" style="margin-top: 45px;"></div>
+              <div class="signature-name">( .............................................................. )</div>
+              <div class="signature-date">วันที่ ........ / ........ / ................</div>
+            </div>
+
+            <div class="signature-box">
+              <div class="signature-title">Supplier</div>
+              <div class="signature-line" style="margin-top: 45px;"></div>
+              <div class="signature-name">( .............................................................. )</div>
+              <div class="signature-date">วันที่ ........ / ........ / ................</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVER RETURN NOTE MODAL -->
+  <div class="modal-overlay" id="overNoteModalOverlay" onclick="if(event.target===this)closeOverNoteModal()">
+    <div class="modal-box" style="max-width: 480px; width: 92%;">
+      <div class="modal-head" style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 18px 22px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.25rem;">📝</span>
+          <span class="modal-title" style="font-size: 1.05rem; font-weight: 700;">บันทึกหมายเหตุ (ส่งเกิน)</span>
+        </div>
+        <button class="modal-close" onclick="closeOverNoteModal()" aria-label="ปิด" style="margin-left: auto;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px;">
+        <input type="hidden" id="overModalDate">
+        <input type="hidden" id="overModalInvID">
+        <input type="hidden" id="overModalProduct">
+        <input type="hidden" id="overModalQty">
+        <input type="hidden" id="overModalEditingTimestamp">
+
+        <!-- Info Card -->
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 0.88rem; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;">
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.76rem;">📅 วันที่:</span>
+            <div id="overInfoDate" style="font-weight: 600; color: var(--text-primary); margin-top: 2px;">—</div>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.76rem;">📄 เลขที่ใบรับคืน:</span>
+            <div id="overInfoInv" style="font-weight: 600; color: var(--text-primary); margin-top: 2px; word-break: break-all;">—</div>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.76rem;">🧪 สินค้า:</span>
+            <div id="overInfoProduct" style="font-weight: 600; color: var(--accent2); margin-top: 2px;">—</div>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.76rem;">⚠️ จำนวนส่งเกิน:</span>
+            <div id="overInfoQty" style="font-weight: 700; color: var(--danger); font-size: 1.05rem; margin-top: 2px;">—</div>
+          </div>
+        </div>
+
+        <!-- Note Textarea with Edit & Delete symbol buttons -->
+        <div style="margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <label for="overNoteText" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary);">
+              ระบุหมายเหตุ / เหตุผลการส่งเกิน:
+            </label>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnEditOverNoteModal" onclick="startEditCurrentOverNote()" title="แก้ไข" style="display: none; padding: 3px 8px; font-size: 0.95rem; line-height: 1; border-radius: 6px;">✏️</button>
+              <button type="button" class="btn btn-danger btn-sm" id="btnDeleteOverNoteModal" onclick="confirmDeleteCurrentOverNote()" title="ลบ" style="display: none; padding: 3px 8px; font-size: 0.95rem; line-height: 1; border-radius: 6px;">🗑️</button>
+            </div>
+          </div>
+          <textarea id="overNoteText" rows="4" style="width: 100%; box-sizing: border-box; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); padding: 10px 12px; font-size: 0.9rem; font-family: inherit; resize: vertical;" placeholder="เช่น ถังตกค้างจากรอบก่อน, ส่งคืนเกินยอดรับเข้า, รอตรวจสอบยอด..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border);">
+        <button class="btn btn-secondary" onclick="closeOverNoteModal()" style="padding: 7px 16px;">ยกเลิก</button>
+        <button class="btn btn-primary" id="btnSaveOverNote" onclick="saveOverNote()" title="บันทึกข้อมูลลง Sheet: Over" style="padding: 7px 16px; font-size: 1.15rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">
+          💾
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVER RETURN REPORT MODAL -->
+  <div class="modal-overlay" id="overReportOverlay">
+    <div class="modal-box over-report-box">
+      <div class="modal-head" style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 12px 16px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 1.15rem;">📊</span>
+          <span class="modal-title" style="font-size: 0.98rem; font-weight: 700;">รายงานส่งเกิน</span>
+          <span id="overReportCount" class="badge" style="background: rgba(252,129,129,0.18); color: #fc8181; font-size: 0.72rem; padding: 2px 9px;">0 รายการ</span>
+        </div>
+        <button class="modal-close" onclick="closeOverReportModal()" aria-label="ปิด" style="margin-left: auto;">✕</button>
+      </div>
+
+      <div style="padding: 8px 16px 6px; font-size: 0.76rem; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.04);">
+        คลิกที่รายการเพื่อเลื่อนและชี้ไปยังข้อมูลส่งเกินในตารางไทม์ไลน์
+      </div>
+
+      <div class="modal-body" style="padding: 0; flex: 1; min-height: 0; overflow-y: auto;">
+        <table class="over-report-table">
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>รายการ</th>
+              <th>เลขที่</th>
+              <th style="text-align: center;">จำนวนส่งเกิน</th>
+            </tr>
+          </thead>
+          <tbody id="overReportTableBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border);">
+        <button class="btn btn-secondary" onclick="closeOverReportModal()" style="padding: 7px 18px;">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div class="app-wrapper" id="appWrapper" style="display: none;">
+    <header class="app-header">
+      <div class="header-icon">📊</div>
+      <div class="header-text">
+        <h1 id="mainTitle">รายการการรับ -ส่ง ถังส่งอัดก๊าซ</h1>
+        <p id="subTitle">เปรียบเทียบยอดค้างส่งและไทม์ไลน์ล่าสุด</p>
+      </div>
+      <div class="header-actions" style="display: flex; align-items: center; gap: 8px;">
+        <span id="headerUserInfo"
+          style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: none;"></span>
+        <button class="btn btn-secondary" id="helpBtn" title="คำอธิบายสี & วิธีใช้งาน" onclick="openHelpModal()"
+          style="padding: 10px 14px; font-size: 1.1rem; line-height: 1;">❓</button>
+        <button class="btn btn-secondary" id="settingsBtn" title="ตั้งค่า / เข้าสู่ระบบ" onclick="openLoginSetting()"
+          style="padding: 10px 14px; font-size: 1.1rem; line-height: 1;">⚙️</button>
+      </div>
+    </header>
+
+    <div class="filter-panel" style="display: none;">
+      <div class="filter-label">กรองตามประเภทสินค้า :</div>
+      <div class="filter-chips">
+        <button class="filter-chip active" onclick="setProductFilter('all', this)">
+          แสดงทั้งหมด
+        </button>
+        <button class="filter-chip" onclick="setProductFilter('ไนโตรเจน 1.5 Q', this)">
+          <span class="dot" style="background:var(--accent-n2);"></span> N₂ 1.5Q
+        </button>
+        <button class="filter-chip" onclick="setProductFilter('ออกซิเจน 1.5 Q', this)">
+          <span class="dot" style="background:var(--accent-o2);"></span> O₂ 1.5Q
+        </button>
+        <button class="filter-chip" onclick="setProductFilter('ออกซิเจน 0.5 Q', this)">
+          <span class="dot" style="background:var(--accent-o2s);"></span> O₂ 0.5Q
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-panel-card">
+      <div class="stats-panel-header">
+        <span class="stats-panel-title">รายการถังส่งอัดก๊าซคงค้างปัจจุบัน</span>
+      </div>
+      <div class="stats-bar">
+      <div class="stat-card" id="cardTotal" style="display: none;">
+        <div class="stat-icon">📋</div>
+        <div>
+          <div class="stat-label" id="statLabel1">ใบส่งอัดทั้งหมด</div>
+          <div class="stat-value" id="statTotal">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-icon">💠</span>
+          <span class="stat-title" id="lblN2">N₂ 1.5Q</span>
+        </div>
+
+        <!-- ข้อมูลค้างส่ง (กึ่งกลางการ์ด ขนาดใหญ่และเด่น) -->
+        <div class="stat-hero">
+          <div class="stat-hero-lbl">ค้างส่ง</div>
+          <div class="stat-hero-val stat-value" id="statN2">—</div>
+        </div>
+
+        <!-- รวม และ คงเหลือ อยู่บรรทัดต่อมา -->
+        <div class="stat-sub-row">
+          <div class="stat-sub-pill" title="Material: 30011061 (Unrestricted)">
+            <span class="sub-lbl">รวม</span>
+            <span class="sub-val" id="stockN2">—</span>
+          </div>
+          <div class="stat-sub-pill" title="คงเหลือในคลัง = รวม - ค้างส่ง">
+            <span class="sub-lbl">คงเหลือ</span>
+            <span class="sub-val stat-remain-val" id="remainN2">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-icon">🔴</span>
+          <span class="stat-title" id="lblO2L">O₂ 1.5Q</span>
+        </div>
+
+        <!-- ข้อมูลค้างส่ง (กึ่งกลางการ์ด ขนาดใหญ่และเด่น) -->
+        <div class="stat-hero">
+          <div class="stat-hero-lbl">ค้างส่ง</div>
+          <div class="stat-hero-val stat-value" id="statO2L">—</div>
+        </div>
+
+        <!-- รวม และ คงเหลือ อยู่บรรทัดต่อมา -->
+        <div class="stat-sub-row">
+          <div class="stat-sub-pill" title="Material: 30011063 (Unrestricted)">
+            <span class="sub-lbl">รวม</span>
+            <span class="sub-val" id="stockO2L">—</span>
+          </div>
+          <div class="stat-sub-pill" title="คงเหลือในคลัง = รวม - ค้างส่ง">
+            <span class="sub-lbl">คงเหลือ</span>
+            <span class="sub-val stat-remain-val" id="remainO2L">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-icon">🟡</span>
+          <span class="stat-title" id="lblO2S">O₂ 0.5Q</span>
+        </div>
+
+        <!-- ข้อมูลค้างส่ง (กึ่งกลางการ์ด ขนาดใหญ่และเด่น) -->
+        <div class="stat-hero">
+          <div class="stat-hero-lbl">ค้างส่ง</div>
+          <div class="stat-hero-val stat-value" id="statO2S">—</div>
+        </div>
+
+        <!-- รวม และ คงเหลือ อยู่บรรทัดต่อมา -->
+        <div class="stat-sub-row">
+          <div class="stat-sub-pill" title="Material: 30014237 (Unrestricted)">
+            <span class="sub-lbl">รวม</span>
+            <span class="sub-val" id="stockO2S">—</span>
+          </div>
+          <div class="stat-sub-pill" title="คงเหลือในคลัง = รวม - ค้างส่ง">
+            <span class="sub-lbl">คงเหลือ</span>
+            <span class="sub-val stat-remain-val" id="remainO2S">—</span>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY LEGEND (Moved to Setting/Help Modal) -->
+
+    <div class="table-card">
+      <div class="table-header"
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <span class="table-title" id="tableTitleText">ไทม์ไลน์ล่าสุด</span>
+          <span class="table-count" id="tableCount"></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <div id="printModeSwitchContainer" style="display: none; align-items: center; gap: 8px;"
+            title="เลือกรูปแบบหน้า Preview พิมพ์ใบรับ-ส่งถังบรรจุก๊าซ (เฉพาะ Admin)">
+            <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">🖨️</span>
+            <span id="printModeLabelV1"
+              style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; cursor: pointer;"
+              onclick="setExportPreviewMode('v1')">แบบเดิม</span>
+            <label class="switch">
+              <input type="checkbox" id="printModeToggle" checked onchange="toggleExportPreviewMode(this.checked)">
+              <span class="slider round"></span>
+            </label>
+            <span id="printModeLabelV2"
+              style="font-size: 0.78rem; color: var(--accent2); font-weight: 700; cursor: pointer;"
+              onclick="setExportPreviewMode('v2')">แบบ 2</span>
+          </div>
+          <div id="summarySwitchContainer" style="display: flex; align-items: center; gap: 10px;">
+            <span
+              style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">แสดงเลขที่เอกสาร</span>
+            <label class="switch">
+              <input type="checkbox" id="fullInvToggle" onchange="toggleFullInvoiceInfo(this.checked)">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table compact-table" id="mainTable">
+          <thead>
+            <tr>
+              <th id="thExp" style="width:32px;"></th>
+              <th id="thStatus" style="width:62px;">สถานะ</th>
+              <th id="thDate" style="display:none;">เลขที่</th>
+              <th id="thInv" style="display:none;">วันที่</th>
+              <th id="thImg" class="hide-mobile">รูปภาพ</th>
+              <th style="text-align:center;"><span class="badge badge-n2">N₂ 1.5Q</span></th>
+              <th style="text-align:center;"><span class="badge badge-o2">O₂ 1.5Q</span></th>
+              <th style="text-align:center;"><span class="badge badge-o2s">O₂ 0.5Q</span></th>
+              <th id="thManage" style="display:none;text-align:left;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="mainTbody">
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <div class="empty-icon">📦</div>
+                  <p>กำลังโหลดข้อมูล...</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Floating Add Button -->
+    <button class="fab-add-btn" id="addBtn" onclick="openAddModal()" title="เพิ่มข้อมูล"
+      aria-label="เพิ่มข้อมูล">+</button>
+  </div>
+
+  <script src="utils.js?v=20261126-preview-3" charset="UTF-8"></script>
+  <script src="config.js?v=20261126-preview-3" charset="UTF-8"></script>
+  <script src="api.js?v=20261126-preview-3" charset="UTF-8"></script>
+  <script src="ui-renderers.js?v=20261126-preview-3" charset="UTF-8"></script>
+  <script src="auth.js?v=20261126-preview-3" charset="UTF-8"></script>
+  <script src="Tank.js?v=20261126-preview-3" charset="UTF-8"></script>
+</body>
+
+</html>
