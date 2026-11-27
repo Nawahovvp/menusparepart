@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบวิเคราะห์ ABC อะไหล่ (เวอร์ชันสมบูรณ์)</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232c3e50'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='16' font-family='Arial' font-weight='700' fill='white'%3EABC%3C/text%3E%3C/svg%3E">
+
+    <!-- CSS หลักของคุณ (แยกไฟล์แล้ว) -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="progress.css">
+    <link rel="stylesheet" href="glass-theme.css">
+
+    <!-- ไอคอน + ฟอนต์ -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Libs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @keyframes blink-orange {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .success-badge-orange {
+            background-color: #ff9800;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            animation: blink-orange 1.5s infinite ease-in-out;
+        }
+
+        .success-badge-red {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .hide-express .express-col {
+            display: none;
+        }
+
+        /* Status Modal Improvements */
+        .status-info-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 8px 16px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid #eee;
+        }
+
+        .status-info-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            text-align: right;
+        }
+
+        .status-info-value {
+            color: #2c3e50;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .status-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .status-select-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #7f8c8d;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .status-select-btn i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            transition: transform 0.2s;
+        }
+
+        .status-select-btn:hover {
+            border-color: #bdc3c7;
+            background: #fcfcfc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-select-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Active States with specific colors */
+        .status-select-btn.active[data-val="Active"] {
+            background-color: #e8f8f5 !important;
+            border-color: #2ecc71 !important;
+            color: #27ae60 !important;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+        }
+
+        .status-select-btn.active[data-val="ByCase"] {
+            background-color: #fef9e7 !important;
+            border-color: #f1c40f !important;
+            color: #d35400 !important;
+            box-shadow: 0 4px 10px rgba(241, 196, 15, 0.2);
+        }
+
+        .status-select-btn.active[data-val="ยกเลิก"] {
+            background-color: #fdedec !important;
+            border-color: #e74c3c !important;
+            color: #c0392b !important;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+        }
+
+        .status-actions {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 10px;
+        }
+
+        .status-badge-current {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e0e0e0;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .status-col-cell {
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .status-approved {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .status-other {
+            color: #95a5a6;
+        }
+
+        /* Earliest PO Columns Conditional Logic */
+        #dataTable .earliest-po-col {
+            display: none;
+        }
+
+        #dataTable.show-earliest-po .earliest-po-col {
+            display: table-cell !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ABC Analysis & Smart Ordering System</h1>
+        <button id="menuBtn" style="display: none;"><i class="fas fa-user-circle"></i></button>
+        <div id="userMenu">
+            <p id="userID"></p>
+            <p id="userName"></p>
+            <p id="userExtra" style="font-size:12px;color:#555;margin:4px 0 0;"></p>
+
+            <!-- ✅ ปุ่ม Help -->
+            <button id="helpBtn" class="export-btn"
+                style="width:100%;justify-content:center;margin:8px 0;background:linear-gradient(135deg,#3498db,#2980b9);">
+                <i class="fas fa-circle-info"></i> Help
+            </button>
+
+            <button id="logoutBtn">Log out</button>
+        </div>
+
+        <div class="loader" id="loader" style="display: none;">
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="progress-text">Initializing...</div>
+        </div>
+        <button id="backBtn"><i class="fas fa-arrow-left"></i></button>
+
+        <!-- Plant Selection -->
+        <div id="plantSelection"
+            style="display: none; text-align: center; padding: 30px; background: linear-gradient(135deg, #f0f4ff, #e0eaff); border-radius: 20px; margin: 30px auto; max-width: 600px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">เลือกคลังสินค้า</h2>
+            <div id="movementSpinner"
+                style="display:none; align-items:center; justify-content:center; gap:10px; font-weight:700; color:#1f2d3d; background:#fff; border:1px solid #e0e6f0; padding:10px 12px; border-radius:10px; margin:0 auto 12px; max-width:520px;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>กำลังโหลดข้อมูลเคลื่อนไหว...</span>
+            </div>
+            <div id="movementInfo"
+                style="display:none; font-weight:700; color:#1f2d3d; background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:10px; margin:0 auto 14px; max-width:520px; line-height:1.5;">
+            </div>
+            <div class="control-group" id="plantSelectionControls"
+                style="justify-content: center; margin: 0 auto; width: fit-content; display: none; align-items: center; gap: 10px;">
+                <label><i class="fas fa-industry control-icon"></i> Plant:</label>
+                <select id="plantSelect" style="width: 250px;"></select>
+                <button id="viewBtn" class="export-btn" style="padding: 10px 16px; height: fit-content;"><i
+                        class="fas fa-eye"></i> View</button>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="summary-row" id="mainCardsSection" style="display:none;">
+            <div class="card total-stock" id="cardTotalStock"
+                title="มูลค่ารวมสต็อกทั้งหมด + จำนวนรายการทั้งหมด (ตามโหมดที่เลือก)">
+                <div class="card-title">มูลค่ารวม</div>
+                <div class="card-value" id="totalStockValue">0.00</div>
+                <div class="card-count" id="totalCount">0 รายการ</div>
+            </div>
+            <div class="card order-items" id="cardOrderItems"
+                title="จำนวนรายการที่ต้องสั่ง + มูลค่ารวมของการสั่ง (ตามโหมด Order)">
+                <div class="card-title">Order</div>
+                <div class="card-value" id="orderItemCount">0</div>
+                <div class="card-value" id="orderTotalValue">0.00</div>
+            </div>
+            <div class="card return-value" id="cardReturnValue"
+                title="มูลค่ารวมของที่ส่งคืนได้ + จำนวนรายการ OverStock (ตามโหมด Return)">
+                <div class="card-title">OverStock</div>
+                <div class="card-value" id="returnValue">0.00</div>
+                <div class="card-count" id="returnItemCount">0 รายการ</div>
+            </div>
+            <!-- Out of Stock -->
+            <div class="card out-of-stock" id="cardOutOfStock"
+                title="รายการที่หมดในคลังนี้แต่ยังมีในนวนคร (จำนวนรายการ + มูลค่า)">
+                <div class="card-title">Out of Stock</div>
+                <div class="card-value" id="countOutOfStock">0</div>
+                <div class="card-value small" id="valOutOfStock">0.00</div>
+            </div>
+
+            <!-- Out of Stock Wait -->
+            <div class="card out-of-stock-wait" id="cardOutOfStockWait"
+                title="รายการที่หมดทั้งในคลังนี้และนวนคร (จำนวนรายการ + มูลค่า)">
+                <div class="card-title">Out of Stock Wait</div>
+                <div class="card-value" id="countOutOfStockWait">0</div>
+                <div class="card-value small" id="valOutOfStockWait">0.00</div>
+            </div>
+            <div class="card monthly-withdrawal" id="cardMonthlyWithdrawal"
+                title="มูลค่าการเบิกเฉลี่ยต่อเดือน (จากข้อมูล 4 เดือน)">
+                <div class="card-title">เบิก/เดือน</div>
+                <div class="card-value" id="monthlyWithdrawalValue">0.00</div>
+            </div>
+            <div class="card stock-days" id="cardStockDays"
+                title="จำนวนวันที่สต็อกปัจจุบันเพียงพอ (Stock Days = คงเหลือ ÷ การใช้เฉลี่ยต่อวัน)">
+                <div class="card-title">Stock Days</div>
+                <div class="card-value" id="stockDaysValue">0</div>
+            </div>
+            <div class="card after-stock-days" id="cardAfterStockDays"
+                title="จำนวนวันที่สต็อกเหลือหลังหักของส่งคืนได้ (After Return)">
+                <div class="card-title">After Stock Days</div>
+                <div class="card-value" id="afterStockDaysValue">0</div>
+            </div>
+        </div>
+
+        <div class="summary-row" id="summarySection" style="display:none;">
+            <div class="card abc-a" id="abcA" title="กลุ่ม A: มูลค่าสะสม ≤70% (สำคัญมากที่สุด)">
+                <div class="card-title">กลุ่ม A</div>
+                <div class="card-value" id="sumA">0.00</div>
+                <div class="card-count" id="countA">0 รายการ</div>
+            </div>
+            <div class="card abc-b" id="abcB" title="กลุ่ม B: มูลค่าสะสม 70-90% (สำคัญรองลงมา)">
+                <div class="card-title">กลุ่ม B</div>
+                <div class="card-value" id="sumB">0.00</div>
+                <div class="card-count" id="countB">0 รายการ</div>
+            </div>
+            <div class="card abc-c" id="abcC" title="กลุ่ม C: มูลค่าสะสม >90% (ทั่วไป)">
+                <div class="card-title">กลุ่ม C</div>
+                <div class="card-value" id="sumC">0.00</div>
+                <div class="card-count" id="countC">0 รายการ</div>
+            </div>
+            <div class="card fast" id="cardFast" title="Fast Moving: เฉลี่ยเบิก ≥30 ชิ้น/เดือน">
+                <div class="card-title">Fast Moving</div>
+                <div class="card-value" id="valFast">0.00</div>
+                <div class="card-count" id="countFast">0 รายการ</div>
+            </div>
+            <div class="card medium" id="cardMedium" title="Medium: เฉลี่ยเบิก 12-29 ชิ้น/เดือน">
+                <div class="card-title">Medium</div>
+                <div class="card-value" id="valMedium">0.00</div>
+                <div class="card-count" id="countMedium">0 รายการ</div>
+            </div>
+            <div class="card slow" id="cardSlow" title="Slow Moving: เฉลี่ยเบิก 0.7-11 ชิ้น/เดือน">
+                <div class="card-title">Slow Moving</div>
+                <div class="card-value" id="valSlow">0.00</div>
+                <div class="card-count" id="countSlow">0 รายการ</div>
+            </div>
+            <div class="card slowly" id="cardSlowly" title="Slowly Moving: เฉลี่ยเบิก <0.7 ชิ้น/เดือน">
+                <div class="card-title">Slowly Moving</div>
+                <div class="card-value" id="valSlowly">0.00</div>
+                <div class="card-count" id="countSlowly">0 รายการ</div>
+            </div>
+            <div class="card dead" id="cardDead" title="Non Moving: ไม่มีการเบิกเลยใน 4 เดือน">
+                <div class="card-title">Non Moving</div>
+                <div class="card-value" id="valDead">0.00</div>
+                <div class="card-count" id="countDead">0 รายการ</div>
+            </div>
+        </div>
+
+        <div class="controls" id="controlsSection" style="display:none;">
+            <div class="filter-row">
+                <div class="control-group compact-group plant-group">
+                    <label><i class="fas fa-industry control-icon"></i> Plant:</label>
+                    <select id="plantFilter">
+                        <option value="">ทุก Plant</option>
+                    </select>
+                </div>
+                <button id="updateBtn" class="icon-btn" title="เปิด Google Sheet เพื่ออัปเดตข้อมูลคลัง"
+                    style="display:none;">
+                    <i class="fas fa-database"></i>
+                </button>
+                <span id="lastUpdateLabel" style="font-size:12px;color:#555;margin-left:8px;"></span>
+
+                <a id="uploadBtn" class="export-btn" href="#" target="_blank"
+                    style="display:none; flex: 0 1 auto; margin-left: 0;"><i class="fas fa-upload"></i> Upload</a>
+                <div class="control-group compact-group lt-filter">
+                    <label
+                        title="ระยะเวลาที่ใช้ในการจัดส่ง (Lead Time) — Plant ทั่วไปใช้ค่ากรอก; 0301 ใช้ L/T จากตาราง"><i
+                            class="fas fa-clock control-icon"></i> Lead Time:</label>
+                    <div class="mini-input-row">
+                        <input type="number" id="leadTimeDays" value="5"><span class="unit">วัน</span>
+                    </div>
+                </div>
+                <div class="control-group compact-group lt-filter">
+                    <label
+                        title="จำนวนวันที่สำรองเพื่อป้องกันความผันผวน (Safety Days) — Plant ทั่วไปใช้ค่ากรอก + เพิ่มตาม Moving: Medium+1, Slow+2, Slowly+4 (ยกเว้น 0301; 0326 เพิ่มเฉพาะ Status 'นวนคร'); 0301 คำนวณจาก L/T (ceil 0.3, min 2 max 30)"><i
+                            class="fas fa-shield-alt control-icon"></i> Safety:</label>
+                    <div class="mini-input-row">
+                        <input type="number" id="safetyDays" value="15"><span class="unit">วัน</span>
+                    </div>
+                </div>
+                <div class="control-group compact-group lt-filter">
+                    <label
+                        title="จำนวนวันที่ต้องการให้สต็อกครอบคลุมหลังสั่ง (Cover Days) — Plant ทั่วไปใช้ค่ากรอก + เพิ่มตาม Moving: Medium+10, Slow+15, Slowly+20 (ยกเว้น 0301); 0301 คำนวณตาม L/T + Moving/ABC; 0326 สถานะติดตั้งเรียกเข้า/เรียกเข้าใช้ Cover 15 เมื่อ DOS&lt;7 (ไม่ใช้ PR/PO), สถานะติดตั้งใช้สูตร 0301"><i
+                            class="fas fa-calendar-check control-icon"></i> ครอบคลุม:</label>
+                    <div class="mini-input-row">
+                        <input type="number" id="coverDays" value="45"><span class="unit">วัน</span>
+                    </div>
+                </div>
+                <button class="export-btn" id="exportBtn" title="Export ข้อมูลที่แสดงเป็นไฟล์ CSV"
+                    style="margin-left: 0;">
+                    <i class="fas fa-file-export"></i> Export
+                </button>
+                <button class="icon-btn" id="refreshBtn" title="อัปเดตข้อมูล Plant ปัจจุบัน">
+                    <i class="fas fa-rotate"></i>
+                </button>
+                <div class="control-group compact-group orderselect-filter" title="ตัวกรองเฉพาะ Plant 0301">
+                    <label title="กรองตาม OrderSelect จากชีทหมายเหตุ (0301)"><i class="fas fa-filter control-icon"></i>
+                        OrderSelect:</label>
+                    <select id="orderSelectFilter" title="เลือกค่า OrderSelect เฉพาะ Plant 0301">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="control-group compact-group comeon-filter" title="ตัวกรองเฉพาะ Plant 0301">
+                    <label title="กรองตาม Call (เฉพาะ Plant 0301)"><i class="fas fa-phone control-icon"></i>
+                        เรียกเข้า:</label>
+                    <select id="comeonFilter" title="เลือกค่า Call เฉพาะ Plant 0301">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="control-group compact-group product-filter" title="ตัวกรองเฉพาะ Plant 0301">
+                    <label title="กรองตาม Product (เฉพาะ Plant 0301)"><i class="fas fa-filter control-icon"></i>
+                        Product:</label>
+                    <input id="productFilter" list="productFilterList" placeholder="ทั้งหมด"
+                        title="พิมพ์เพื่อค้นหา Product เฉพาะ Plant 0301">
+                    <datalist id="productFilterList"></datalist>
+                </div>
+            </div>
+            <div class="search-row">
+                <div class="control-group">
+                    <label><i class="fas fa-search control-icon"></i> ค้นหา:</label>
+                    <input type="text" id="searchInput" placeholder="Material หรือ Description">
+                </div>
+                <div id="responsibleFilterContainer">
+                    <label title="กรองตามผู้รับคืน/เจ้าของ Shelf"><i class="fas fa-user-check control-icon"></i>
+                        ผู้รับคืน:</label>
+                    <select id="responsibleFilter">
+                        <option value="">ทุกคน</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label title="กรองตาม Purchasing Group (PRG) จากข้อมูลสต็อก"><i
+                            class="fas fa-users-cog control-icon"></i> PRG:</label>
+                    <select id="prgFilter">
+                        <option value="">ทุก PRG</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label title="กรองตามสถานะวัสดุจากชีท Orders"><i class="fas fa-filter control-icon"></i>
+                        Status:</label>
+                    <select id="statusFilter">
+                        <option value="">ทุกสถานะ</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label title="กรองตามจำนวนคงเหลือในนวนคร">นวนคร:</label>
+                    <select id="navanakornFilter">
+                        <option value="">ทั้งหมด</option>
+                        <option value="nav0">นวนคร = 0</option>
+                        <option value="navgt0">นวนคร &gt; 0</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label title="กรองตามความแตกต่างระหว่างสั่งจริง vs แนะนำสั่ง"><i
+                            class="fas fa-balance-scale control-icon"></i> Success:</label>
+                    <select id="orderDiffFilter">
+                        <option value="">ทั้งหมด</option>
+                        <option value="ordered">Success</option>
+                        <option value="pending">Wait</option>
+                        <option value="cancelled">ยกเลิก</option>
+                    </select>
+                </div>
+
+
+                <div class="control-group compact-group" title="เลือกรอบสั่ง (วันที่) เพื่อบันทึก/ดูยอดสั่ง">
+                    <label><i class="fas fa-calendar-alt control-icon"></i> Order Round:</label>
+                    <input type="date" id="orderRoundDate"
+                        style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+
+                <!-- ✅ ปุ่ม Set -->
+                <button class="icon-btn set-btn" id="setActualBtn"
+                    title="ตั้ง “สั่งจริง” = “แนะนำสั่ง” สำหรับรายการในหน้าปัจจุบัน">
+                    <i class="fas fa-check"></i>
+                </button>
+
+                <button class="export-btn" id="saveCloudBtn" onclick="saveOrdersToCloud()"
+                    title="บันทึกยอดสั่งจริงลง Cloud (Google Sheet)"
+                    style="background: linear-gradient(135deg, #8e44ad, #9b59b6); margin-left: 5px;">
+                    <i class="fas fa-cloud-upload-alt"></i> Save
+                </button>
+                <div id="syncIndicator" class="sync-badge" style="display:none">0</div>
+                <span id="actualOrderSummary"
+                    style="font-size:16px; font-weight: bold; color: #d35400; margin-left: 10px;"></span>
+            </div>
+
+            <div class="table-container" id="tableSection" style="display:none;">
+                <table id="dataTable">
+                    <thead>
+                        <tr id="tableHeader">
+                            <th data-sort="Plant" title="รหัสคลังสินค้า (Plant) ที่กำลังดูข้อมูล">
+                                Plant <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="Status"
+                                title="สถานะวัสดุ/คำสั่ง (0301 ใช้ Active/Inactive จากชีทหมายเหตุ; 0326 บางสถานะมีผลต่อสูตรแนะนำสั่ง)">
+                                Status
+                            </th>
+                            <th data-sort="Material" title="รหัสอะไหล่/วัสดุ (Material Code)">
+                                Material <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th title="ชื่อ/รายละเอียดอะไหล่จาก SAP (Material description)">รายการอะไหล่</th>
+                            <th data-sort="StorageBin" title="ตำแหน่งจัดเก็บ (Storage bin) จากข้อมูลคลัง">
+                                Storage bin <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="RebuiltStock" title="RBT: จำนวนคงเหลือ Rebuilt ของ Plant (แสดงเฉพาะ > 0)">RBT
+                            </th>
+
+                            <th data-sort="Navanakorn" class="nav-col"
+                                title="จำนวนคงเหลือของ Material เดียวกันในคลังนวนคร (Plant 0301) เพื่อดูว่าคลังกลางมีของไหม">
+                                นวนคร
+                            </th>
+                            <th data-sort="Unrestricted"
+                                title="คงเหลือใช้งานได้ (Unrestricted stock) ของคลังที่กำลังดู">
+                                คงเหลือ <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="subtotal-col" data-sort="SubtotalAllPlant"
+                                title="รวมคงเหลือทุก Plant ของ Material นี้ (แสดงเฉพาะตอนเปิด Plant 0301)">
+                                Etc <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="Value"
+                                title="มูลค่าสต๊อก: ถ้ามี AvgVal => คงเหลือ×AvgVal, ถ้าไม่มีใช้ Value Unrestricted จาก SAP">
+                                มูลค่า <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="lt-col" title="Planned Delivery Time (แสดงเฉพาะ Plant 0301/0326)">L/T</th>
+                            <th data-sort="Qty6Month"
+                                title="ยอดเบิกย้อนหลัง 6 เดือน (จาก MoveAllsum). ถ้าไม่มีจะประมาณจาก 4M×1.5">
+                                6M
+                            </th>
+                            <th data-sort="Qty4Month" title="ยอดเบิกย้อนหลัง 4 เดือน (ใช้เป็นฐานเมื่อไม่มี 3M)">
+                                4M
+                            </th>
+                            <th data-sort="Qty3Month" title="ยอดเบิกย้อนหลัง 3 เดือน (จาก MoveAllsum ถ้ามี)">
+                                3M
+                            </th>
+                            <th data-sort="Qty2Month" title="ยอดเบิกย้อนหลัง 2 เดือน (จาก MoveAllsum)">
+                                2M
+                            </th>
+                            <th data-sort="ThirtyDay" title="ยอดเบิกจริงใน 30 วันล่าสุด (ช่วยจับความต้องการล่าสุด)">
+                                30Day
+                            </th>
+                            <th data-sort="Sale" class="sale-col" title="ยอดขาย (Sale) แสดงเฉพาะ Plant 0326">
+                                Sale
+                            </th>
+                            <th data-sort="AvgMonthly"
+                                title="AvgM: ถ้ามี 3M ใช้ 3M ÷ 3 เดือน, ถ้าไม่มีใช้ 4M ÷ 4 เดือน">
+                                AvgM
+                            </th>
+                            <th data-sort="Mean"
+                                title="Mean: ผสม 4M/3M/2M/30Day ตาม Moving + ABC + guard/boost (0301 ใช้สูตร override)">
+                                Mean
+                            </th>
+                            <th data-sort="SafetyStock"
+                                title="Safety Stock = AvgDailyUse × SafetyDays (Plant ทั่วไปใช้ค่ากรอก + เพิ่มตาม Moving; 0301 คำนวณจาก L/T; 0326 เพิ่มเฉพาะ Status 'นวนคร')">
+                                Safety
+                            </th>
+                            <th data-sort="ROP"
+                                title="ROP = (AvgDailyUse × LeadTimeDays) + SafetyStock (0301 ใช้ L/T จากตาราง +สูตร override)">
+                                ROP <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="DOS"
+                                title="Days of Stock (DOS) = คงเหลือ ÷ AvgDailyUse (ถ้า AvgDailyUse=0 จะแสดง 'มาก')">
+                                DOS <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="PrOutstanding" class="pr-col"
+                                title="PR (รอเปิด PO) แสดงเฉพาะ Plant 0301/0326 (0301 ใช้รวม NetStock; 0326 ใช้เฉพาะสถานะติดตั้งที่คำนวณแบบ 0301)">
+                                PR <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="PoOutstanding" class="po-col"
+                                title="PO ค้างรับ แสดงเฉพาะ Plant 0301/0326 (0301 ใช้รวม NetStock; 0326 ใช้เฉพาะสถานะติดตั้งที่คำนวณแบบ 0301)">
+                                PO <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="EarliestPoDate" class="earliest-po-col" title="กำหนดส่งที่ใกล้ที่สุด">
+                                กำหนดส่ง <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="EarliestPoNumber" class="earliest-po-col" title="เลขที่ PO ที่ใกล้ที่สุด">
+                                เลขที่ PO <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="EarliestPoQty" class="earliest-po-col"
+                                title="จำนวน PO รอกำหนดส่งที่ใกล้ที่สุด">
+                                จำนวน (PO) <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th data-sort="RecommendedOrder"
+                                title="แนะนำสั่ง: ถ้าสต็อก < ROP ⇒ (AvgDailyUse×CoverDays) - สต็อก ปัดตาม Pack; 0301 ใช้ NetStock=สต็อก+PR+PO และ CoverDay จาก L/T+Moving/ABC; 0326 สถานะติดตั้งใช้สูตร 0301, ติดตั้งเรียกเข้า/เรียกเข้าใช้ Cover 15 เมื่อ DOS&lt;7 (ไม่ใช้ PR/PO)">
+                                แนะนำสั่ง <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th title="จำนวนสั่งจริงที่ผู้ใช้ปรับเอง (ระบบจะจำค่าไว้ในเครื่องด้วย LocalStorage)">
+                                สั่งจริง
+                            </th>
+                            <th class="express-col"
+                                title="ยอดสั่งนอกรอบ (รวมจาก Request ที่สถานะรอเบิก เฉพาะ Plant 0326)">
+                                นอกรอบ
+                            </th>
+                            <th title="แสดง Success เมื่อสั่งจริง > 0 (ตรงกับ Filter สั่งจริง)">
+                                Success
+                            </th>
+                            <th data-sort="Unit" title="หน่วยนับของวัสดุ (Base Unit of Measure เช่น Pc)">
+                                หน่วย
+                            </th>
+                            <th title="หมายเหตุเพิ่มเติมจากข้อมูล (0301 ใช้ชีทหมายเหตุ)">หมายเหตุ</th>
+                            <th data-sort="MultiplyUnit"
+                                title="Pack/Package: จำนวนต่อแพ็คสำหรับปัดการสั่ง (เช่น 10 ชิ้น/แพ็ค)">
+                                Package
+                            </th>
+                            <th data-sort="MinOrder" class="minorder-col"
+                                title="MinOrder จากชีทหมายเหตุ (0301 ใช้จำกัดขั้นต่ำสั่ง)">MinOrder</th>
+                            <th class="lt-col" data-sort="SafetyDayUsed"
+                                title="SafetyDay ที่ใช้คำนวณสำหรับ Plant 0301 (จาก L/T, min 2 max 30, ตาม Moving/ABC)">
+                                SafetyDay
+                            </th>
+                            <th class="lt-col" data-sort="CoverDayUsed"
+                                title="CoverDay ที่ใช้คำนวณแนะนำสั่งสำหรับ Plant 0301 (จาก L/T + ABC + Moving)">
+                                CoverDay
+                            </th>
+                            <th data-sort="Product" title="กลุ่ม/ประเภทสินค้า (Product Group) จาก mainsap">
+                                Product
+                            </th>
+                            <th data-sort="PartType" title="ประเภทอะไหล่จาก mainsap">
+                                ประเภทอะไหล่
+                            </th>
+                            <th data-sort="Rebuilt" title="Rebuilt จากชีทหมายเหตุ (0301)">Rebuilt</th>
+                            <th data-sort="ABCValue"
+                                title="ABC ตามมูลค่าสะสม (Pareto): A≤70%, B≤90%, C>90% (คำนวณใหม่ตามโหมด)">
+                                ABC
+                            </th>
+                            <th data-sort="Moving"
+                                title="ความเร็วการเคลื่อนไหวจาก AvgM: Non Moving=0, Slowly<0.7, Slow<12, Medium<30, Fast>=30">
+                                Moving
+                            </th>
+                            <th data-sort="ReturnQty"
+                                title="จำนวนส่งคืนได้ = max(0, คงเหลือ - KeepQty). KeepQty คำนวณจาก Moving + ABC">
+                                จำนวนส่งคืน
+                            </th>
+                            <th data-sort="CumPercent" title="เปอร์เซ็นต์มูลค่าสะสมของรายการนั้นในลำดับการจัด ABC">
+                                %สะสม <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="col-location" title="Location จากข้อมูลจัดเก็บ (ถ้ามี) หรือใช้ Storage bin แทน">
+                                Location</th>
+                            <th class="col-shelf" title="Shelf = อักษร/รหัส 3 ตัวแรกของ Location (ใช้ map หาเจ้าของ)">
+                                Shelf</th>
+                            <th title="ผู้รับคืน/ผู้ดูแล Shelf (map จาก Shelf → UserID → ชื่อ)">ผู้รับคืน</th>
+                            <th title="Purchasing Group (PRG) จากข้อมูลสต็อก">PRG</th>
+                            <th data-sort="OrderSelect" class="orderselect-col"
+                                title="OrderSelect จากชีทหมายเหตุ (เฉพาะ Plant 0301)">
+                                OrderSelect
+                            </th>
+                            <th data-sort="Comeon" class="comeon-col" title="Call จากหน้ารวม">
+                                Comeon
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataList"></tbody>
+                </table>
+            </div>
+
+            <div id="pagination" class="pagination"></div>
+        </div>
+
+        <!-- PO Detail Modal -->
+        <div id="poModal" class="po-modal" style="display:none;">
+            <div class="po-modal-content">
+                <div class="po-modal-header">
+                    <h3>รายละเอียด PO: <span id="poMaterialLabel"></span></h3>
+                    <button id="poModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body">
+                    <div class="po-total">รวมค้างรับ: <span id="poTotalQty">0</span></div>
+                    <table id="poDetailTable">
+                        <thead>
+                            <tr>
+                                <th>กำหนดส่ง</th>
+                                <th>เลขที่ PO</th>
+                                <th>จำนวน</th>
+                                <th>Leadtime</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="poEmpty" class="po-empty">ไม่มีข้อมูล PO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PO By Number Detail Modal -->
+        <div id="poByNumberModal" class="po-modal" style="display:none; z-index: 10001;">
+            <div class="po-modal-content">
+                <div class="po-modal-header">
+                    <h3>รายละเอียด PO: <span id="poByNumberLabel"></span></h3>
+                    <button id="poByNumberModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body">
+                    <table id="poByNumberDetailTable">
+                        <thead>
+                            <tr>
+                                <th>Purchasing Document</th>
+                                <th>Document Date</th>
+                                <th>Material</th>
+                                <th>Short Text</th>
+                                <th>Still to be delivered (qty)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="poByNumberEmpty" class="po-empty">ไม่พบข้อมูล PO</div>
+                    <div class="rec-actions" style="margin-top: 10px;">
+                        <button id="poTimestampBtn" class="export-btn"
+                            style="margin-left:0; padding:10px 16px; background:linear-gradient(135deg,#27ae60,#2ecc71);">
+                            <i class="fas fa-clock"></i> Supplier
+                        </button>
+                        <span id="poTimestampStatus" style="margin-left:10px; font-size:13px; color:#555;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PR Detail Modal -->
+        <div id="prModal" class="po-modal" style="display:none;">
+            <div class="po-modal-content">
+                <div class="po-modal-header">
+                    <h3>รายละเอียด PR: <span id="prMaterialLabel"></span></h3>
+                    <button id="prModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body">
+                    <div class="po-total">รวม PR: <span id="prTotalQty">0</span></div>
+                    <table id="prDetailTable">
+                        <thead>
+                            <tr>
+                                <th>เลขที่ PR</th>
+                                <th>กำหนดส่ง</th>
+                                <th>จำนวน</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="prEmpty" class="po-empty">ไม่มีข้อมูล PR</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rebuilt Detail Modal -->
+        <div id="rebuiltModal" class="po-modal" style="display:none;">
+            <div class="po-modal-content">
+                <div class="po-modal-header">
+                    <h3>รายละเอียด Rebuilt</h3>
+                    <button id="rebuiltModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body">
+                    <div class="po-total">Material หลัก: <span id="rebuiltMaterialLabel">-</span></div>
+                    <div class="po-total">Rebuilt จาก: <span id="rebuiltCodeLabel">-</span></div>
+                    <div class="po-total">ยอดคงเหลือ Rebuilt: <span id="rebuiltQtyLabel">0</span></div>
+                    <table id="rebuiltDetailTable">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>รายการอะไหล่</th>
+                                <th>Storage bin</th>
+                                <th>RBT</th>
+                                <th>คงเหลือ</th>
+                                <th>Etc</th>
+                                <th>มูลค่า</th>
+                                <th>L/T</th>
+                                <th>6M</th>
+                                <th>4M</th>
+                                <th>3M</th>
+                                <th>2M</th>
+                                <th>30Day</th>
+                                <th>AvgM</th>
+                                <th>Mean</th>
+                                <th>Safety</th>
+                                <th>ROP</th>
+                                <th>DOS</th>
+                                <th>PR</th>
+                                <th>PO</th>
+                                <th>แนะนำสั่ง</th>
+                                <th>สั่งจริง</th>
+                                <th>หมายเหตุ</th>
+                                <th>Rebuilt</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="po-empty" style="margin-top:8px;">ข้อมูล Rebuilt นี้มาจากยอดคงเหลือของคลัง 0301</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Update Modal -->
+        <div id="statusModal" class="po-modal" style="display:none;">
+            <div class="po-modal-content" style="max-width: 450px; border-radius: 12px; overflow: hidden;">
+                <div class="po-modal-header" style="background: #f1f2f6; border-bottom: 1px solid #e1e1e1;">
+                    <h3 style="color: #2c3e50;"><i class="fas fa-edit"></i> อัปเดตสถานะ</h3>
+                    <button id="statusModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body" style="padding: 20px;">
+                    <div class="status-info-grid">
+                        <div class="status-info-label">Plant:</div>
+                        <div class="status-info-value" id="stPlant">-</div>
+                        <div class="status-info-label">Material:</div>
+                        <div class="status-info-value" id="stMaterial">-</div>
+                        <div class="status-info-label">รายการ:</div>
+                        <div class="status-info-value" id="stDesc">-</div>
+                        <div class="status-info-label">สถานะเดิม:</div>
+                        <div class="status-info-value"><span id="stCurrent" class="status-badge-current">-</span></div>
+                    </div>
+
+                    <div style="margin-bottom: 10px; font-weight: 600; color: #34495e;">เลือกสถานะใหม่:</div>
+                    <div class="status-options">
+                        <button type="button" class="status-select-btn" data-val="Active"><i
+                                class="fas fa-check-circle"></i><span>Active</span></button>
+                        <button type="button" class="status-select-btn" data-val="ByCase"><i
+                                class="fas fa-exclamation-circle"></i><span>ByCase</span></button>
+                        <button type="button" class="status-select-btn" data-val="ยกเลิก"><i
+                                class="fas fa-ban"></i><span>ยกเลิก</span></button>
+                    </div>
+                    <div class="status-actions">
+                        <button id="btnCancelStatus" class="export-btn"
+                            style="background:#95a5a6; border:none;">ยกเลิก</button>
+                        <button id="btnSaveStatus" class="export-btn"
+                            style="background:linear-gradient(135deg,#27ae60,#2ecc71); border:none; box-shadow: 0 2px 5px rgba(39, 174, 96, 0.3);"><i
+                                class="fas fa-save"></i> บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Order Detail Modal (Plant 0326) -->
+        <div id="recModal" class="po-modal" style="display:none;">
+            <div class="po-modal-content">
+                <div class="po-modal-header">
+                    <h3>รายละเอียดแนะนำสั่ง</h3>
+                    <button id="recModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="po-modal-body">
+                    <table id="recDetailTable">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>รายการอะไหล่</th>
+                                <th>Storage bin</th>
+                                <th>นวนคร</th>
+                                <th>คงเหลือ</th>
+                                <th>30Day</th>
+                                <th>AvgM</th>
+                                <th>Mean</th>
+                                <th>แนะนำสั่ง</th>
+                                <th>สั่งจริง</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="recMat">-</td>
+                                <td id="recDesc">-</td>
+                                <td id="recBin">-</td>
+                                <td id="recNav">-</td>
+                                <td id="recStock">-</td>
+                                <td id="rec30Day">-</td>
+                                <td id="recAvgM">-</td>
+                                <td id="recMean">-</td>
+                                <td id="recRecommend">-</td>
+                                <td><input type="number" id="recActualInput" min="0"
+                                        style="width:100px;padding:6px;border-radius:6px;border:1px solid #ccd1ff;text-align:right;">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="rec-actions">
+                        <button id="recExpressBtn" class="export-btn"
+                            style="margin-left:0; padding:10px 14px; background:linear-gradient(135deg,#e67e22,#d35400);">
+                            สั่งนอกรอบ
+                        </button>
+                    </div>
+                    <div class="po-empty" style="margin-top:8px;">เฉพาะ Plant 0326 เท่านั้น</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" style="display:none;">
+        <div class="login-form">
+            <h2>Login</h2>
+
+            <form id="loginForm">
+                <input type="text" id="idUserInput" placeholder="IDUser" autocomplete="username">
+                <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+                <label><input type="checkbox" id="rememberMe"> จดจำฉัน</label>
+                <button type="submit" id="loginBtn">เข้าสู่ระบบ</button>
+            </form>
+
+            <div id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- =========================
+         ✅ HELP MODAL (อธิบายโปรแกรม) – เวอร์ชันสมบูรณ์ + title ในทุกองค์ประกอบ
+         ========================= -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-content">
+            <div class="help-header">
+                <h2><i class="fas fa-circle-info"></i> คู่มือระบบ ABC Analysis & Smart Ordering</h2>
+                <button class="help-close-btn" id="helpCloseBtn" title="ปิด"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="help-body">
+                <div class="help-grid">
+                    <div class="help-card">
+                        <h3><span class="help-pill">เริ่มต้นใช้งาน (เร็ว)</span></h3>
+                        <ol>
+                            <li>Login → เลือก Plant → กด View</li>
+                            <li>ดูแถบการ์ดด้านบน เลือกโหมด <b>Order</b> หากจะสั่ง</li>
+                            <li>ปรับ <b>LeadTime/Safety/Cover</b> (ค่า default Plant ทั่วไป 5/15/45; 0301 ใช้สูตรจาก
+                                L/T; 0326 มีเงื่อนไขตาม Status)</li>
+                            <li>ตรวจคอลัมน์ <b>แนะนำสั่ง</b> ปรับ <b>สั่งจริง</b> หากต้องการ</li>
+                            <li>ใช้ตัวกรอง (Moving/ABC/Status/ผู้รับคืน) และ Export ตามต้องการ</li>
+                        </ol>
+                    </div>
+                    <div class="help-card">
+                        <h3><span class="help-pill">ข้อมูลที่ใช้คิดสูตร</span></h3>
+                        <ul>
+                            <li>6M/4M/3M/2M/30Day: ยอดเบิกย้อนหลัง (30Day คือยอดสดล่าสุด)</li>
+                            <li>Unrestricted: คงเหลือปัจจุบัน</li>
+                            <li>AvgVal: ราคาเฉลี่ยต่อชิ้น (คำนวณมูลค่าสต็อก)</li>
+                            <li>MultiplyUnit: ขนาดแพ็ค (ปัดจำนวนสั่ง)</li>
+                            <li>Navanakorn: คลังกลาง 0301; PR/PO แสดงเฉพาะ 0301/0326 (0301 ใช้รวม net stock)</li>
+                            <li>Status: บาง Plant (เช่น 0326) มีผลต่อสูตรแนะนำสั่ง/ความปลอดภัย</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>คอลัมน์หลักที่ควรรู้</h3>
+                <ul>
+                    <li><b>AvgM</b>: ถ้ามี 3M ใช้ 3M ÷ 3, ถ้าไม่มีใช้ 4M ÷ 4 → ใช้จัด Moving</li>
+                    <li><b>Mean</b>: ผสม 4M/3M/2M/30Day ตาม Moving+ABC พร้อม guard/boost, ใช้เป็นฐาน
+                        Safety/ROP/แนะนำสั่ง</li>
+                    <li><b>Safety</b> = MeanDaily × SafetyDays (Plant ทั่วไปใช้ค่ากรอก + เพิ่มตาม Moving: Medium+1,
+                        Slow+2, Slowly+4; 0326 เพิ่มเฉพาะ Status “นวนคร”; 0301 คำนวณจาก L/T)</li>
+                    <li><b>ROP</b> = MeanDaily × LeadTime + SafetyStock (0301 ใช้ L/T จากตาราง)</li>
+                    <li><b>DOS</b> = คงเหลือ ÷ MeanDaily (MeanDaily=0 และมีสต็อกจะแสดง “มาก”)</li>
+                    <li><b>แนะนำสั่ง</b>: ถ้าสต็อก < ROP → (MeanDaily×Cover) - สต็อก ปัดตามแพ็ค; Plant ทั่วไป Cover
+                            เพิ่มตาม Moving: Medium+10, Slow+15, Slowly+20; 0301 ใช้ NetStock=สต็อก+PR+PO และ CoverDay
+                            ตามสูตร 0301</li>
+                    <li><b>สั่งจริง</b>: จำนวนที่ผู้ใช้แก้ ระบบบันทึกไว้ในเบราว์เซอร์</li>
+                </ul>
+
+                <h3>การจัดกลุ่ม Moving</h3>
+                <ul>
+                    <li>Non Moving = 0</li>
+                    <li>Slowly < 0.7 /เดือน</li>
+                    <li>Slow 0.7–<12 /เดือน</li>
+                    <li>Medium 12–<30 /เดือน</li>
+                    <li>Fast ≥ 30 /เดือน</li>
+                </ul>
+
+                <h3>สูตร Mean (สั้นและตรง)</h3>
+                <ul>
+                    <li>น้ำหนักพื้นฐาน (Plant ทั่วไป): ผสม 4M/3M (ถ้ามี)/2M/30Day ตาม Moving + ปรับ ABC (+/-5%)</li>
+                    <li>Guard: 30Day ≤ base×3, 2M ≤ base×2.5, 3M ≤ base×2 (base คือ avg จาก 3M หรือ 4M)</li>
+                    <li>Boost: ถ้า 30Day/base ≥ 1.8 เพิ่มน้ำหนัก 30Day ชั่วคราว</li>
+                    <li>Fallback/Over-protect: 30Day=0 แต่มีฐานเก่า → ลด mean 30%; ฐาน=0 แต่ 30Day>0 → ดัน mean
+                        อย่างน้อย 0.8×30Day</li>
+                    <li>Mean = MeanDaily×30 (MeanDaily คือผลรวม avg×weight หลัง guard/boost)</li>
+                    <li>Plant 0301 ใช้สูตร override เดียวกันแต่มี w3m และ Cover/Safety/NetStock ตามสูตร 0301</li>
+                </ul>
+
+                <h3>กฎแนะนำสั่ง (สรุป)</h3>
+                <ul>
+                    <li>ถ้า MeanDaily=0 → ไม่สั่ง (DOS แสดงมากถ้ามีสต็อก)</li>
+                    <li>Slow/Slowly: ถ้า 30Day=0 → ไม่สั่ง; ถ้า Slowly และ 30Day≥4M → ไม่สั่ง; (0301 เพิ่มกรณีไม่มี 3M
+                        และ 30Day=0 → ไม่สั่ง)</li>
+                    <li>สต็อก < ROP → คำนวณ need ตาม Cover แล้วปัดเป็นแพ็ค; สต็อก ≥ ROP → 0</li>
+                    <li>0301 ใช้ NetStock (สต็อก+PR+PO) และ CoverDay ปรับตาม L/T + Moving/ABC</li>
+                    <li>0326 สถานะติดตั้งใช้สูตร 0301; สถานะติดตั้งเรียกเข้า/เรียกเข้าใช้ Cover 15 เมื่อ DOS&lt;7
+                        (ไม่ใช้ PR/PO)</li>
+                </ul>
+
+                <h3>สูตรเฉพาะ Plant 0301/0326</h3>
+                <ul>
+                    <li><b>Plant 0301</b>: LeadTime ใช้ L/T จากตาราง (clamp 7–365 วัน); SafetyDays = ceil(L/T×0.3) จำกัด
+                        2–30; CoverDay ตาม Moving (Fast/Medium = LT+Safety+15 จำกัด 30–140, Slow = LT×0.6+Safety จำกัด
+                        20–90, Slowly/Dead = LT×0.4+Safety จำกัด 10–60)</li>
+                    <li><b>Plant 0301</b>: NetStock = สต็อก + PR + PO; ถ้า NetStock &lt; ROP → คิด need =
+                        MeanDaily×CoverDay - NetStock แล้วปัดตาม Pack</li>
+                    <li><b>Plant 0326</b>: Status “ติดตั้ง” → ใช้สูตร 0301 ทั้งชุด</li>
+                    <li><b>Plant 0326</b>: Status “ติดตั้งเรียกเข้า/เรียกเข้า” → ถ้า DOS&lt;7 ให้สั่งด้วย Cover 15
+                        และใช้เฉพาะคงเหลือ (ไม่รวม PR/PO)</li>
+                    <li><b>Plant 0326</b>: Status “นวนคร” → Safety เพิ่มตาม Moving (Medium+3, Slow+5, Slowly+8); Status
+                        ว่าง/“-” ถ้าแนะนำสั่ง&gt;0 จะตั้งเป็น “Order”</li>
+                </ul>
+
+                <h3>ทริก & การใช้งาน</h3>
+                <ul>
+                    <li>เริ่มดู A/Fast ก่อน กันของขาดกระทบสูง</li>
+                    <li>ถ้า 30Day พุ่ง ให้ดู Mean/แนะนำสั่ง แล้วตัดสินใจปรับ “สั่งจริง” ตามหน้างาน</li>
+                    <li>ใช้ตัวกรอง นวนคร=0 เพื่อตรวจรายการที่ต้องพึ่งการสั่งใหม่</li>
+                    <li>ใช้ Export CSV สำหรับวิเคราะห์ต่อ</li>
+                </ul>
+
+                <h3>คำแนะนำการตั้งค่า LeadTime/Safety/Cover</h3>
+                <ul>
+                    <li>ถ้ารอบสั่งทุกอาทิตย์: Safety = 5, LeadTime = 8, ครอบคลุม = 25</li>
+                    <li>ถ้ารอบสั่งทุก 2 อาทิตย์: Safety = 5, LeadTime = 15, ครอบคลุม = 45</li>
+                </ul>
+
+                <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> การเก็บ “สั่งจริง”</h3>
+                <ul>
+                    <li>ค่าที่แก้ในช่อง “สั่งจริง” จะถูกเก็บในเบราว์เซอร์เครื่องนี้</li>
+                    <li>รีเฟรช/โหลด Plant ใหม่: รายการที่ไม่เคยแก้จะถูกรีเซ็ตตาม “แนะนำสั่ง”; รายการที่เคยแก้จะดึงกลับมา
+                    </li>
+                    <li>กด “ตั้งตามแนะนำ” จะบันทึกค่าที่ตั้งใหม่ถาวร</li>
+                    <li>กด “ล้าง” ล้างเฉพาะ Plant ปัจจุบัน; ล้างเบราว์เซอร์หรือเปลี่ยนเครื่อง → ค่าหายทั้งหมด</li>
+                </ul>
+
+                <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin-top:12px;">
+                    ระบบคำนวณให้สมดุล “กันของขาด” และ “กันของเกิน” ปรับพารามิเตอร์ได้ตามสถานการณ์ของแต่ละ Plant
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ JS เฉพาะ Plant + หลักของระบบ -->
+    <script src="state.js"></script>
+    <script src="utils.js"></script>
+    <script src="progress.js"></script>
+    <script src="calc.js"></script>
+    <script src="ui.js"></script>
+    <script src="auth.js"></script>
+    <script src="api.js"></script>
+    <script src="plant0301-calculations.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Spinner overlay สำหรับสั่งนอกรอบ -->
+    <div id="recOverlaySpinner" class="rec-overlay-spinner" style="display:none;">
+        <div class="rec-overlay-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>กำลังบันทึก...</span>
+        </div>
+    </div>
+</body>
+
+</html>

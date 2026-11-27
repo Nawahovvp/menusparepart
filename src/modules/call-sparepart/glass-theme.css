@@ -1,0 +1,488 @@
+/* ==========================================================================
+   Unified Raindrop Glassmorphism Theme for Call Sparepart
+   (Consistent dark frosted-glass tone matching "สรุปผลตามศูนย์พื้นที่")
+   ========================================================================== */
+
+:root,
+[data-theme="day"],
+.theme-day {
+  --bg-color: transparent;
+  --bg-gradient: none;
+  --card-bg: rgba(15, 23, 42, 0.44);
+  --card-border: rgba(255, 255, 255, 0.18);
+  --text-primary: #f4f6fb;
+  --text-secondary: #cbd5e1;
+  --border-color: rgba(255, 255, 255, 0.18);
+  --header-bg: linear-gradient(135deg, rgba(14, 24, 44, 0.62) 0%, rgba(30, 58, 138, 0.52) 60%, rgba(49, 46, 129, 0.52) 100%);
+  --header-text: #ffffff;
+  --hover-bg: rgba(255, 255, 255, 0.12);
+  --shadow-color: rgba(0, 0, 0, 0.32);
+  --shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.42);
+  --modal-bg: rgba(5, 9, 18, 0.68);
+  --call-count-bg: rgba(56, 189, 248, 0.22);
+  --modern-label-bg: rgba(15, 23, 42, 0.52);
+  --modern-label-border: rgba(255, 255, 255, 0.2);
+
+  /* Translucent Glass Table */
+  --table-bg: rgba(12, 18, 34, 0.52);
+  --table-header-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(30, 58, 138, 0.78) 100%);
+  --table-header-text: #ffffff;
+  --table-row-even: rgba(255, 255, 255, 0.045);
+  --table-row-odd: rgba(15, 23, 42, 0.34);
+  --table-row-hover: rgba(56, 189, 248, 0.18);
+  --table-border: rgba(255, 255, 255, 0.12);
+  --table-link: #7dd3fc;
+
+  /* Unified Dark Frosted Glass Tone (same as สรุปผลตามศูนย์พื้นที่) */
+  --card-total-bg: rgba(15, 23, 42, 0.44);
+  --card-exceed-bg: rgba(15, 23, 42, 0.44);
+  --card-pending-bg: rgba(15, 23, 42, 0.44);
+  --card-other-bg: rgba(15, 23, 42, 0.44);
+  --card-success-bg: rgba(15, 23, 42, 0.44);
+  --card-nawa-bg: rgba(15, 23, 42, 0.44);
+  --card-project-bg: rgba(15, 23, 42, 0.44);
+  --card-request-bg: rgba(15, 23, 42, 0.44);
+  --card-newpart-bg: rgba(15, 23, 42, 0.44);
+  --card-over7-bg: rgba(15, 23, 42, 0.44);
+  --card-waiting-bg: rgba(15, 23, 42, 0.44);
+}
+
+body.theme-day {
+  background: transparent !important;
+  background-image: none !important;
+  color: #f4f6fb !important;
+}
+
+.ambient-parallax-bg {
+  display: none !important;
+}
+
+/* Header */
+.app-header {
+  background: rgba(12, 18, 34, 0.52) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  padding-left: 82px !important;
+}
+
+/* Unified Dark Frosted Glass Containers (สรุปผลตามศูนย์พื้นที่, กรอบ Status, กรอบตัวกรอง, ตาราง, แถบขวา) */
+.group-cards-section,
+.dashboard-group-frame,
+#searchContainer.modern-search-bar,
+.control-panel,
+.controls-container,
+.filter-bar,
+.table-container,
+.right-menu-bar,
+.right-drawer,
+.floating-selection-bar {
+  background: rgba(12, 18, 34, 0.46) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+  color: #f4f6fb !important;
+}
+
+/* Base Glassmorphism Properties for All Cards (without overriding per-card color gradients) */
+.dashboard-card,
+.stat-card,
+.analytics-card {
+  backdrop-filter: blur(14px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(165%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+  color: #f8fafc !important;
+}
+
+.dashboard-card:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  filter: brightness(1.12);
+}
+
+/* Translucent Colored Glass Tints matching ABC Analysis Cards (0.56-0.58 -> 0.42-0.46) */
+.dashboard-card.group-card,
+.dashboard-card.teamplant-card {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.54), rgba(41, 128, 185, 0.4)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.gm-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.56), rgba(118, 75, 162, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.total-card {
+  background: linear-gradient(135deg, rgba(44, 62, 80, 0.64), rgba(52, 73, 94, 0.48)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.exceedLeadtime-card {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.58), rgba(192, 57, 43, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.engInTeam-card {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.56), rgba(13, 148, 136, 0.42)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.rebuiltStock-card {
+  background: linear-gradient(135deg, rgba(142, 68, 173, 0.58), rgba(155, 89, 182, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.success-card {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.56), rgba(39, 174, 96, 0.42)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.nawaVipa-card {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.56), rgba(37, 99, 235, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.request-card {
+  background: linear-gradient(135deg, rgba(132, 204, 22, 0.54), rgba(77, 124, 15, 0.42)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.pending-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.58), rgba(217, 119, 6, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.otherPlant-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.58), rgba(109, 40, 217, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.spacial-card {
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.58), rgba(71, 85, 105, 0.46)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.newPart-card {
+  background: linear-gradient(135deg, rgba(192, 38, 211, 0.56), rgba(134, 25, 143, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.over7-card {
+  background: linear-gradient(135deg, rgba(230, 126, 34, 0.58), rgba(211, 84, 0, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.new-card {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.56), rgba(14, 116, 144, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.max-card {
+  background: linear-gradient(135deg, rgba(255, 118, 117, 0.58), rgba(255, 71, 87, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.graph-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.58), rgba(79, 70, 229, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.spare-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.56), rgba(5, 150, 105, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+.dashboard-card.gm-summary-card {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.56), rgba(190, 24, 93, 0.44)) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+}
+
+.dashboard-card.active {
+  border-color: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.55), 0 14px 30px rgba(0, 0, 0, 0.38) !important;
+  filter: brightness(1.16);
+}
+
+.dashboard-card h3,
+.dashboard-card .value,
+.dashboard-card .progress-text,
+.group-cards-section h2 {
+  color: #f8fafc !important;
+}
+
+.dashboard-card .progress-container {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.dashboard-card .progress-bar {
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Filter Frame (#searchContainer.modern-search-bar) & Quick Unit Chips */
+#searchContainer .search-input-wrap {
+  background: rgba(15, 23, 42, 0.56) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+#searchContainer .search-input-icon,
+#searchContainer .search-clear-icon {
+  color: #cbd5e1 !important;
+}
+
+#searchContainer .action-button.ghost,
+#searchContainer .filter-trigger-btn,
+#searchContainer .result-count-pill {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f1f5f9 !important;
+}
+
+#searchContainer .filter-trigger-btn:hover {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.quick-unit-bar {
+  background: rgba(15, 23, 42, 0.34) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.quick-unit-label {
+  color: #e2e8f0 !important;
+}
+
+.quick-unit-expand-btn {
+  background: rgba(15, 23, 42, 0.52) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f1f5f9 !important;
+}
+
+.quick-unit-group-box {
+  background: rgba(15, 23, 42, 0.38) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.quick-unit-group-tag {
+  background: rgba(30, 41, 59, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #f1f5f9 !important;
+}
+
+.quick-unit-chip {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #f1f5f9 !important;
+}
+
+.quick-unit-chip:hover {
+  background: rgba(30, 41, 59, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+}
+
+.quick-unit-chip.is-user-unit {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.32), rgba(2, 132, 199, 0.24)) !important;
+  border-color: rgba(125, 211, 252, 0.58) !important;
+  color: #f0f9ff !important;
+}
+
+/* Pending Unit Chip when all คลังตอบ are Done (class="clear") */
+.quick-unit-chip.clear {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.56), rgba(5, 150, 105, 0.44)) !important;
+  border-color: rgba(110, 231, 183, 0.75) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28) !important;
+}
+
+.quick-unit-chip.clear:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.7), rgba(5, 150, 105, 0.56)) !important;
+  border-color: rgba(167, 243, 208, 0.9) !important;
+}
+
+.quick-unit-chip.active {
+  background: rgba(37, 99, 235, 0.52) !important;
+  border-color: rgba(147, 197, 253, 0.82) !important;
+  color: #ffffff !important;
+}
+
+.quick-unit-chip.clear.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.82), rgba(5, 150, 105, 0.72)) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 0 0 2px rgba(110, 231, 183, 0.55), 0 6px 16px rgba(16, 185, 129, 0.38) !important;
+  color: #ffffff !important;
+}
+
+.dashboard-card.dept-clear {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.58), rgba(5, 150, 105, 0.44)) !important;
+  border-color: rgba(110, 231, 183, 0.75) !important;
+}
+
+.quick-unit-count {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+.active-filters-strip {
+  background: rgba(15, 23, 42, 0.38) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.active-filters-label {
+  color: #cbd5e1 !important;
+}
+
+.active-filter-chip {
+  background: rgba(37, 99, 235, 0.36) !important;
+  border: 1px solid rgba(147, 197, 253, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+/* Inputs, Selects & Filter Controls */
+.app-content input[type="text"],
+.app-content input[type="search"],
+.app-content input[type="number"],
+.app-content select,
+.app-content textarea {
+  background: rgba(15, 23, 42, 0.56) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(10px);
+}
+
+.app-content select option {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.app-content input::placeholder {
+  color: rgba(203, 213, 225, 0.72) !important;
+}
+
+/* Table readability on Glass */
+.table-container table {
+  background: transparent !important;
+  color: #f1f5f9 !important;
+}
+
+.table-container tbody tr {
+  background: rgba(15, 23, 42, 0.36) !important;
+}
+
+.table-container tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+.table-container tbody tr:hover {
+  background: rgba(56, 189, 248, 0.2) !important;
+}
+
+.table-container td {
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.table-container a,
+.table-container .material-link,
+.table-container .clickable-cell {
+  color: #7dd3fc !important;
+}
+
+/* Modals (including GraphModal) */
+.modal-content {
+  background: rgba(12, 18, 34, 0.82) !important;
+  backdrop-filter: blur(22px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #f8fafc !important;
+}
+
+.pagination-bar,
+.pagination-controls {
+  background: rgba(15, 23, 42, 0.48) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Standalone Summary Pages & Premium Modals (SpareSummaryPage, GMSummaryPage, Po/Pr/Graph Modals) */
+.spare-page-container,
+.gm-summary-page {
+  background: transparent !important;
+  position: relative;
+  z-index: 10;
+}
+
+.premium-modal-content {
+  background: rgba(12, 18, 34, 0.54) !important;
+  backdrop-filter: blur(18px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  color: #f4f6fb !important;
+}
+
+.premium-modal-header {
+  background: linear-gradient(135deg, rgba(14, 24, 44, 0.68), rgba(37, 99, 235, 0.56)) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.premium-modal-body {
+  background: transparent !important;
+  color: #f4f6fb !important;
+}
+
+.modal-info-bar {
+  background: rgba(15, 23, 42, 0.52) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #f4f6fb !important;
+}
+
+.modal-info-label {
+  color: #cbd5e1 !important;
+}
+
+.modal-info-bar select {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.modal-info-bar select option {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.56), rgba(15, 23, 42, 0.46)) !important;
+  backdrop-filter: blur(14px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(165%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #f8fafc !important;
+}
+
+.stat-card .stat-label {
+  color: #cbd5e1 !important;
+}
+
+.stat-card .stat-value {
+  color: #ffffff !important;
+}
+
+.compact-table-wrapper {
+  background: rgba(12, 18, 34, 0.48) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px;
+}
+
+.compact-table {
+  background: transparent !important;
+  color: #f1f5f9 !important;
+}
+
+.compact-table thead th {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+.compact-table tbody tr {
+  background: rgba(15, 23, 42, 0.36) !important;
+}
+
+.compact-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+.compact-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.2) !important;
+}
+
+.compact-table tbody td {
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}

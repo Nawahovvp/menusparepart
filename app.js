@@ -1,8 +1,8 @@
 /**
  * Plant Operations Hub — Settigation-Style Vertical Left Sidebar + Orb Morph
- * - Opensheet API Login (Sheet: UserPlantCode)
- *   Username = IDUser
- *   Password = last 4 digits of IDUser + 2-digit zero-padded sum of last 2 digits
+ * - Opensheet API Login (Sheet: EmployeeWeb)
+ *   Username = IDRec
+ *   Password = last 4 digits of IDRec + 2-digit zero-padded sum of last 2 digits
  * - Remember Me persistence
  * - Long vertical left sidebar with toggle button, search, show/hide all menus,
  *   bottom Settings & Dark/Light switch
@@ -14,12 +14,12 @@
   'use strict';
 
   const SHEET_ID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
-  const SHEET_NAME = 'UserPlantCode';
+  const SHEET_NAME = 'EmployeeWeb';
   const OPENSHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}`;
   const GVIZ_FALLBACK_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
   const STORAGE_KEYS = {
-    SESSION: 'plant_hub_user_session_v1',
+    SESSION: 'plant_hub_user_session_v2',
     THEME: 'plant_hub_theme_v1',
     AUTO_ORB: 'plant_hub_auto_orb_v1',
     OPEN_NEW_TAB: 'plant_hub_open_new_tab_v1',
@@ -177,22 +177,25 @@
     autoOrbCheckbox: document.getElementById('autoOrbCheckbox'),
     settingsAvatarLg: document.getElementById('settingsAvatarLg'),
     settingsHeroName: document.getElementById('settingsHeroName'),
+    settingsHeroStatus: document.getElementById('settingsHeroStatus'),
     settingsHeroPlant: document.getElementById('settingsHeroPlant'),
+    infoIdRec: document.getElementById('infoIdRec'),
     infoName: document.getElementById('infoName'),
-    infoNicname: document.getElementById('infoNicname'),
+    infoPosition: document.getElementById('infoPosition'),
+    infoDepartment: document.getElementById('infoDepartment'),
+    infoTeam: document.getElementById('infoTeam'),
     infoPlant: document.getElementById('infoPlant'),
-    infoPlantCode: document.getElementById('infoPlantCode'),
 
     toast: document.getElementById('toast'),
   };
 
   /* ------------------------------------------------------------------------
      Password Formula:
-     4 last digits of IDUser + 2-digit zero-padded sum of last 2 digits
+     4 last digits of IDRec + 2-digit zero-padded sum of last 2 digits
      Example: 1001234 -> 1234 + (3+4=07) -> 123407
      ------------------------------------------------------------------------ */
-  function computeExpectedPassword(idUser) {
-    const raw = String(idUser ?? '').trim();
+  function computeExpectedPassword(idRec) {
+    const raw = String(idRec ?? '').trim();
     const digits = raw.replace(/\D/g, '');
     const source = digits.length >= 4 ? digits : raw;
     if (source.length < 2) return null;
@@ -340,26 +343,38 @@
   `;
 
   function renderUserProfile(user) {
-    const displayName = user.Nicname
-      ? `${user.Name || user.IDUser} (${user.Nicname})`
-      : user.Name || user.IDUser;
-    const plantLabel = [user.Plant, user.PlantCode].filter(Boolean).join(' · ') || 'Operations Menu';
+    const idRec = String(user.IDRec ?? '').trim();
+    const displayName = user.Name || idRec || 'ผู้ใช้งาน';
+    const plantLabel = [user.Plant, user.Team].filter(Boolean).join(' · ') || 'Operations Menu';
+    const heroSub = [user['ตำแหน่ง'], user['หน่วยงาน'], user.Plant].filter(Boolean).join(' · ') || plantLabel;
 
     el.userAvatar.innerHTML = USER_AVATAR_SVG;
     el.userDisplayName.textContent = displayName;
-    if (el.userSubInfo) el.userSubInfo.textContent = `ID: ${user.IDUser}`;
+    if (el.userSubInfo) el.userSubInfo.textContent = `ID: ${idRec}`;
     el.brandPlantSub.textContent = plantLabel;
     el.stagePlantBadge.textContent = plantLabel;
 
     // Populate User-Focused Settings Modal
     el.settingsAvatarLg.innerHTML = USER_AVATAR_SVG;
     el.settingsHeroName.textContent = displayName;
-    el.settingsHeroPlant.textContent = plantLabel;
+    el.settingsHeroPlant.textContent = heroSub;
 
+    if (el.settingsHeroStatus) {
+      const statusText = String(user.Status ?? '').trim();
+      if (statusText) {
+        el.settingsHeroStatus.textContent = statusText;
+        el.settingsHeroStatus.classList.remove('hidden');
+      } else {
+        el.settingsHeroStatus.classList.add('hidden');
+      }
+    }
+
+    el.infoIdRec.textContent = idRec || '-';
     el.infoName.textContent = user.Name || '-';
-    el.infoNicname.textContent = user.Nicname || '-';
+    el.infoPosition.textContent = user['ตำแหน่ง'] || '-';
+    el.infoDepartment.textContent = user['หน่วยงาน'] || '-';
+    el.infoTeam.textContent = user.Team || '-';
     el.infoPlant.textContent = user.Plant || '-';
-    el.infoPlantCode.textContent = user.PlantCode || '-';
   }
 
   function showStagePreview() {
@@ -614,7 +629,7 @@
 
     hideLoginError();
     if (!username || !password) {
-      showLoginError('กรุณากรอก Username (IDUser) และ Password ให้ครบถ้วน');
+      showLoginError('กรุณากรอก Username (IDRec) และ Password ให้ครบถ้วน');
       return;
     }
 
@@ -622,16 +637,16 @@
     try {
       const users = await fetchUsersFromSheet();
       const matchedUser = users.find(
-        (row) => String(row.IDUser ?? '').trim().toLowerCase() === username.toLowerCase()
+        (row) => String(row.IDRec ?? '').trim().toLowerCase() === username.toLowerCase()
       );
 
       if (!matchedUser) {
-        showLoginError('ไม่พบชื่อผู้ใช้งาน (IDUser) นี้ในระบบ UserPlantCode');
+        showLoginError('ไม่พบชื่อผู้ใช้งาน (IDRec) นี้ในระบบ EmployeeWeb');
         setLoginLoading(false);
         return;
       }
 
-      const expectedPassword = computeExpectedPassword(matchedUser.IDUser);
+      const expectedPassword = computeExpectedPassword(matchedUser.IDRec);
       if (!expectedPassword || password !== expectedPassword) {
         showLoginError('รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง');
         setLoginLoading(false);
@@ -641,10 +656,10 @@
       currentUser = matchedUser;
       saveSession(matchedUser, remember);
       enterApp(matchedUser);
-      showToast(`ยินดีต้อนรับ ${matchedUser.Nicname || matchedUser.Name || matchedUser.IDUser}`);
+      showToast(`ยินดีต้อนรับ ${matchedUser.Name || matchedUser.IDRec}`);
     } catch (err) {
       console.error('Login error:', err);
-      showLoginError('ไม่สามารถเชื่อมต่อฐานข้อมูล UserPlantCode ได้ กรุณาลองใหม่อีกครั้ง');
+      showLoginError('ไม่สามารถเชื่อมต่อฐานข้อมูล EmployeeWeb ได้ กรุณาลองใหม่อีกครั้ง');
     } finally {
       setLoginLoading(false);
     }

@@ -1,0 +1,2818 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap');
+
+:root {
+  --primary: #2563eb;
+  --primary-soft: #e0edff;
+  --bg: #f3f4f8;
+  --card-bg: #ffffff;
+  --border-soft: #e2e8f0;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --tab-bg: #ffffff;
+  --tab-active: #2563eb;
+  --success: #10b981;
+  --danger: #ef4444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans Thai', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 24px;
+  background: radial-gradient(circle at top, #e0ebff 0, #f3f4f8 45%, #f9fafb 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Premium Loading Overlay */
+#main-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  gap: 24px;
+}
+
+#main-loading-overlay.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.premium-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.premium-loader-circle {
+  position: absolute;
+  inset: 0;
+  border: 4px solid transparent;
+  border-top-color: #ff7aa2;
+  border-right-color: #ff7aa2;
+  border-radius: 50%;
+  animation: premium-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.premium-loader-inner {
+  position: absolute;
+  inset: 12px;
+  border: 4px solid transparent;
+  border-bottom-color: #60a5fa;
+  border-left-color: #60a5fa;
+  border-radius: 50%;
+  animation: premium-spin-reverse 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.premium-loader-logo {
+  position: absolute;
+  inset: 22px;
+  background: linear-gradient(135deg, #ff7aa2, #60a5fa);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(255, 122, 162, 0.4);
+  animation: premium-pulse 2s ease-in-out infinite;
+}
+
+@keyframes premium-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes premium-spin-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes premium-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+#main-loading-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 320px;
+  text-align: center;
+}
+
+.loading-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+}
+
+.loading-msg {
+  font-size: 0.9rem;
+  color: #64748b;
+  min-height: 1.2em;
+  transition: all 0.3s ease;
+}
+
+.app-shell.is-hidden {
+  display: none;
+}
+
+.login-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #dbeafe 0, #eef2ff 45%, #f8fafc 100%);
+  z-index: 2600;
+  padding: 24px;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
+  border: 1px solid #e2e8f0;
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.login-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.login-input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  background: #f9fafb;
+  font-family: inherit;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  background: #ffffff;
+}
+
+.login-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.login-btn {
+  margin-top: 4px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(120deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+  opacity: 0.95;
+}
+
+.plant-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #dbeafe 0, #eef2ff 45%, #f8fafc 100%);
+  z-index: 2500;
+  padding: 24px;
+}
+
+.plant-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
+  border: 1px solid #e2e8f0;
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plant-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.plant-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.plant-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.plant-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.plant-select {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  background: #f9fafb;
+  font-family: inherit;
+}
+
+.plant-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  background: #ffffff;
+}
+
+.plant-enter-btn {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(120deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.plant-enter-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+  opacity: 0.95;
+}
+
+.plant-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.app-shell {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+header.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+header.app-header .title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+header.app-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+header.app-header .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.menu-btn {
+  border: 1px solid #cbd5f5;
+  background: #eef2ff;
+  color: #1e40af;
+  border-radius: 16px;
+  padding: 8px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  min-width: 40px;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.menu-btn:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.menu-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1e3a8a;
+}
+
+.menu-caret {
+  font-size: 0.8rem;
+  color: #1e3a8a;
+}
+
+.menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+  padding: 12px 14px;
+  min-width: 260px;
+  display: none;
+  z-index: 1200;
+}
+
+.menu-panel.open {
+  display: block;
+}
+
+.menu-panel-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+
+.menu-label {
+  color: var(--text-muted);
+}
+
+.menu-value {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.menu-action-btn {
+  width: 100%;
+  border: 1px solid #cbd5f5;
+  background: #eef2ff;
+  color: #1e40af;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 8px;
+}
+
+.menu-action-btn:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.menu-logout-btn {
+  width: 100%;
+  border: 1px solid #fca5a5;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.menu-logout-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  margin-bottom: 16px;
+  width: fit-content;
+}
+
+.tab-btn {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.tab-btn span.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.tab-btn span.icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Cards & table (Barcode tab) */
+.card {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border-soft);
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.premium-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.premium-icon-btn:hover {
+  background: rgba(var(--primary-rgb, 37, 99, 235), 0.1);
+  transform: rotate(30deg);
+}
+
+.premium-icon-btn svg {
+  stroke: currentColor;
+}
+
+.card-title-pill {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.status {
+  font-size: 0.8rem;
+  margin-top: 6px;
+  color: var(--text-muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+thead {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: #fff;
+}
+
+th,
+td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+td input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+td input[readonly] {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.not-found {
+  color: #dc2626;
+  font-size: 0.8rem;
+}
+
+#empCodeInput {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  min-width: 220px;
+  margin-left: 4px;
+  font-size: 0.9rem;
+}
+
+#empCodeInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.employee-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.clear-all-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.clear-all-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+}
+
+.print-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: #ffffff;
+  cursor: pointer;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+  transition: all 0.18s ease;
+}
+
+.print-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+}
+
+.print-btn .emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.print-btn .emoji svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* ปุ่มลบแถว Serial */
+.delete-btn {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+}
+
+/* ========= Serial tab extra UI (Canva-ish) ========= */
+.serial-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-serial-primary {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-serial-primary .btn-icon,
+.btn-serial-outline .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.btn-serial-primary .btn-icon svg,
+.btn-serial-outline .btn-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.btn-serial-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.45);
+  opacity: 0.95;
+}
+
+.btn-serial-outline {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-serial-outline:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.serial-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+
+.serial-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px dashed rgba(37, 99, 235, 0.3);
+  font-size: 0.8rem;
+  color: #1e3a8a;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.serial-chip-label {
+  opacity: 0.7;
+}
+
+.serial-chip-value {
+  font-weight: 600;
+}
+
+/* ========= สไตล์ฉลาก Small 102x30 mm ========= */
+#printArea {
+  display: none;
+}
+
+.container-small {
+  display: block;
+  width: 106mm;
+}
+
+.sticker-small {
+  width: 106mm;
+  height: 30mm;
+  display: flex;
+  flex-direction: row;
+  background: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+
+.label-small {
+  width: 53mm;
+  height: 30mm;
+  box-sizing: border-box;
+  padding: 2mm 1mm 1mm 1mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 0.5px solid #ccc;
+}
+
+.label-small:last-child {
+  border-right: none;
+}
+
+.row-small {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 1mm;
+}
+
+.qr-small {
+  width: 10mm;
+  height: 10mm;
+  margin-right: 5mm;
+  margin-left: 3mm;
+}
+
+.material-small {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1;
+}
+
+.technician-small {
+  font-size: 10px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  margin-right: 2mm;
+  line-height: 1;
+}
+
+.department-small {
+  font-size: 10px;
+  text-align: left;
+  margin: 0;
+  margin-right: 2mm;
+  line-height: 1;
+}
+
+.description-small {
+  font-size: 10px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  margin: 0;
+  margin-left: 2mm;
+}
+
+.location-small {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1px;
+  margin-bottom: 0;
+  line-height: 1.1;
+  margin-left: 2mm;
+}
+
+.lot-line-small {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.1;
+  margin-left: 2mm;
+  margin-right: 1mm;
+}
+
+.barcode-small {
+  margin-left: 2mm;
+  width: 15mm !important;
+  height: 6mm !important;
+}
+
+/* ========= สไตล์ฉลาก Medium 60x70 mm ========= */
+.container-medium {
+  display: block;
+  width: 60mm;
+}
+
+.sticker-medium {
+  width: 60mm;
+  height: 70mm;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  page: medium;
+}
+
+.label-medium {
+  width: 60mm;
+  height: 70mm;
+  box-sizing: border-box;
+  padding: 2mm;
+  padding-top: 9mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  position: relative;
+}
+
+.row-medium {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2mm;
+  margin-bottom: 0.5mm;
+}
+
+.qr-medium {
+  width: 13mm;
+  height: 13mm;
+}
+
+.material-medium {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.technician-medium {
+  font-size: 12px;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.department-medium {
+  font-size: 12px;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.description-medium {
+  font-size: 15px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  margin: 0;
+  margin-top: 0;
+  margin-left: 2mm;
+}
+
+.lot-line-medium {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 1mm;
+  margin-bottom: 0;
+  line-height: 1.2;
+  margin-left: 2mm;
+  margin-right: 1mm;
+}
+
+.central-bin-medium {
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 0.5mm;
+  margin-bottom: 0;
+  line-height: 1.2;
+  margin-left: 2mm;
+}
+
+.center-pack-unit-medium {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 34px;
+  font-weight: bold;
+  text-align: center;
+  width: 80%;
+  line-height: 1;
+}
+
+.loc-line-medium {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 1.1;
+  margin-left: 2mm;
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.barcode-medium {
+  margin-left: 2mm;
+  width: 18mm !important;
+  height: 7mm !important;
+}
+
+/* ========= สไตล์ฉลาก Big 80x100 mm ========= */
+.container-big {
+  display: block;
+  width: 80mm;
+}
+
+.sticker-big {
+  width: 80mm;
+  height: 100mm;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.label-big {
+  width: 80mm;
+  height: 100mm;
+  box-sizing: border-box;
+  padding: 6mm 2mm 0 2mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0;
+  position: relative;
+}
+
+.label-serial-big {
+  justify-content: flex-start;
+  gap: 1mm;
+  padding-top: calc(6mm + 10mm);
+}
+
+.label-serial-big .row-big {
+  margin-bottom: 1mm;
+}
+
+.label-serial-big .info-block-big {
+  margin-top: 0;
+}
+
+.label-serial-big .description-big {
+  margin-top: 0;
+}
+
+.label-serial-big .bottom-container-big {
+  margin-top: auto;
+}
+
+/* Serial QR block: S/N text on top, QR below right-center */
+.serial-row-big {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0 3mm;
+  box-sizing: border-box;
+}
+
+.serial-big {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.3;
+  word-break: break-all;
+}
+
+.qr-serial-big {
+  width: 20mm;
+  height: 20mm;
+  align-self: center;
+  margin-right: 5mm;
+  margin-top: 1mm;
+}
+
+.row-big {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 2mm;
+}
+
+.bottom-container-big {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.qr-big {
+  width: 14mm;
+  height: 14mm;
+  margin-right: 2mm;
+  margin-left: 3mm;
+}
+
+.barcode-big {
+  width: 20mm !important;
+  height: 6mm !important;
+  margin-top: 1mm;
+  margin-left: 3mm;
+}
+
+.text-container-big {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 50mm;
+}
+
+.material-big {
+  font-size: 40px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.technician-big {
+  font-size: 16px;
+  text-align: left;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.department-big {
+  font-size: 16px;
+  text-align: left;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.description-big {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.3;
+  width: calc(100% - 4mm);
+  margin: 2mm 0 0 3mm;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+
+.location-big {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.3;
+  margin-left: 3mm;
+}
+
+.lot-line-big {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.3;
+  margin-left: 3mm;
+  margin-right: 2mm;
+}
+
+.center-pack-unit-big {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+  font-size: 60px;
+  font-weight: bold;
+  text-align: center;
+  width: 80%;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Spinner */
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+#spinner {
+  display: none;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media print {
+  @page medium {
+    size: 60mm 70mm;
+    margin: 0;
+  }
+
+  header.app-header,
+  .tabs,
+  .print-btn,
+  .spinner-container,
+  #appRoot {
+    display: none !important;
+  }
+
+  #tab-barcode {
+    display: block !important;
+  }
+
+  /* ? ซ่อน tab Serial ตอน print (ไม่งั้นจะเกะกะกระดาษ) */
+  #tab-serial,
+  #tab-grn {
+    display: none !important;
+  }
+
+  #printArea {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: #ffffff;
+  }
+
+  .app-shell {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .sticker-small,
+  .sticker-medium,
+  .sticker-big,
+  .sticker-fragile {
+    page-break-inside: avoid;
+    margin: 0;
+  }
+}
+
+.container,
+.sticker,
+.label {
+  page-break-inside: avoid;
+}
+
+.delete-row-btn {
+  border: 1px solid #fecaca;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.delete-row-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #fca5a5;
+}
+
+.edit-row-btn {
+  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-right: 4px;
+}
+
+.edit-row-btn:hover {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #60a5fa;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+.required-star {
+  color: #ef4444;
+  font-weight: bold;
+  margin-left: 4px;
+  font-size: 1.1em;
+}
+
+/* ===== Serial Form UI (จัดการ Serial Number) ===== */
+.serial-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.serial-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+  flex: 1;
+}
+
+.serial-field.serial-wide {
+  flex: 1.5;
+}
+
+.serial-field.serial-narrow {
+  max-width: 200px;
+}
+
+.serial-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.serial-input {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 0.85rem;
+  background: #f9fafb;
+  transition: all 0.15s ease;
+}
+
+.serial-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.serial-input[readonly] {
+  background: #f3f4f6;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* ===== GRN Tab Filters ===== */
+.grn-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.grn-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.grn-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.grn-select {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 0.85rem;
+  background: #f9fafb;
+  transition: all 0.15s ease;
+}
+
+.grn-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.grn-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+}
+
+.grn-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+#grnTable td {
+  white-space: nowrap;
+}
+
+/* ===== Fragile Sticker Style (80x100 mm) ===== */
+.sticker-fragile {
+  width: 80mm;
+  height: 100mm;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.label-fragile {
+  width: 80mm;
+  height: 100mm;
+  box-sizing: border-box;
+  padding: 2mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  /* Align from top to fill space */
+  text-align: center;
+  gap: 2mm;
+  color: #dc2626;
+  overflow: hidden;
+  background: white;
+  position: relative;
+}
+
+.fragile-icon {
+  width: 76mm;
+  height: 60mm;
+  object-fit: contain;
+}
+
+.fragile-title {
+  font-size: 72px;
+  /* Increased size for impact since border is removed */
+  font-weight: 900;
+  line-height: 1;
+  margin: 0;
+  color: #dc2626;
+  text-transform: uppercase;
+  /* Double layer effect using shadow */
+  text-shadow:
+    2px 2px 0 #fff,
+    4px 4px 0 #dc2626;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  /* Single line */
+}
+
+.fragile-desc {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* ===== ฉลาก Serial 80x100 mm (ใช้ตอน Print Serial) ===== */
+.container {
+  display: block;
+  width: 80mm;
+}
+
+.sticker {
+  width: 80mm;
+  height: 100mm;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.label {
+  width: 80mm;
+  height: 100mm;
+  box-sizing: border-box;
+  padding: 2mm;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0;
+  position: relative;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  margin-bottom: 0;
+  /* เดิม 0.5mm ลดให้ชิด */
+  margin-top: 6mm;
+}
+
+
+
+/* คอลัมน์ซ้าย: QR + Barcode เรียงบน–ล่าง */
+.left-col-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 3mm;
+  margin-right: 2mm;
+}
+
+/* ทำ QR ให้เล็กลง */
+.qr {
+  width: 12mm;
+  height: 12mm;
+  margin: 0 0 1mm 0;
+}
+
+/* Barcode ใต้ QR ให้พอดีกับความกว้างของ QR */
+.barcode-in-text {
+  width: 12mm !important;
+  height: 6mm !important;
+  margin: 0;
+  background: white;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 50mm;
+  align-items: flex-end;
+  /* ชิดขวา */
+  margin-right: 3mm;
+  /* ระยะจากขอบขวา */
+  margin-top: 0;
+}
+
+.material {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: right;
+  margin: 0;
+  line-height: 1.0;
+}
+
+
+
+.barcode-in-text {
+  width: 100% !important;
+  height: 8mm !important;
+  margin-top: 1mm;
+  background: white;
+}
+
+.description {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.3;
+  width: calc(100% - 3mm);
+  margin: 0 0 0 3mm;
+  /* 👉 เปลี่ยน margin-left เป็น 3mm, margin-top 0 ให้ชิดใต้ row/barcode */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+
+.serial-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 0 0 3mm;
+  /* 👉 เปลี่ยน margin-left เป็น 3mm, margin-top 0 ให้ชิดใต้ description */
+  width: calc(100% - 3mm);
+}
+
+.serial-info {
+  display: flex;
+  flex-direction: row;
+  /* 👉 เรียงแนวนอน */
+  align-items: baseline;
+  /* 👉 ให้ตัวหนังสือสูงใกล้ ๆ กัน */
+  gap: 0px;
+  /* 👉 เว้นระยะระหว่าง S/N: กับเลข Serial */
+  width: 100%;
+}
+
+.serial-label {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.serial-text {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.firstrear-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 1mm 0 0 3mm;
+  width: calc(100% - 4mm);
+}
+
+.firstrear-label {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.firstrear-text {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.location {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.3;
+  margin-left: 3mm;
+}
+
+.lot-line {
+  font-size: 25px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.3;
+  margin-left: 3mm;
+  margin-right: 2mm;
+}
+
+.center-serial-qr {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+  width: 15mm;
+  height: 15mm;
+  margin-top: 2mm;
+}
+
+/* ===== Serial on Big Label (80x100 for Serial) ===== */
+.serial-big {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.2;
+  margin-left: 3mm;
+  margin-top: 1mm;
+  margin-bottom: 0;
+}
+
+.barcode-serial-big {
+  width: 30mm !important;
+  height: 8mm !important;
+  margin-left: 3mm;
+  margin-top: 1mm;
+}
+
+/* QR Code สำหรับ Serial บนฉลาก Big */
+.qr-serial-big {
+  width: 14mm;
+  height: 14mm;
+  margin-left: 3mm;
+  margin-top: 1mm;
+}
+
+/* แถว S/N บนฉลาก Big */
+.serial-big {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.2;
+  margin-left: 3mm;
+  margin-top: 1mm;
+  margin-bottom: 0;
+}
+
+/* บล็อกข้อมูล Description + S/N + QR Serial ใต้ Barcode 128 */
+.info-block-big {
+  margin-left: 3mm;
+  margin-right: 3mm;
+  margin-top: 2mm;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* ชิดซ้าย */
+  width: calc(100% - 6mm);
+  /* กว้างเต็มหน้ากระดาษ ลบ margin ซ้ายขวา */
+}
+
+/* Description เฉพาะในฉลาก Serial ให้กินเต็มบล็อก */
+.info-block-big .description-big {
+  width: 100%;
+  margin: 0 0 1mm 0;
+  text-align: left;
+}
+
+/* แถว S/N บนฉลาก Big */
+.serial-big {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.2;
+  margin: 0 0 1mm 0;
+}
+
+/* QR Code สำหรับ Serial อยู่ใต้ S/N ชิดซ้าย */
+.qr-serial-big {
+  width: 20mm;
+  height: 20mm;
+}
+
+/* ===== Canva-ish Pastel Theme Overrides ===== */
+:root {
+  --primary: #ff7aa2;
+  --primary-soft: #ffe4ee;
+  --bg: #f9f7ff;
+  --card-bg: #ffffff;
+  --border-soft: #e7e5f4;
+  --text-main: #2b2a3a;
+  --text-muted: #6d6a7c;
+  --tab-bg: #f0edff;
+  --tab-active: #ff7aa2;
+}
+
+body {
+  font-family: 'Baloo 2', 'Noto Sans Thai', sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255, 199, 224, 0.6), transparent 40%),
+    radial-gradient(circle at 90% 15%, rgba(186, 230, 253, 0.55), transparent 45%),
+    linear-gradient(180deg, #f9f7ff, #fef6f9);
+  color: var(--text-main);
+}
+
+.app-shell {
+  max-width: 1600px;
+}
+
+header.app-header {
+  background: linear-gradient(120deg, rgba(255, 122, 162, 0.2), rgba(186, 230, 253, 0.25));
+  border: 1px solid rgba(255, 122, 162, 0.25);
+  padding: 14px 18px;
+  border-radius: 20px;
+  box-shadow: 0 16px 30px rgba(255, 122, 162, 0.12);
+}
+
+header.app-header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+}
+
+header.app-header .subtitle {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.login-gate,
+.plant-gate {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 214, 231, 0.8), transparent 40%),
+    radial-gradient(circle at 88% 12%, rgba(186, 230, 253, 0.7), transparent 45%),
+    linear-gradient(180deg, #f9f7ff, #fef6f9);
+}
+
+.login-card,
+.plant-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(231, 229, 244, 0.9);
+  box-shadow: 0 28px 60px rgba(40, 30, 80, 0.12);
+}
+
+.login-title,
+.plant-title {
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+}
+
+.login-input,
+.plant-select,
+.serial-input,
+#empCodeInput,
+.grn-select {
+  background: #ffffff;
+  border: 1px solid #e7e5f4;
+  color: var(--text-main);
+}
+
+.login-input:focus,
+.plant-select:focus,
+.serial-input:focus,
+#empCodeInput:focus,
+.grn-select:focus {
+  border-color: #ff9ab8;
+  box-shadow: 0 0 0 2px rgba(255, 122, 162, 0.2);
+}
+
+.menu-btn,
+.back-plant-btn {
+  background: #ffffff;
+  border: 1px solid rgba(255, 122, 162, 0.3);
+  color: #ff7aa2;
+}
+
+.menu-btn:hover,
+.back-plant-btn:hover {
+  background: rgba(255, 122, 162, 0.12);
+}
+
+.menu-panel {
+  background: #ffffff;
+  border: 1px solid rgba(231, 229, 244, 0.9);
+}
+
+.menu-panel-title {
+  color: #ff7aa2;
+}
+
+.menu-value {
+  color: #2b2a3a;
+}
+
+.menu-logout-btn {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #b91c1c;
+}
+
+.tabs {
+  background: #ffffff;
+  border: 1px solid rgba(231, 229, 244, 0.9);
+  box-shadow: 0 12px 24px rgba(90, 72, 130, 0.12);
+}
+
+.tab-btn {
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+}
+
+.tab-btn.active {
+  background: linear-gradient(120deg, #ff7aa2, #ffc9dd);
+  color: #2b2a3a;
+  box-shadow: 0 10px 22px rgba(255, 122, 162, 0.35);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(231, 229, 244, 0.9);
+  box-shadow: 0 16px 30px rgba(86, 74, 118, 0.12);
+}
+
+.card-title {
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.card-title-pill {
+  background: rgba(255, 122, 162, 0.16);
+  color: #d9466a;
+  border: 1px solid rgba(255, 122, 162, 0.25);
+}
+
+.print-btn,
+.btn-serial-primary,
+.btn-serial-outline {
+  border-radius: 16px;
+  letter-spacing: 0.06em;
+}
+
+.print-btn {
+  background: #ffffff;
+  border: 1px solid rgba(255, 122, 162, 0.45);
+  color: #d9466a;
+  box-shadow: 0 10px 18px rgba(255, 122, 162, 0.15);
+}
+
+.print-btn:hover {
+  background: #ff7aa2;
+  color: #ffffff;
+  box-shadow: 0 14px 24px rgba(255, 122, 162, 0.3);
+}
+
+.btn-serial-primary {
+  background: linear-gradient(120deg, #ff7aa2, #ffb6cf);
+  box-shadow: 0 10px 22px rgba(255, 122, 162, 0.3);
+}
+
+.btn-serial-outline {
+  background: #ffffff;
+  border: 1px solid rgba(255, 122, 162, 0.45);
+  color: #d9466a;
+}
+
+.btn-serial-outline:hover {
+  background: rgba(255, 122, 162, 0.12);
+}
+
+table {
+  background: #ffffff;
+  border: 1px solid rgba(231, 229, 244, 0.9);
+}
+
+thead {
+  background: linear-gradient(90deg, #ff7aa2, #ffd1e2);
+  color: #2b2a3a;
+}
+
+th,
+td {
+  border: 1px solid rgba(231, 229, 244, 0.9);
+  color: #2b2a3a;
+}
+
+td input,
+td input[readonly] {
+  background: #ffffff;
+  color: #2b2a3a;
+}
+
+tr:nth-child(even) td {
+  background: rgba(255, 248, 251, 0.9);
+}
+
+.status,
+.login-subtitle,
+.plant-subtitle,
+.plant-note,
+.serial-label,
+.grn-label {
+  color: var(--text-muted);
+}
+
+.delete-btn,
+.delete-row-btn {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #b91c1c;
+}
+
+.delete-btn:hover,
+.delete-row-btn:hover {
+  background: rgba(248, 113, 113, 0.35);
+}
+
+/* ===== Confirm Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 10, 30, 0.45);
+  z-index: 3000;
+  padding: 24px;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-card {
+  width: min(420px, 90vw);
+  background: #ffffff;
+  border-radius: 22px;
+  border: 1px solid rgba(231, 229, 244, 0.9);
+  box-shadow: 0 28px 60px rgba(40, 30, 80, 0.18);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.grn-field label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Auto-mapped Part feedback */
+input.auto-mapped {
+  border-color: var(--success) !important;
+  background-color: rgba(46, 204, 113, 0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.modal-message {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.status-msg-scanner {
+  font-size: 0.9rem;
+  color: #dc2626;
+  text-align: center;
+  margin: 10px 0;
+  min-height: 1.2em;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Call Pending Modal Specific Styles */
+.cp-modal {
+  max-width: 450px;
+  border-top: 5px solid #f59e0b;
+}
+
+.cp-title {
+  color: #d97706 !important;
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+}
+
+.cp-content {
+  padding: 10px 0;
+}
+
+.cp-row {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+  font-size: 1rem;
+}
+
+.cp-label {
+  font-weight: 700;
+  color: #4b5563;
+  min-width: 100px;
+}
+
+.cp-value {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.cp-alert {
+  margin-top: 15px;
+  padding: 15px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #92400e;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.cp-count {
+  font-size: 1.6rem;
+  color: #dc2626;
+  margin: 0 4px;
+  font-family: inherit;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+#reader video {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+#reader video {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  body {
+    padding: 0 0 80px 0;
+    /* เพิ่มพื้นที่ด้านล่างให้พอดีกับ Tab Bar */
+    background-color: #f8fafc;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ปรับขนาดฟอนต์และปุ่มให้เล็กลง ดูสวยงาม กระชับ */
+  body,
+  input,
+  select,
+  button,
+  textarea {
+    font-size: 14px;
+  }
+
+  .login-title,
+  .plant-title,
+  .card-title,
+  .modal-title {
+    font-size: 1.15rem;
+  }
+
+  .login-label,
+  .plant-label,
+  .serial-label,
+  .grn-label {
+    font-size: 0.85rem;
+  }
+
+  .login-input,
+  .plant-select,
+  .serial-input,
+  #empCodeInput,
+  .grn-select {
+    padding: 8px 12px;
+    height: auto;
+    font-size: 14px;
+  }
+
+  .login-btn,
+  .plant-enter-btn,
+  .print-btn,
+  .btn-serial-primary,
+  .btn-serial-outline,
+  .menu-btn,
+  .tab-btn {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .desktop-text {
+    display: none;
+  }
+
+  header.app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 0;
+    margin: 0 0 8px 0;
+    border-width: 0 0 1px 0;
+    position: sticky;
+    /* Sticky Header */
+    top: 0;
+    z-index: 900;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 10px 16px;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+
+  header.app-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .card {
+    padding: 12px 16px;
+    overflow-x: auto;
+    /* ให้ตารางเลื่อนแนวนอนได้ */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    margin-bottom: 8px;
+    box-shadow: none;
+  }
+
+  table {
+    min-width: 600px;
+    /* บังคับความกว้างตารางไม่ให้บีบจนเละ */
+  }
+
+  /* ปรับ Form ให้เรียงแนวตั้ง */
+  .serial-form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .serial-field,
+  .serial-field.serial-narrow,
+  .serial-field.serial-wide {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  /* ปุ่มกดง่ายขึ้น เต็มจอ */
+  .btn-serial-primary,
+  .btn-serial-outline {
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .card-header-row {
+    flex-wrap: wrap;
+  }
+
+  .print-btn-group {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .print-btn {
+    width: auto;
+    flex: 1;
+    margin-top: 0;
+    padding: 6px 4px;
+    font-size: 0.8rem;
+  }
+
+  .serial-actions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .serial-actions .btn-serial-primary,
+  .serial-actions .btn-serial-outline {
+    width: auto;
+    flex: 1;
+    margin-top: 0;
+  }
+
+  /* แปลง Tabs เป็น Bottom Navigation Bar */
+  .tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    justify-content: space-between;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1000;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .tab-btn {
+    flex-direction: column;
+    padding: 8px 0;
+    gap: 4px;
+    background: transparent !important;
+    /* ลบพื้นหลังปุ่มเดิม */
+    box-shadow: none !important;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    flex: 1;
+    min-height: 60px;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-btn.active {
+    color: var(--primary) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .tab-btn span.icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* ปรับตารางให้อ่านง่ายขึ้น */
+  th,
+  td {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ซ่อน Dropdown เลือกกล้อง เพื่อบังคับใช้กล้องที่ตั้งค่าไว้ (กล้องหลัง) */
+#reader select {
+  display: none !important;
+}
+
+.btn-scan-table {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.btn-scan-table:hover {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+/* ปรับแต่ง Scanner Modal ให้เต็มจอในมือถือ */
+@media (max-width: 768px) {
+  #scannerModal {
+    padding: 0 !important;
+    align-items: stretch !important;
+    z-index: 9999 !important;
+    /* บังคับให้อยู่บนสุดเหนือทุกอย่าง */
+  }
+
+  #scannerModal .modal-card {
+    width: 100% !important;
+    width: 100vw !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    /* พื้นหลังดำเพื่อให้กล้องเด่น */
+    border: none;
+  }
+
+  #scannerModal .modal-title {
+    background: #000;
+    color: #fff;
+    border-bottom: none;
+    text-align: center;
+    flex-shrink: 0;
+    padding: 16px;
+  }
+
+  #reader {
+    flex-grow: 1;
+    background-color: #000;
+    width: 100% !important;
+    border: none !important;
+    padding: 0 !important;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #reader video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+  }
+
+  #scannerModal .modal-actions {
+    background: #000;
+    padding: 16px;
+    border-top: none;
+    flex-shrink: 0;
+  }
+
+  #closeScannerBtn {
+    width: 100%;
+    background: #333;
+    color: #fff;
+    border: none;
+  }
+}
+
+/* ========= Address tab styles ========= */
+.address-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.address-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.address-field.address-wide {
+  flex: 2;
+}
+
+.address-field.address-full {
+  flex: 1 1 100%;
+}
+
+.address-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.address-select,
+.address-input {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  font-family: inherit;
+}
+
+.address-select:focus,
+.address-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  background: #ffffff;
+}
+
+.address-input[readonly] {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+#addAddressBtn {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+/* Address table */
+#addressTable {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+  min-height: 100px;
+  border: 2px solid #2563eb;
+}
+
+#addressTable thead {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: #fff;
+}
+
+#addressTable th,
+#addressTable td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+#addressTable tbody tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+/* Ensure Address tab table is visible */
+#tab-address .card {
+  display: block !important;
+  visibility: visible !important;
+}
+
+#tab-address table {
+  display: table !important;
+  visibility: visible !important;
+  min-height: 100px !important;
+}
+
+/* Button: เพิ่มที่อยู่ */
+.btn-add-address {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-add-address:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-add-address svg {
+  flex-shrink: 0;
+}
+
+/* Address Form Modal */
+.address-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.address-modal-form {
+  padding: 16px 0;
+}
+
+/* GRN Data Specific Styles */
+.grn-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 12px;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.grn-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grn-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.grn-field select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: white;
+  min-width: 150px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.data-status-info {
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--primary);
+  font-weight: 600;
+  border-left: 4px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.premium-icon-btn.loading svg {
+  animation: spin 1s linear infinite;
+}
+
+.premium-table tbody tr {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Column Header Sort Wrapper & Button */
+.th-sort-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-col-sort {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-col-sort:hover {
+  background: #ffffff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.btn-col-sort:active {
+  transform: scale(0.92);
+}
+
+.btn-col-sort.active-asc,
+.btn-col-sort.active-desc {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+}
+
+.sort-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.sort-icon-wrap svg {
+  display: block;
+}

@@ -1,0 +1,596 @@
+/* ==========================================================================
+   Smart Warehouse Barcode — Call-Matched Raindrop Glassmorphism
+   Optimized for Mobile & Tablet Barcode Scanning
+   (Scoped to @media screen so @media print sticker output stays crisp B&W)
+   ========================================================================== */
+
+@media screen {
+  :root {
+    --primary: #38bdf8;
+    --primary-soft: rgba(56, 189, 248, 0.22);
+    --bg: transparent;
+    --card-bg: rgba(12, 18, 34, 0.48);
+    --border-soft: rgba(255, 255, 255, 0.18);
+    --text-main: #f4f6fb;
+    --text-muted: #cbd5e1;
+    --tab-bg: rgba(15, 23, 42, 0.48);
+    --tab-active: #2563eb;
+    --success: #34d399;
+    --danger: #f87171;
+  }
+
+  html,
+  body {
+    background: transparent !important;
+    background-image: none !important;
+    color: #f4f6fb !important;
+    padding: 14px 16px 32px !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Loading & Gate Overlays */
+  #main-loading-overlay,
+  .login-gate,
+  .plant-gate {
+    background: rgba(6, 10, 20, 0.58) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  .loading-title {
+    color: #f8fafc !important;
+  }
+
+  .loading-msg {
+    color: #cbd5e1 !important;
+  }
+
+  .app-shell {
+    max-width: 1480px !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Header — Matching Call Sparepart Glass Header */
+  .app-header {
+    background: linear-gradient(135deg, rgba(12, 20, 38, 0.62), rgba(30, 58, 138, 0.48)) !important;
+    backdrop-filter: blur(18px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 18px !important;
+    padding: 14px 18px 14px 82px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .app-header h1,
+  .title-block h1 {
+    color: #ffffff !important;
+    font-size: clamp(1.05rem, 2.2vw, 1.4rem) !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
+    margin: 0 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Segmented Glass Navigation Tabs (Thumb-Friendly for Mobile/Tablet) */
+  .tabs {
+    background: rgba(12, 18, 34, 0.5) !important;
+    backdrop-filter: blur(16px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 16px !important;
+    padding: 6px !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26) !important;
+    position: sticky;
+    top: 8px;
+    z-index: 40;
+  }
+
+  .tab-btn {
+    min-height: 46px !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #cbd5e1 !important;
+    border: 1px solid transparent !important;
+    font-weight: 600 !important;
+    font-size: 0.92rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.22s ease !important;
+    cursor: pointer;
+  }
+
+  .tab-btn:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.62), rgba(37, 99, 235, 0.62)) !important;
+    color: #ffffff !important;
+    border-color: rgba(186, 230, 253, 0.55) !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+  }
+
+  .tab-btn .icon svg {
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;
+  }
+
+  /* Tab Panels & Glass Cards */
+  .tab-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .card,
+  .panel,
+  .section-card,
+  .login-card,
+  .plant-card,
+  .menu-panel,
+  .modal-card,
+  .modal-content {
+    background: rgba(12, 18, 34, 0.48) !important;
+    backdrop-filter: blur(16px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+    color: #f4f6fb !important;
+    padding: 16px 18px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .card-header-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .card-title {
+    color: #ffffff !important;
+    font-size: 1.04rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border-left: 4px solid #38bdf8;
+    padding-left: 10px !important;
+  }
+
+  /* Vibrant Translucent Action Buttons (Matching Call / ABC Palette) */
+  .print-btn-group,
+  .serial-actions,
+  .grn-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .print-btn,
+  .btn-serial-primary,
+  .btn-serial-outline,
+  .btn-add-address,
+  .plant-enter-btn,
+  .login-btn,
+  .menu-action-btn {
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+    color: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+    transition: transform 0.16s ease, filter 0.18s ease !important;
+    cursor: pointer;
+  }
+
+  .print-btn:active,
+  .btn-serial-primary:active,
+  .btn-serial-outline:active {
+    transform: scale(0.96) !important;
+  }
+
+  .print-btn:hover,
+  .btn-serial-primary:hover,
+  .btn-serial-outline:hover {
+    filter: brightness(1.14) !important;
+  }
+
+  #printSmallBtn {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.58), rgba(37, 99, 235, 0.46)) !important;
+  }
+  #printMediumBtn {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.58), rgba(79, 70, 229, 0.46)) !important;
+  }
+  #printBigBtn {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.58), rgba(5, 150, 105, 0.46)) !important;
+  }
+  #printFragileBtn {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.6), rgba(185, 28, 28, 0.48)) !important;
+  }
+
+  .btn-serial-primary,
+  .plant-enter-btn,
+  .login-btn,
+  .btn-add-address {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.62), rgba(5, 150, 105, 0.5)) !important;
+  }
+
+  .btn-serial-outline,
+  .menu-action-btn {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.48), rgba(37, 99, 235, 0.4)) !important;
+  }
+
+  .clear-all-btn,
+  .menu-logout-btn {
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.56), rgba(185, 28, 28, 0.44)) !important;
+    border: 1px solid rgba(252, 165, 165, 0.45) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+  }
+
+  .print-btn svg,
+  .btn-serial-primary svg,
+  .btn-serial-outline svg {
+    fill: currentColor !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Form Rows & Inputs — Large Touch Targets & Zero iOS Auto-Zoom */
+  .employee-row,
+  .serial-form-row,
+  .grn-filters,
+  .address-form-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: flex-end !important;
+    gap: 12px !important;
+  }
+
+  .employee-row label,
+  .serial-label,
+  .grn-label,
+  .address-label,
+  .plant-label,
+  .login-label {
+    color: #cbd5e1 !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+  }
+
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea {
+    min-height: 44px !important;
+    padding: 9px 12px !important;
+    border-radius: 11px !important;
+    background: rgba(15, 23, 42, 0.62) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    font-size: 15px !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none !important;
+    background: rgba(15, 23, 42, 0.82) !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.32) !important;
+  }
+
+  input[readonly] {
+    background: rgba(15, 23, 42, 0.34) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  select option {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  .status {
+    color: #cbd5e1 !important;
+    font-size: 0.85rem !important;
+    margin-top: 8px !important;
+  }
+
+  /* Camera / Barcode Scan Buttons inside Tables */
+  .scan-btn,
+  .btn-scan,
+  .camera-scan-btn,
+  button[title*="สแกน"],
+  button[aria-label*="สแกน"] {
+    min-width: 42px !important;
+    min-height: 42px !important;
+    border-radius: 11px !important;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.64), rgba(37, 99, 235, 0.56)) !important;
+    border: 1px solid rgba(165, 243, 252, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.32) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+  }
+
+  /* Tables — Touch-Scrollable & Active Scan-Row Highlight */
+  .card:has(table) {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: rgba(12, 18, 34, 0.36) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    color: #f1f5f9 !important;
+  }
+
+  thead th {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(30, 58, 138, 0.8)) !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+    padding: 11px 8px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+  }
+
+  tbody tr,
+  #entryTable tbody tr,
+  #serialTable tbody tr,
+  #grnTable tbody tr,
+  #addressTable tbody tr {
+    background: transparent !important;
+    transition: background 0.18s ease !important;
+  }
+
+  tbody td,
+  #entryTable tbody td,
+  #serialTable tbody td,
+  #grnTable tbody td,
+  #addressTable tbody td {
+    background: rgba(15, 23, 42, 0.58) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 9px 10px !important;
+    vertical-align: middle !important;
+    font-size: 0.88rem !important;
+  }
+
+  tbody tr:nth-child(even) td,
+  #entryTable tbody tr:nth-child(even) td,
+  #serialTable tbody tr:nth-child(even) td,
+  #grnTable tbody tr:nth-child(even) td,
+  #addressTable tbody tr:nth-child(even) td {
+    background: rgba(30, 41, 59, 0.62) !important;
+    color: #f8fafc !important;
+  }
+
+  tbody tr:hover td,
+  #entryTable tbody tr:hover td,
+  #serialTable tbody tr:hover td,
+  #grnTable tbody tr:hover td,
+  #addressTable tbody tr:hover td {
+    background: rgba(56, 189, 248, 0.24) !important;
+  }
+
+  /* Highlight active row receiving barcode scan */
+  tbody tr:focus-within td,
+  #entryTable tbody tr:focus-within td,
+  #serialTable tbody tr:focus-within td {
+    background: rgba(56, 189, 248, 0.3) !important;
+  }
+
+  tbody tr:focus-within td:first-child {
+    box-shadow: inset 4px 0 0 #38bdf8 !important;
+  }
+
+  table input[type="checkbox"] {
+    accent-color: #38bdf8;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  tbody td input[type="text"],
+  tbody td input[type="number"] {
+    min-height: 40px !important;
+    padding: 6px 9px !important;
+    font-size: 14.5px !important;
+  }
+
+  /* Hamburger Menu & Panel */
+  .menu-btn,
+  .premium-icon-btn {
+    min-width: 42px !important;
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .menu-panel {
+    background: rgba(12, 18, 34, 0.88) !important;
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+  }
+
+  .menu-row,
+  .menu-value {
+    color: #f8fafc !important;
+  }
+
+  .menu-label {
+    color: #94a3b8 !important;
+  }
+
+  /* Keep Barcode / QR Sticker Previews crisp white so physical scanners always read them */
+  .sticker,
+  .label-card,
+  .barcode-card,
+  .barcode-preview,
+  .print-sheet,
+  .sticker-preview,
+  svg.barcode,
+  canvas.barcode {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* ========================================================================
+     Tablet & Mobile Optimizations (เน้นการยิงสแกนผ่านมือถือ / แท็บเล็ต)
+     ======================================================================== */
+  @media (max-width: 1024px) {
+    html,
+    body {
+      padding: 10px 10px 28px !important;
+    }
+
+    input[type="text"],
+    input[type="search"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+      font-size: 16px !important; /* Prevent iOS/Android auto-zoom on scan/focus */
+      min-height: 46px !important;
+    }
+
+    .serial-form-row {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+    }
+
+    .serial-field,
+    .serial-field.serial-narrow,
+    .serial-field.serial-wide {
+      width: 100% !important;
+      min-width: 0 !important;
+      flex: unset !important;
+    }
+
+    #clearAllSerialBtn {
+      position: static !important;
+      grid-column: 1 / -1 !important;
+      width: 100% !important;
+    }
+
+    .grn-filters {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+    }
+
+    .grn-actions {
+      grid-column: 1 / -1 !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .app-header {
+      padding: 12px 12px 12px 74px !important;
+      border-radius: 14px !important;
+    }
+
+    .tabs {
+      gap: 4px !important;
+      padding: 5px !important;
+    }
+
+    .tab-btn {
+      flex-direction: column !important;
+      gap: 3px !important;
+      padding: 8px 4px !important;
+      font-size: 0.74rem !important;
+      min-height: 52px !important;
+    }
+
+    .card {
+      padding: 12px !important;
+      border-radius: 14px !important;
+    }
+
+    .print-btn-group {
+      width: 100% !important;
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .serial-actions {
+      width: 100% !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .employee-row {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+
+    .employee-row label {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      width: 100% !important;
+    }
+
+    .serial-form-row,
+    .grn-filters,
+    .address-form-row {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}

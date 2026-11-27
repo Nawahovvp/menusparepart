@@ -1,0 +1,106 @@
+import React from 'react';
+
+function GroupCard({ label, value, percent, id, onClick, isActive, typeClass, isDepartmentClear, compact }) {
+    return (
+        <div
+            className={`dashboard-card group-card ${typeClass} ${isDepartmentClear ? 'dept-clear' : ''} ${isActive ? 'active' : ''}`}
+            onClick={() => onClick(id)}
+            style={compact ? undefined : { minWidth: '130px' }}
+            title={`${label}: ${value} (${percent}%)`}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '4px', width: '100%', marginBottom: '2px' }}>
+                <h3 style={{
+                    fontSize: compact ? '0.76em' : '0.8em',
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'left'
+                }}>{label}</h3>
+                {isActive && (
+                    <div style={{
+                        background: '#fff',
+                        borderRadius: '50%',
+                        width: compact ? '15px' : '18px',
+                        height: compact ? '15px' : '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                        <i className="fas fa-check-circle" style={{ fontSize: compact ? '13px' : '16px', color: '#e74c3c' }}></i>
+                    </div>
+                )}
+            </div>
+            <div className="value" style={{ fontSize: compact ? '1.08em' : '1.2em' }}>{value}</div>
+            <div className="progress-container" style={{ height: compact ? '3px' : '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                <div className="progress-bar" style={{ width: `${percent}%`, backgroundColor: '#fff' }}></div>
+            </div>
+            <div className="progress-text" style={{ color: '#fff', fontSize: compact ? '0.72em' : undefined }}>{percent}%</div>
+        </div>
+    );
+}
+
+export default function GroupCards({ title, stats = [], onCardClick, activeFilter, prefix, children, showZero = false, compact = false }) {
+    if (!stats || stats.length === 0) return null;
+
+    const getTypeClass = (label) => {
+        if (prefix === 'calltype_') {
+            const cleanLabel = String(label).toLowerCase();
+            return `calltype-${cleanLabel}-card`;
+        }
+        if (prefix === 'gm_') return 'gm-card';
+        if (prefix === 'teamplant_') return 'teamplant-card';
+        if (prefix === 'dept_') {
+            const cleanLabel = String(label).toLowerCase();
+            return `dept-card dept-${cleanLabel}-card`;
+        }
+        return '';
+    };
+
+    const displayStats = (showZero || prefix === 'dept_') ? stats : stats.filter(item => item.value > 0);
+    if (displayStats.length === 0) return null;
+
+    const isItemActive = (label) => {
+        if (Array.isArray(activeFilter)) {
+            return activeFilter.includes(label) || activeFilter.includes(`${prefix}${label}`);
+        }
+        return activeFilter === `${prefix}${label}` || activeFilter === label;
+    };
+
+    return (
+        <div className={`group-cards-section ${compact ? 'compact-section' : ''}`} style={{ marginTop: compact ? '10px' : '20px' }}>
+            {title && (
+                <h2 style={{
+                    fontSize: compact ? '1.02em' : '1.2em',
+                    marginBottom: compact ? '10px' : '20px',
+                    fontWeight: '700',
+                    paddingLeft: '12px',
+                    color: 'var(--text-primary)',
+                    borderLeft: '4px solid var(--info-color)',
+                    lineHeight: '1.2'
+                }}>
+                    {title}
+                </h2>
+            )}
+            <div className={`dashboard group-dashboard ${compact ? 'group-dashboard-compact' : ''} ${prefix === 'teamplant_' ? 'group-dashboard-teamplant' : ''}`}>
+                {displayStats.map((item, index) => (
+                    <GroupCard
+                        key={index}
+                        label={item.label}
+                        value={item.value}
+                        percent={item.percent}
+                        id={`${prefix}${item.label}`}
+                        onClick={onCardClick}
+                        isActive={isItemActive(item.label)}
+                        typeClass={getTypeClass(item.label)}
+                        isDepartmentClear={prefix === 'dept_' && item.waitingResponse === 0}
+                        compact={compact}
+                    />
+                ))}
+                {children}
+            </div>
+        </div>
+    );
+}
