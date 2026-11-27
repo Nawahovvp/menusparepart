@@ -31,6 +31,8 @@ function apiDevServerPlugin() {
             handlerModule = await import('./functions/api/outside-request.js');
           } else if (route === 'web-data') {
             handlerModule = await import('./functions/api/web-data.js');
+          } else if (route === 'proxy') {
+            handlerModule = await import('./functions/api/proxy.js');
           } else {
             return next();
           }
@@ -113,7 +115,8 @@ export default defineConfig(({ mode }) => {
           '**/ABC-Analysis-New-Plant-All/**',
           '**/Barcode-Nawanakorn-Web/**',
           '**/Stockday_Auth/**',
-          '**/TankRecharge/**'
+          '**/TankRecharge/**',
+          '**/DashboardTSC/**'
         ]
       }
     }

@@ -23,6 +23,7 @@ export default function HubShell({
   const [isSidebarMini, setIsSidebarMini] = useState(false);
   const [isCollapsingToOrb, setIsCollapsingToOrb] = useState(false);
   const [isMenuListExpanded, setIsMenuListExpanded] = useState(true);
+  const [expandedGroups, setExpandedGroups] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [previewedMenu, setPreviewedMenu] = useState(
     () => MENU_ITEMS.find((m) => m.type === 'internal') || MENU_ITEMS[0]
@@ -175,7 +176,21 @@ export default function HubShell({
     localStorage.setItem(STORAGE_KEYS.THEME, next);
   };
 
+  const handleToggleGroup = (groupItem) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [groupItem.id]: !prev[groupItem.id],
+    }));
+    setPreviewedMenu(groupItem);
+    applyAdaptiveTheme(groupItem);
+  };
+
   const handleSelectItem = (item) => {
+    if (item.type === 'group') {
+      handleToggleGroup(item);
+      return;
+    }
+
     // Only enabled apps (internal React modules or same-origin embedded apps) have an action
     if (item.type !== 'internal' && item.type !== 'embedded') {
       return;
@@ -197,13 +212,21 @@ export default function HubShell({
     showToast('กลับสู่หน้าหลัก Plant Hub');
   };
 
+  const q = searchQuery.trim().toLowerCase();
   const filteredItems = MENU_ITEMS.filter((item) => {
-    const q = searchQuery.trim().toLowerCase();
     if (!q) return true;
-    return (
+    const parentMatches =
       item.title.toLowerCase().includes(q) ||
-      item.subtitle.toLowerCase().includes(q)
-    );
+      item.subtitle.toLowerCase().includes(q);
+    if (parentMatches) return true;
+    if (item.children?.length) {
+      return item.children.some(
+        (child) =>
+          child.title.toLowerCase().includes(q) ||
+          child.subtitle.toLowerCase().includes(q)
+      );
+    }
+    return false;
   });
 
   const idRec = String(user?.IDRec ?? '').trim();
@@ -412,44 +435,110 @@ export default function HubShell({
               aria-label="รายการเมนูระบบงาน"
             >
               {filteredItems.map((item) => {
-                const isActive = activeMenu?.id === item.id;
-                const hasAction = item.type === 'internal' || item.type === 'embedded';
+                const isGroup = item.type === 'group' && item.children?.length > 0;
+                const hasActiveChild = isGroup && item.children.some((c) => activeMenu?.id === c.id);
+                const isActive = activeMenu?.id === item.id || hasActiveChild;
+                const isGroupOpen = isGroup && (Boolean(expandedGroups[item.id]) || Boolean(q) || hasActiveChild);
+                const hasAction = isGroup || item.type === 'internal' || item.type === 'embedded';
+
+                const visibleChildren = isGroup
+                  ? item.children.filter((child) => {
+                      if (!q) return true;
+                      const parentMatches =
+                        item.title.toLowerCase().includes(q) ||
+                        item.subtitle.toLowerCase().includes(q);
+                      if (parentMatches) return true;
+                      return (
+                        child.title.toLowerCase().includes(q) ||
+                        child.subtitle.toLowerCase().includes(q)
+                      );
+                    })
+                  : [];
+
                 return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={`nav-item${isActive ? ' is-active' : ''}${!hasAction ? ' is-no-action' : ''}`}
-                    title={`${item.title} — ${item.subtitle}`}
-                    style={{
-                      '--item-c1': item.color1,
-                      '--item-c2': item.color2,
-                      '--item-glow': item.glow,
-                    }}
-                    onPointerMove={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
-                      e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
-                    }}
-                    onMouseEnter={() => {
-                      applyAdaptiveTheme(item);
-                      if (!activeMenu) setPreviewedMenu(item);
-                      showStagePreview();
-                    }}
-                    onClick={() => handleSelectItem(item)}
-                  >
-                    <span
-                      className="nav-item-icon"
-                      dangerouslySetInnerHTML={{ __html: item.icon }}
-                    />
-                    <span className="nav-item-text">
-                      <span className="nav-item-title">{item.title}</span>
-                      <span className="nav-item-sub">{item.subtitle}</span>
-                    </span>
-                    {hasAction && !isActive && (
-                      <span className="nav-internal-badge">พร้อมใช้</span>
+                  <div key={item.id} className={`nav-group${isGroupOpen ? ' is-open' : ''}`}>
+                    <button
+                      type="button"
+                      className={`nav-item${isActive ? ' is-active' : ''}${!hasAction ? ' is-no-action' : ''}`}
+                      title={`${item.title} — ${item.subtitle}`}
+                      style={{
+                        '--item-c1': item.color1,
+                        '--item-c2': item.color2,
+                        '--item-glow': item.glow,
+                      }}
+                      onPointerMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                        e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
+                      }}
+                      onMouseEnter={() => {
+                        applyAdaptiveTheme(item);
+                        if (!activeMenu) setPreviewedMenu(item);
+                        showStagePreview();
+                      }}
+                      onClick={() => handleSelectItem(item)}
+                    >
+                      <span
+                        className="nav-item-icon"
+                        dangerouslySetInnerHTML={{ __html: item.icon }}
+                      />
+                      <span className="nav-item-text">
+                        <span className="nav-item-title">{item.title}</span>
+                        <span className="nav-item-sub">{item.subtitle}</span>
+                      </span>
+                      {isGroup ? (
+                        <span className={`nav-chevron${isGroupOpen ? ' is-open' : ''}`} aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <>
+                          {hasAction && !isActive && (
+                            <span className="nav-internal-badge">พร้อมใช้</span>
+                          )}
+                          {isActive && <span className="nav-active-dot" title="กำลังเปิดใช้งาน"></span>}
+                        </>
+                      )}
+                    </button>
+
+                    {isGroup && isGroupOpen && (
+                      <div className="nav-submenu" role="group" aria-label={item.title}>
+                        {visibleChildren.map((child) => {
+                          const childActive = activeMenu?.id === child.id;
+                          return (
+                            <button
+                              key={child.id}
+                              type="button"
+                              className={`nav-subitem${childActive ? ' is-active' : ''}`}
+                              title={`${child.title} — ${child.subtitle}`}
+                              style={{
+                                '--item-c1': child.color1,
+                                '--item-c2': child.color2,
+                                '--item-glow': child.glow,
+                              }}
+                              onMouseEnter={() => {
+                                applyAdaptiveTheme(child);
+                                if (!activeMenu) setPreviewedMenu(child);
+                                showStagePreview();
+                              }}
+                              onClick={() => handleSelectItem(child)}
+                            >
+                              <span
+                                className="nav-subitem-icon"
+                                dangerouslySetInnerHTML={{ __html: child.icon }}
+                              />
+                              <span className="nav-subitem-text">
+                                <span className="nav-subitem-title">{child.title}</span>
+                                <span className="nav-subitem-sub">{child.subtitle}</span>
+                              </span>
+                              {childActive && <span className="nav-active-dot" title="กำลังเปิดใช้งาน"></span>}
+                            </button>
+                          );
+                        })}
+                      </div>
                     )}
-                    {isActive && <span className="nav-active-dot" title="กำลังเปิดใช้งาน"></span>}
-                  </button>
+                  </div>
                 );
               })}
             </nav>
@@ -567,6 +656,29 @@ export default function HubShell({
                 dangerouslySetInnerHTML={{ __html: previewedMenu ? previewedMenu.icon : DEFAULT_HUB_ICON }}
               />
               <h2>{previewedMenu ? previewedMenu.title : 'เลือกเมนูจากแถบด้านซ้าย'}</h2>
+              {previewedMenu?.type === 'group' && previewedMenu.children?.length > 0 && (
+                <div className="stage-subgrid">
+                  {previewedMenu.children.map((child) => (
+                    <button
+                      key={child.id}
+                      type="button"
+                      className="stage-subbtn"
+                      style={{
+                        '--item-c1': child.color1,
+                        '--item-c2': child.color2,
+                        '--item-glow': child.glow,
+                      }}
+                      onClick={() => handleSelectItem(child)}
+                    >
+                      <span
+                        className="stage-subbtn-icon"
+                        dangerouslySetInnerHTML={{ __html: child.icon }}
+                      />
+                      <span className="stage-subbtn-label">{child.title}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         )}

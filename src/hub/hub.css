@@ -1962,3 +1962,245 @@ body.sidebar-mini .welcome-stage {
 .app-viewport iframe {
   background: transparent !important;
 }
+
+
+/* ==========================================================================
+   Sidebar Expandable Submenu Group (TSC Bluetap Summi Adapter Wif Dyno)
+   ========================================================================== */
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.nav-chevron {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  transition: transform 0.25s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nav-chevron svg {
+  width: 15px;
+  height: 15px;
+}
+
+.nav-chevron.is-open {
+  transform: rotate(180deg);
+  color: #ffffff;
+}
+
+.nav-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 16px;
+  padding-left: 10px;
+  border-left: 1.5px solid rgba(125, 211, 252, 0.28);
+  animation: submenuFadeIn 0.2s ease;
+}
+
+@keyframes submenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-subitem {
+  --item-c1: #06b6d4;
+  --item-c2: #2563eb;
+  --item-glow: rgba(6, 182, 212, 0.38);
+
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.28);
+  color: var(--text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-subitem:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--item-c1) 55%, transparent);
+  transform: translateX(3px);
+}
+
+.nav-subitem.is-active {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--item-c1) 34%, transparent),
+    color-mix(in srgb, var(--item-c2) 20%, transparent)
+  );
+  border-color: var(--item-c1);
+  box-shadow: 0 6px 16px -8px var(--item-glow);
+}
+
+.nav-subitem-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--item-c1), var(--item-c2));
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px -3px var(--item-glow);
+}
+
+.nav-subitem-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.nav-subitem-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nav-subitem-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-subitem-sub {
+  font-size: 0.64rem;
+  line-height: 1.15;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Welcome Stage Preview Sub-Buttons */
+.stage-subgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+}
+
+.stage-subbtn {
+  --item-c1: #06b6d4;
+  --item-c2: #2563eb;
+  --item-glow: rgba(6, 182, 212, 0.38);
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--item-c1) 46%, rgba(15, 23, 42, 0.45)),
+    color-mix(in srgb, var(--item-c2) 34%, rgba(15, 23, 42, 0.55))
+  );
+  color: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+}
+
+.stage-subbtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.stage-subbtn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.stage-subbtn-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.stage-subbtn-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+/* Mini Sidebar Rail — Submenu Icon Support */
+.sidebar.is-mini .nav-internal-badge,
+.sidebar.is-mini .nav-chevron,
+.sidebar.is-mini .nav-subitem-text {
+  display: none;
+}
+
+.sidebar.is-mini .nav-submenu {
+  margin-left: 0;
+  padding: 5px 4px;
+  border-left: none;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.34);
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  gap: 5px;
+}
+
+.sidebar.is-mini .nav-subitem {
+  justify-content: center;
+  padding: 4px 0;
+  background: transparent;
+  border-color: transparent;
+}
+
+.sidebar.is-mini .nav-subitem:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.sidebar.is-mini .nav-subitem.is-active {
+  background: color-mix(in srgb, var(--item-c1) 28%, transparent);
+  border-color: var(--item-c1);
+}
+
+.sidebar.is-mini .nav-subitem-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+}
+
+.sidebar.is-mini .nav-subitem-icon svg {
+  width: 14px;
+  height: 14px;
+}

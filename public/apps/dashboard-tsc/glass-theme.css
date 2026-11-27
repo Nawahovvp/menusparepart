@@ -1,0 +1,532 @@
+/* ==========================================================================
+   DashboardTSC — Unified Raindrop Dark Glassmorphism Theme
+   (Matches Call Sparepart, ABC Analysis & Hub Card Tones & Typography)
+   ========================================================================== */
+
+@media screen {
+  html,
+  body {
+    background: transparent !important;
+    background-image: none !important;
+    color: #f8fafc !important;
+  }
+
+  .dashboard-container,
+  .login-container,
+  .container,
+  .main-container,
+  #mainApp,
+  #tscStoreApp,
+  #landingPage {
+    background: transparent !important;
+    background-image: none !important;
+    color: #f8fafc !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #ffffff !important;
+  }
+
+  p,
+  label {
+    color: #cbd5e1 !important;
+  }
+
+  /* Landing Page Header */
+  .dashboard-title {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    text-shadow: 0 4px 22px rgba(0, 0, 0, 0.45) !important;
+    filter: none !important;
+  }
+
+  .dashboard-subtitle {
+    color: rgba(226, 232, 240, 0.92) !important;
+    font-weight: 400 !important;
+  }
+
+  /* Hub Submenu Mode: Close landing page & back buttons */
+  #landingPage,
+  #backButton,
+  #tscStore_backButton {
+    display: none !important;
+  }
+
+  /* Report Header (mainApp & tscStoreApp) — Leave room for Hub Floating Orb */
+  .report-header-container,
+  .header-bar,
+  .top-bar,
+  .page-header,
+  .app-header {
+    padding-left: 82px !important;
+    background: rgba(12, 18, 34, 0.54) !important;
+    backdrop-filter: blur(18px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+    color: #f8fafc !important;
+  }
+
+  .report-title-text {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .report-subtitle {
+    color: #cbd5e1 !important;
+  }
+
+  .report-back-btn {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .report-back-btn:hover {
+    background: rgba(56, 189, 248, 0.45) !important;
+    color: #ffffff !important;
+  }
+
+  /* ========================================================================
+     Landing Page Cards — Translucent Colored Glass matching Call & ABC
+     ======================================================================== */
+  .dashboard-card {
+    backdrop-filter: blur(16px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+    color: #ffffff !important;
+  }
+
+  .dashboard-card:hover {
+    border-color: rgba(255, 255, 255, 0.48) !important;
+    filter: brightness(1.1);
+  }
+
+  .dashboard-card.card-tsc {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.56), rgba(41, 128, 185, 0.44)) !important;
+  }
+  .dashboard-card.card-store {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.56), rgba(5, 150, 105, 0.44)) !important;
+  }
+  .dashboard-card.card-bluetap {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.56), rgba(217, 119, 6, 0.44)) !important;
+  }
+  .dashboard-card.card-bluetap-claim {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.56), rgba(109, 40, 217, 0.44)) !important;
+  }
+  #btnAdapterClaim.dashboard-card {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.56), rgba(13, 148, 136, 0.44)) !important;
+  }
+  .dashboard-card.card-wifi,
+  .dashboard-card.card-truewifi {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.56), rgba(37, 99, 235, 0.44)) !important;
+  }
+
+  .dashboard-card .dashboard-card-icon {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28)) !important;
+  }
+
+  .dashboard-card-title {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .dashboard-card-desc {
+    color: rgba(241, 245, 249, 0.92) !important;
+  }
+
+  /* ========================================================================
+     Status Cards inside mainApp (WorkOrder, ยอดรวม, กำลังดำเนินการ, สถานะ, คลัง)
+     ======================================================================== */
+  .status-card {
+    background: rgba(15, 23, 42, 0.52) !important;
+    backdrop-filter: blur(14px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+    color: #f8fafc !important;
+  }
+
+  .status-card:hover {
+    border-color: rgba(255, 255, 255, 0.45) !important;
+    filter: brightness(1.12);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  .status-card-icon {
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .status-card-label {
+    color: rgba(241, 245, 249, 0.92) !important;
+    font-weight: 600 !important;
+  }
+
+  .status-card-count {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  /* Variant Translucent Colored Glass Tints (matching Call & ABC) */
+  .status-card.status-workorder {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.58), rgba(192, 57, 43, 0.44)) !important;
+  }
+  .status-card.status-total {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.64), rgba(52, 73, 94, 0.48)) !important;
+  }
+  .status-card.status-processing {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.56), rgba(118, 75, 162, 0.44)) !important;
+  }
+  .status-card.status-success {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.56), rgba(39, 174, 96, 0.42)) !important;
+  }
+  .status-card.status-transit {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.58), rgba(217, 119, 6, 0.44)) !important;
+  }
+  .status-card.status-pending {
+    background: linear-gradient(135deg, rgba(225, 29, 72, 0.56), rgba(190, 18, 60, 0.44)) !important;
+  }
+  .status-card.status-claim {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.56), rgba(37, 99, 235, 0.44)) !important;
+  }
+  .status-card.status-plant {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.56), rgba(41, 128, 185, 0.42)) !important;
+  }
+  .status-card.status-other {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.54), rgba(109, 40, 217, 0.42)) !important;
+  }
+
+  /* Description Badges Row — Teal Glass */
+  #descriptionBadges .status-card {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.54), rgba(13, 148, 136, 0.42)) !important;
+  }
+
+  /* Plant Badges Row — Dark Frosted Glass matching ABC & Call */
+  #plantBadges .status-card.status-plant-item {
+    background: rgba(15, 23, 42, 0.54) !important;
+    border-color: rgba(148, 163, 184, 0.28) !important;
+  }
+
+  #plantBadges .status-card.status-plant-item:hover {
+    background: rgba(30, 41, 59, 0.68) !important;
+    border-color: rgba(125, 211, 252, 0.5) !important;
+  }
+
+  /* ไม่คืนซาก Card (overrides inline pink styles) */
+  #notReturnCard.status-card {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.58), rgba(192, 57, 43, 0.44)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  }
+
+  #notReturnCard .status-card-icon,
+  #notReturnCard .status-card-label,
+  #notReturnCard .status-card-count {
+    color: #ffffff !important;
+  }
+
+  /* Selected / Active Status Card */
+  .status-card.active-status {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.82), rgba(37, 99, 235, 0.78)) !important;
+    border: 2px solid #7dd3fc !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.32), 0 12px 28px rgba(0, 0, 0, 0.36) !important;
+    color: #ffffff !important;
+  }
+
+  .status-card.active-status .status-card-icon {
+    background: rgba(255, 255, 255, 0.28) !important;
+    color: #ffffff !important;
+  }
+
+  /* ========================================================================
+     TSC Store Status Cards (รอส่งคลัง / ไม่ครบ / รอจัดเก็บ / ครบ)
+     ======================================================================== */
+  .tsc-status-card {
+    backdrop-filter: blur(14px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.26) !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+  }
+
+  .tsc-status-card:hover {
+    transform: translateY(-3px) !important;
+    border-color: rgba(255, 255, 255, 0.48) !important;
+    filter: brightness(1.12);
+  }
+
+  .tsc-status-card.waiting {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.58), rgba(192, 57, 43, 0.44)) !important;
+  }
+  .tsc-status-card.incomplete {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.58), rgba(217, 119, 6, 0.44)) !important;
+  }
+  .tsc-status-card.pending {
+    background: linear-gradient(135deg, rgba(230, 126, 34, 0.58), rgba(211, 84, 0, 0.44)) !important;
+  }
+  .tsc-status-card.complete {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.56), rgba(39, 174, 96, 0.42)) !important;
+  }
+
+  .tsc-status-card .status-title,
+  .tsc-status-card .branch-count,
+  .tsc-status-card .machine-count {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  /* ========================================================================
+     Search / Filter Bars, Containers, User Menu & Modals
+     ======================================================================== */
+  .search-row,
+  .filter-row,
+  #tscStore_searchContainer,
+  .summary-card,
+  .stat-card,
+  .kpi-card,
+  .filter-card,
+  .filter-bar,
+  .controls-bar,
+  .search-bar,
+  .table-container,
+  .table-wrapper,
+  .card,
+  .panel,
+  .login-card,
+  .user-profile-btn,
+  .user-dropdown,
+  .modal-content,
+  .modal-box {
+    background: rgba(12, 18, 34, 0.52) !important;
+    backdrop-filter: blur(16px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(165%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  #tscStore_searchContainer {
+    padding: 14px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  /* User Profile Button & Dropdown */
+  .user-name,
+  .user-chevron,
+  .dropdown-user-name {
+    color: #ffffff !important;
+  }
+
+  .dropdown-header {
+    background: rgba(15, 23, 42, 0.72) !important;
+    border-bottom-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  .dropdown-user-role,
+  .detail-item {
+    color: #cbd5e1 !important;
+  }
+
+  .dropdown-user-details {
+    border-top-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  .dropdown-divider {
+    background: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  .dropdown-item {
+    color: #f8fafc !important;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(56, 189, 248, 0.18) !important;
+  }
+
+  .dropdown-item.logout-item {
+    color: #fca5a5 !important;
+  }
+
+  .user-dropdown,
+  .modal-content,
+  .modal-box,
+  #tscStore_detailModal .modal-content {
+    background: rgba(12, 18, 34, 0.94) !important;
+  }
+
+  /* Modals Inner Cards */
+  .modal-body-compact {
+    background: rgba(15, 23, 42, 0.65) !important;
+    color: #f8fafc !important;
+  }
+
+  .compact-summary-bar,
+  .detail-section-compact {
+    background: rgba(15, 23, 42, 0.72) !important;
+    border: 1px solid rgba(148, 163, 184, 0.24) !important;
+    color: #f8fafc !important;
+  }
+
+  .summary-item,
+  .detail-item-compact {
+    border-color: rgba(148, 163, 184, 0.16) !important;
+  }
+
+  .summary-label,
+  .detail-label-compact {
+    color: #94a3b8 !important;
+  }
+
+  .summary-value,
+  .detail-value-compact,
+  #tscStore_modalContent span.value {
+    color: #f8fafc !important;
+  }
+
+  #tscStore_modalContent span.label {
+    color: #7dd3fc !important;
+  }
+
+  .detail-section-title-compact {
+    background: rgba(30, 41, 59, 0.75) !important;
+    color: #ffffff !important;
+    border-bottom-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  .detail-section-title-compact i {
+    color: #38bdf8 !important;
+  }
+
+  /* Inputs & Selects (including high-specificity IDs) */
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea,
+  #searchInput,
+  #tscStore_searchInput,
+  #tscStore_statusFilter,
+  #plantCallFilter,
+  #plantFilter,
+  #statusFilter {
+    background: rgba(15, 23, 42, 0.72) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.34) !important;
+    box-shadow: none !important;
+  }
+
+  #searchInput::placeholder,
+  #tscStore_searchInput::placeholder,
+  input::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  select option {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  /* ========================================================================
+     Tables & Row Color Tints (Readable white text on dark frosted rows)
+     ======================================================================== */
+  table,
+  .pivot-table,
+  .detail-summary-table,
+  .detail-table {
+    background: transparent !important;
+    color: #f1f5f9 !important;
+  }
+
+  thead th,
+  #tscStore_dataTable th,
+  .pivot-table th,
+  .detail-table th {
+    background: rgba(15, 23, 42, 0.88) !important;
+    color: #ffffff !important;
+    border-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  tbody tr {
+    background: rgba(15, 23, 42, 0.42) !important;
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.48) !important;
+  }
+
+  tbody tr:hover {
+    background: rgba(56, 189, 248, 0.2) !important;
+  }
+
+  /* Override light pastel WorkOrder grouping colors for dark glass readability */
+  tr.wo-color-0 { background: rgba(30, 58, 138, 0.28) !important; }
+  tr.wo-color-1 { background: rgba(88, 28, 135, 0.26) !important; }
+  tr.wo-color-2 { background: rgba(6, 78, 59, 0.28) !important; }
+  tr.wo-color-3 { background: rgba(120, 53, 15, 0.28) !important; }
+  tr.wo-color-4 { background: rgba(20, 83, 45, 0.26) !important; }
+  tr.wo-color-5 { background: rgba(131, 24, 67, 0.26) !important; }
+  tr.wo-color-6 { background: rgba(19, 78, 74, 0.28) !important; }
+  tr.wo-color-7 { background: rgba(30, 41, 59, 0.42) !important; }
+  tr.highlight-green { background: rgba(16, 185, 129, 0.24) !important; }
+
+  tbody td,
+  .pivot-table td,
+  .detail-table td,
+  .detail-summary-table td:nth-child(2) {
+    color: #f1f5f9 !important;
+    border-color: rgba(148, 163, 184, 0.16) !important;
+  }
+
+  .detail-table td,
+  .detail-summary-table td:nth-child(2) {
+    background: rgba(15, 23, 42, 0.46) !important;
+  }
+
+  /* Bright status colors inside dark tables */
+  #tscStore_dataTable .status-green,
+  .green-text {
+    color: #4ade80 !important;
+  }
+
+  #tscStore_dataTable .status-red,
+  .red-text {
+    color: #f87171 !important;
+  }
+
+  #tscStore_dataTable .status-orange {
+    color: #fbbf24 !important;
+  }
+
+  .pivot-table .status-success { background: rgba(22, 163, 74, 0.35) !important; color: #86efac !important; }
+  .pivot-table .status-sent { background: rgba(14, 165, 233, 0.35) !important; color: #7dd3fc !important; }
+  .pivot-table .status-transport { background: rgba(245, 158, 11, 0.35) !important; color: #fde68a !important; }
+  .pivot-table .status-wait { background: rgba(220, 38, 38, 0.35) !important; color: #fca5a5 !important; }
+  .pivot-table .status-other { background: rgba(100, 116, 139, 0.35) !important; color: #e2e8f0 !important; }
+
+  a {
+    color: #7dd3fc !important;
+  }
+}

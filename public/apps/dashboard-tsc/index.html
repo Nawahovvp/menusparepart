@@ -1,0 +1,459 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงานการเก็บเครื่องคืนลูกค้า</title>
+  <!-- Enhanced Content Security Policy to reduce phishing risks -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://unpkg.com https://code.jquery.com https://opensheet.elk.sh https://docs.google.com https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob: https://drive.google.com https://lh3.googleusercontent.com; connect-src 'self' https://opensheet.elk.sh https://docs.google.com https://script.google.com https://script.googleusercontent.com; frame-src https://docs.google.com https://drive.google.com; object-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com;">
+  <!-- Additional security headers via meta -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- Verification meta to help with Safe Browsing (add your site verification if available) -->
+  <meta name="google-site-verification" content="your-verification-token-if-any">
+  <!-- Clear description to indicate legitimacy -->
+  <meta name="description"
+    content="ระบบภายในสำหรับรายงานข้อมูลอะไหล่คลังสินค้านวนคร - เครื่องมือสำหรับพนักงานเท่านั้น ไม่ใช่เว็บไซต์ภายนอก">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&family=Sarabun:wght@300;400;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="glass-theme.css?v=20261128c" />
+</head>
+
+<body>
+  <!-- Login Section -->
+  <div id="loginSection" class="login-container" style="display: none;">
+    <div class="login-card">
+      <div class="login-header">
+        <h2 class="login-title">เข้าสู่ระบบ</h2>
+        <p class="login-subtitle">รายงานการเก็บเครื่องคืนลูกค้า</p>
+      </div>
+      <div class="login-body">
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="username" placeholder="ชื่อผู้ใช้งาน">
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="รหัสผ่าน">
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">จดจำฉันไว้ในระบบ</label>
+        </div>
+        <button id="loginButton" class="login-btn">
+          เข้าสู่ระบบ <i class="fas fa-sign-in-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Menu (Top Right) -->
+  <div id="userMenu" class="user-menu-container" style="display: none;">
+    <button id="userProfileBtn" class="user-profile-btn">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <span id="displayUserName" class="user-name">Loading...</span>
+      <i class="fas fa-chevron-down user-chevron"></i>
+    </button>
+    <div id="userDropdown" class="user-dropdown">
+      <div class="dropdown-header">
+        <div id="dropdownName" class="dropdown-user-name">Loading...</div>
+        <div id="dropdownPosition" class="dropdown-user-role">Position</div>
+        <div class="dropdown-user-details">
+          <div class="detail-item"><i class="fas fa-sitemap"></i> <span id="dropdownDept">Dept</span></div>
+          <div class="detail-item"><i class="fas fa-users"></i> <span id="dropdownTeam">Team</span></div>
+          <div class="detail-item"><i class="fas fa-industry"></i> <span id="dropdownPlant">Plant</span></div>
+        </div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <button id="logoutItem" class="dropdown-item logout-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>ออกจากระบบ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Landing Page Section -->
+  <!-- Dashboard Section -->
+  <div id="landingPage" class="dashboard-container" style="display: none;">
+    <div class="dashboard-content">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">รายงานการเก็บเครื่องคืนลูกค้า<br>TSC, BLUETAP, TRUEWIFI</h1>
+        <p class="dashboard-subtitle">เลือกรายการที่ต้องการดูข้อมูล</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Card 1: TSC Dummy -->
+        <div id="btnTSC" class="dashboard-card card-tsc">
+          <i class="fas fa-tools dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">รายงานการเก็บเครื่องคืนลูกค้า</h2>
+          <p class="dashboard-card-desc">รายการอะไหล่รับคืน TSC Dummy<br>สำหรับตรวจสอบยอดและสถานะต่างๆ</p>
+        </div>
+
+        <!-- Card 2: TSC Store Closed/Return -->
+        <div id="btnTSCStore" class="dashboard-card card-store">
+          <i class="fas fa-store-slash dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">TSC ร้านปิดถาวร / ยกเลิก / Renovate</h2>
+          <p class="dashboard-card-desc">รายการเครื่อง TSC ร้านปิดถาวร,<br>Renovate, ยกเลิก Pos, คืนคลังสินค้า</p>
+        </div>
+
+        <!-- Card 3: Bluetap -->
+        <div id="btnBluetap" class="dashboard-card card-bluetap">
+          <i class="fas fa-water dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">รายงานการเก็บเครื่อง Sunmi คืนลูกค้า</h2>
+          <p class="dashboard-card-desc">รายการอะไหล่รับคืน Bluetap<br>ข้อมูลการส่งคืนและสถานะ</p>
+        </div>
+
+        <!-- Card 3.5: Bluetap Claim New Model -->
+        <div id="btnBluetapClaim" class="dashboard-card card-bluetap-claim">
+          <i class="fas fa-toolbox dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">รายงานการเคลมเครื่อง Bluetap รุ่นใหม่</h2>
+          <p class="dashboard-card-desc">รายการอะไหล่รับคืน Bluetap<br>ข้อมูลการส่งคืนและสถานะ</p>
+        </div>
+
+        <!-- Card 3.6: Adapter Pos Nss Claim -->
+        <div id="btnAdapterClaim" class="dashboard-card card-bluetap-claim">
+          <i class="fas fa-plug dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">รายงานการเคลม Adapter Pos Nss</h2>
+          <p class="dashboard-card-desc">รายการอะไหล่รับคืน Adapter<br>ข้อมูลการส่งคืนและสถานะ</p>
+        </div>
+
+        <!-- Card 4: TRUE WIFI -->
+        <div id="btnTrueWifi" class="dashboard-card card-wifi">
+          <i class="fas fa-wifi dashboard-card-icon"></i>
+          <h2 class="dashboard-card-title">รายการการเก็บอะไหล่คืน True WiFi</h2>
+          <p class="dashboard-card-desc">รายการการเก็บอะไหล่คืน True WiFi<br>ข้อมูล Access Point และสถานะ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Section (Hidden by default) -->
+  <div id="mainApp" style="display: none;">
+    <div class="report-header-container">
+      <button id="backButton" class="report-back-btn" title="กลับหน้าหลัก">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="report-header-content">
+        <h1 id="reportTitleText" class="report-title-text">รายงานการเก็บเครื่องคืนลูกค้า</h1>
+
+      </div>
+    </div>
+    <div id="searchContainer">
+      <!-- Hidden Filters -->
+      <div style="display:none;">
+        <select id="plantCallFilter">
+          <option value="">ทั้งหมด</option>
+        </select>
+        <select id="plantFilter">
+          <option value="">ทั้งหมด</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">ทั้งหมด</option>
+        </select>
+      </div>
+
+      <!-- Description Cards Row -->
+      <div class="status-cards-row" id="descriptionBadges"></div>
+
+      <!-- Dashboard Status Cards Row -->
+      <div class="status-cards-row">
+        <!-- WorkOrder Card -->
+        <div id="workOrderCountInfo" class="status-card status-workorder">
+          <div class="status-card-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">WorkOrder</span>
+            <span class="status-card-count"><span id="workOrderCountValue">0</span> งาน</span>
+          </div>
+        </div>
+
+        <!-- Total Items Card -->
+        <div id="rowCountInfo" class="status-card status-total">
+          <div class="status-card-icon">
+            <i class="fas fa-list"></i>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">ยอดรวม</span>
+            <span class="status-card-count"><span id="rowCountValue">0</span> ชิ้น</span>
+          </div>
+        </div>
+
+        <!-- Processing Items Card (Not Sent to Customer) -->
+        <div id="processingCountInfo" class="status-card status-processing">
+          <div class="status-card-icon">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">กำลังดำเนินการ</span>
+            <span class="status-card-count"><span id="processingCountValue">0</span> ชิ้น</span>
+          </div>
+        </div>
+
+        <!-- Latest Delivery Round Card -->
+        <div id="latestDeliveryCountInfo" class="status-card status-success" style="display: none;">
+          <div class="status-card-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">รอบล่าสุด</span>
+            <span class="status-card-count"><span id="latestDeliveryValue">-</span></span>
+          </div>
+        </div>
+
+        <div id="notReturnCard" class="status-card" style="display: none; background-color: #f8d7da; border: 1px solid #f5c6cb; cursor: pointer;">
+          <div class="status-card-icon" style="color: #721c24;">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label" style="color: #721c24;">ไม่คืนซาก</span>
+            <span class="status-card-count" style="color: #721c24;"><span id="notReturnCountValue">0</span> ชิ้น</span>
+          </div>
+        </div>
+        <!-- Status Badges Container (Dynamic) -->
+        <div id="statusBadges" class="status-badges-container" style="display: contents;"></div>
+      </div>
+    </div>
+
+    <!-- Plant Cards Row -->
+    <div class="status-cards-row" id="plantBadges"></div>
+    <div class="search-row">
+      <input type="text" id="searchInput"
+        placeholder="🔍 ค้นหา วันที่รับ, Code, Description, รหัสร้าน, Store Name, อุปกรณ์, WorkOrder, Serial ซ่อม, Serial คืน, TID ซ่อม, TID คืน, MatCode, EQ, อาการ, รหัสช่าง, ชื่อช่าง, คลังพื้นที่, คลังรับคืน, หมายเหตุ, ขนส่ง, ศูนย์อะไหล่, ส่งลูกค้า, Status..." />
+      <button id="searchButton" class="action-button"><i class="fas fa-search"></i> ค้นหา</button>
+      <button id="excelButton" class="action-button"><i class="fas fa-file-excel"></i> Excel</button>
+      <button id="summaryButton" class="action-button"><i class="fas fa-table"></i> สรุปข้อมูล</button>
+    </div>
+  <div class="table-container">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-column="Status">Status <span class="arrow"></span></th>
+          <th class="sortable" data-column="OrderChk">OrderChk <span class="arrow"></span></th>
+          <th class="sortable" data-column="Product">Product <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateKeep">วันที่รับ <span class="arrow"></span></th>
+          <th class="sortable" data-column="Spare Part Code">Code <span class="arrow"></span></th>
+          <th class="sortable" data-column="Spare Part Name">Description <span class="arrow"></span></th>
+          <th class="sortable" data-column="Qty">Qty <span class="arrow"></span></th>
+          <th class="sortable" data-column="Store Name">Store Name <span class="arrow"></span></th>
+          <th class="sortable" data-column="Store Code">รหัสร้าน <span class="arrow"></span></th>
+          <th class="sortable" data-column="อุปกรณ์">อุปกรณ์ <span class="arrow"></span></th>
+          <th class="sortable" data-column="WorkOrder">WorkOrder <span class="arrow"></span></th>
+          <th class="sortable" data-column="Serial Old">Serial ซ่อม <span class="arrow"></span></th>
+          <th class="sortable" data-column="SerialKeep">Serial คืน <span class="arrow"></span></th>
+          <th class="sortable" data-column="TIDCall">TID ซ่อม <span class="arrow"></span></th>
+          <th class="sortable" data-column="TID"><span id="tidColumnHeader">MAC</span> <span class="arrow"></span></th>
+          <th class="sortable" data-column="MatCode">MatCode <span class="arrow"></span></th>
+          <th class="sortable" data-column="EQ">EQ <span class="arrow"></span></th>
+          <th class="sortable" data-column="อาการ">อาการ <span class="arrow"></span></th>
+          <th class="sortable" data-column="รหัสช่าง">รหัสช่าง <span class="arrow"></span></th>
+          <th class="sortable" data-column="ชื่อช่าง">ชื่อช่าง <span class="arrow"></span></th>
+          <th class="sortable" data-column="การคืนซาก">การคืนซาก <span class="arrow"></span></th>
+          <th class="sortable" data-column="PlantCall">คลังพื้นที่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="Plant">คลังรับคืน <span class="arrow"></span></th>
+          <th class="sortable" data-column="Note">หมายเหตุ <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateDelivery">ขนส่ง <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateCenter">ศูนย์อะไหล่ <span class="arrow"></span></th>
+          <th class="sortable" data-column="DeliveryTSC_Detail">ส่งลูกค้า <span class="arrow"></span></th>
+          <th>ดูรายละเอียด</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
+    <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
+    <div id="pageNumbers"></div>
+    <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+    <button id="lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
+    <div class="items-per-page">
+      <label for="itemsPerPage">รายการต่อหน้า:</label>
+      <select id="itemsPerPage">
+        <option value="10">10 รายการ</option>
+        <option value="20" selected>20 รายการ</option>
+        <option value="30">30 รายการ</option>
+      </select>
+    </div>
+  </div>
+  </div>
+
+  <!-- TSC Store Application Section -->
+  <div id="tscStoreApp" style="display: none;">
+    <div class="report-header-container">
+      <button id="tscStore_backButton" class="report-back-btn" title="กลับหน้าหลัก">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="report-header-content">
+        <h1 class="report-title-text">รายการแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate, ยกเลิก Pos,
+          คืนคลังสินค้าทั่วประเทศ</h1>
+      </div>
+    </div>
+    <div id="tscStore_searchContainer">
+      <select id="tscStore_statusFilter">
+        <option value="">ทุกสถานะ</option>
+        <option value="รอส่งคลัง">รอส่งคลัง</option>
+        <option value="ครบ">ครบ</option>
+        <option value="ไม่ครบ">ไม่ครบ</option>
+        <option value="รอจัดเก็บ">รอจัดเก็บ</option>
+      </select>
+      <input type="text" id="tscStore_searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
+      <button id="tscStore_searchButton"><i class="fas fa-search"></i></button>
+      <button id="tscStore_exportExcel">Excel</button>
+    </div>
+    <div id="tscStore_statusSummary">
+      <div class="tsc-status-card waiting" onclick="tscStore_filterByStatus('รอส่งคลัง')">
+        <div class="status-title">รอส่งคลัง</div>
+        <div class="branch-count"><span id="tscStore_waitingCount">0</span> สาขา</div>
+        <div class="machine-count">จำนวน <span id="tscStore_waitingPosCount">0</span> เครื่อง</div>
+      </div>
+      <div class="tsc-status-card incomplete" onclick="tscStore_filterByStatus('ไม่ครบ')">
+        <div class="status-title">ไม่ครบ</div>
+        <div class="branch-count"><span id="tscStore_incompleteCount">0</span> สาขา</div>
+        <div class="machine-count">จำนวน <span id="tscStore_incompletePosCount">0</span> เครื่อง</div>
+      </div>
+      <div class="tsc-status-card pending" onclick="tscStore_filterByStatus('รอจัดเก็บ')">
+        <div class="status-title">รอจัดเก็บ</div>
+        <div class="branch-count"><span id="tscStore_pendingCount">0</span> สาขา</div>
+        <div class="machine-count">จำนวน <span id="tscStore_pendingPosCount">0</span> เครื่อง</div>
+      </div>
+      <div class="tsc-status-card complete" onclick="tscStore_filterByStatus('ครบ')">
+        <div class="status-title">ครบ</div>
+        <div class="branch-count"><span id="tscStore_completeCount">0</span> สาขา</div>
+        <div class="machine-count">จำนวน <span id="tscStore_completePosCount">0</span> เครื่อง</div>
+      </div>
+    </div>
+    <div class="table-container">
+      <table id="tscStore_dataTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-column="Staus">สถานะ <span class="arrow"></span></th>
+            <th class="sortable" data-column="รหัสสาขา">รหัสสาขา <span class="arrow"></span></th>
+            <th class="sortable" data-column="สาขา">สาขา <span class="arrow"></span></th>
+            <th class="sortable" data-column="จังหวัด">จังหวัด <span class="arrow"></span></th>
+            <th class="sortable" data-column="สถานะร้าน">สถานะร้าน <span class="arrow"></span></th>
+            <th class="sortable" data-column="จำนวนเครื่อง">จำนวนเครื่อง <span class="arrow"></span></th>
+            <th class="sortable" data-column="ส่งคืน">ส่งคืน <span class="arrow"></span></th>
+            <th class="sortable" data-column="ผ่านมา(วัน)">ผ่านมา(วัน) <span class="arrow"></span></th>
+            <th class="sortable" data-column="วันที่ดำเนินการ">วันที่ดำเนินการ <span class="arrow"></span></th>
+            <th class="sortable" data-column="ผู้ส่งคืน">ผู้ส่งคืน <span class="arrow"></span></th>
+            <th class="sortable" data-column="วันที่คืนคลัง">วันที่คืนคลัง <span class="arrow"></span></th>
+            <th>ดูรายละเอียด</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="tscStore_detailModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header-compact" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+          <h2><i class="fas fa-store"></i> ใบคืนเครื่อง TSC</h2>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="print-button" onclick="window.print()" style="margin: 0; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+              <i class="fas fa-print"></i>
+            </button>
+            <span class="close" id="tscStore_closeModal" style="float: none; margin: 0;">×</span>
+          </div>
+        </div>
+        <div id="tscStore_modalContent" class="modal-body-compact"></div>
+      </div>
+    </div>
+
+    <div class="pagination" id="tscStore_pagination">
+      <button id="tscStore_firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
+      <button id="tscStore_prevPage"><i class="fas fa-chevron-left"></i></button>
+      <div id="tscStore_pageNumbers"></div>
+      <button id="tscStore_nextPage"><i class="fas fa-chevron-right"></i></button>
+      <button id="tscStore_lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
+      <div class="items-per-page">
+        <label for="tscStore_itemsPerPage">รายการต่อหน้า:</label>
+        <select id="tscStore_itemsPerPage">
+          <option value="10">10 รายการ</option>
+          <option value="20">20 รายการ</option>
+          <option value="30">30 รายการ</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header-compact">
+        <h2><i class="fas fa-file-invoice"></i> รายละเอียดงาน</h2>
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <button class="print-button" onclick="printModalContent()" style="margin: 0; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
+            <i class="fas fa-print"></i>
+          </button>
+          <span class="close" id="closeModal" style="float: none; margin: 0;">×</span>
+        </div>
+      </div>
+      <div id="modalContent" class="modal-body-compact"></div>
+    </div>
+  </div>
+  <div id="summaryModal" class="modal">
+    <div class="modal-content" style="max-width: 1000px; padding: 24px;">
+      <span class="close" id="closeSummaryModal">×</span>
+      <h2 style="font-size: 22px; margin-bottom: 20px; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">
+        <i class="fas fa-chart-pie" style="color: #007bff; margin-right: 10px;"></i> สรุปข้อมูลการรับเครื่องคืนลูกค้า
+      </h2>
+      <div id="summaryContent"></div>
+    </div>
+  </div>
+  <script src="Api.js"></script>
+  <script src="auth.js"></script>
+  <script src="product.js"></script>
+  <script src="tsc_store.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize TSC Store
+      if (typeof tscStore_init === 'function') {
+        tscStore_init();
+      }
+
+      // Button Logic
+      const btnTSCStore = document.getElementById("btnTSCStore");
+      const landingPage = document.getElementById("landingPage");
+      const mainApp = document.getElementById("mainApp");
+      const tscStoreApp = document.getElementById("tscStoreApp");
+      const tscStore_backButton = document.getElementById("tscStore_backButton");
+
+      if (btnTSCStore) {
+        btnTSCStore.onclick = () => {
+          landingPage.style.display = "none";
+          mainApp.style.display = "none";
+          tscStoreApp.style.display = "block";
+        };
+      }
+
+      if (tscStore_backButton) {
+        tscStore_backButton.onclick = () => {
+          tscStoreApp.style.display = "none";
+          landingPage.style.display = "flex";
+        };
+      }
+    });
+  </script>
+
+  <!-- Custom Premium Notifications -->
+  <div id="authAlert" class="auth-alert-container">
+    <div class="auth-alert-content">
+      <div class="auth-alert-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <div id="authAlertMessage" class="auth-alert-message"></div>
+    </div>
+  </div>
+</body>
+
+</html>
