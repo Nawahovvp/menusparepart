@@ -486,3 +486,128 @@ body.theme-day {
   color: #f1f5f9 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* ==========================================================================
+   Dark Mode Text, Borders, Badges & Data Frame Polish (Call Sparepart)
+   ========================================================================== */
+
+/* Crisp Dark-Mode Borders & Text across Header, Drawers, Modals, and Pagination */
+.app-content,
+.workspace-shell,
+.right-drawer,
+.right-menu-bar,
+.modal-content,
+.premium-modal-content {
+  color: #f8fafc !important;
+}
+
+.app-content h1,
+.app-content h2,
+.app-content h3,
+.app-content h4,
+.app-content label,
+.right-drawer h3,
+.right-drawer h4,
+.right-drawer label,
+.modal-content h2,
+.modal-content h3,
+.modal-content h4,
+.modal-content label {
+  color: #f8fafc !important;
+}
+
+.app-content p,
+.app-content small,
+.right-drawer span,
+.modal-content p {
+  color: #cbd5e1 !important;
+}
+
+/* Borders surrounding cards, frames, and table cells */
+.group-cards-section,
+.dashboard-group-frame,
+#searchContainer.modern-search-bar,
+.table-container,
+.compact-table-wrapper,
+.right-drawer,
+.modal-content,
+.premium-modal-content {
+  border-color: rgba(148, 163, 184, 0.28) !important;
+}
+
+.table-container th,
+.table-container td,
+.compact-table th,
+.compact-table td {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+/* High-Contrast Dark Mode Badges / Status Pills / Data Tags in Tables */
+.table-container .status-badge,
+.table-container .badge,
+.table-container .plant-badge,
+.table-container .status-pill,
+.table-container .unit-badge,
+.table-container .tag,
+.table-container td span[style*="border"] {
+  background: rgba(15, 23, 42, 0.68) !important;
+  border-color: rgba(125, 211, 252, 0.48) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+/* Keep semantic status colors luminous & legible on dark glass */
+.table-container td a,
+.table-container .material-link,
+.table-container .ticket-link,
+.table-container .clickable-cell,
+.compact-table td a {
+  color: #7dd3fc !important;
+}
+
+.table-container td a:hover,
+.table-container .clickable-cell:hover {
+  color: #bae6fd !important;
+}
+
+/* Soft dark-mode surface for inner modal cards / info grids */
+.modal-content .info-box,
+.modal-content .detail-card,
+.modal-content .detail-grid,
+.modal-content .timeline-item,
+.right-drawer .filter-section,
+.right-drawer .drawer-section,
+.right-drawer .filter-group {
+  background: rgba(15, 23, 42, 0.56) !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Pagination buttons & text */
+.pagination-bar button,
+.pagination-controls button,
+.page-btn {
+  background: rgba(15, 23, 42, 0.62) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #f1f5f9 !important;
+}
+
+.pagination-bar button:hover:not(:disabled),
+.pagination-controls button:hover:not(:disabled),
+.page-btn:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.28) !important;
+  border-color: rgba(125, 211, 252, 0.6) !important;
+}
+
+.pagination-bar button.active,
+.pagination-controls button.active,
+.page-btn.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.65), rgba(37, 99, 235, 0.65)) !important;
+  border-color: rgba(186, 230, 253, 0.7) !important;
+  color: #ffffff !important;
+}
+
+/* Standalone Spare Summary PRG & pill text legibility */
+.compact-table td span {
+  color: #f8fafc !important;
+}

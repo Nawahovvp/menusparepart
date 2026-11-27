@@ -594,3 +594,111 @@
     }
   }
 }
+
+/* ==========================================================================
+   Dark Mode Text, Borders, Badges & Data Frame Polish (Barcode)
+   ========================================================================== */
+
+@media screen {
+  .app-shell,
+  .card,
+  .panel,
+  .modal-card,
+  .plant-card,
+  .login-card,
+  .menu-panel {
+    border-color: rgba(148, 163, 184, 0.28) !important;
+    color: #f8fafc !important;
+  }
+
+  .plant-title,
+  .login-title,
+  .modal-title,
+  .menu-panel-title,
+  .card h2,
+  .card h3 {
+    color: #ffffff !important;
+  }
+
+  .plant-subtitle,
+  .plant-note,
+  .login-subtitle,
+  .cp-label {
+    color: #cbd5e1 !important;
+  }
+
+  .cp-value {
+    color: #ffffff !important;
+  }
+
+  .cp-row {
+    border-bottom-color: rgba(148, 163, 184, 0.2) !important;
+  }
+
+  .cp-alert {
+    background: rgba(239, 68, 68, 0.22) !important;
+    border: 1px solid rgba(248, 113, 113, 0.45) !important;
+    color: #fecaca !important;
+  }
+
+  /* Address section headers & borders */
+  #tab-address div[style*="border-bottom"] {
+    color: #7dd3fc !important;
+    border-bottom-color: rgba(148, 163, 184, 0.26) !important;
+  }
+
+  /* Status text & semantic colors */
+  .status {
+    color: #cbd5e1 !important;
+  }
+  .status.ok,
+  .status.success {
+    color: #6ee7b7 !important;
+  }
+  .status.not-found,
+  .status.error {
+    color: #fca5a5 !important;
+  }
+
+  /* Sort buttons & small table buttons */
+  .btn-col-sort {
+    background: rgba(255, 255, 255, 0.14) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+    color: #ffffff !important;
+  }
+
+  .del-btn,
+  .delete-row-btn,
+  .btn-delete {
+    background: rgba(239, 68, 68, 0.28) !important;
+    border: 1px solid rgba(248, 113, 113, 0.48) !important;
+    color: #fecaca !important;
+  }
+
+  .del-btn:hover,
+  .delete-row-btn:hover,
+  .btn-delete:hover {
+    background: rgba(239, 68, 68, 0.5) !important;
+    color: #ffffff !important;
+  }
+
+  /* Crisp Dark-Mode Table Borders */
+  table,
+  thead th,
+  tbody td,
+  #entryTable th,
+  #entryTable td,
+  #serialTable th,
+  #serialTable td,
+  #grnTable th,
+  #grnTable td,
+  #addressTable th,
+  #addressTable td {
+    border-color: rgba(148, 163, 184, 0.22) !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(203, 213, 225, 0.68) !important;
+  }
+}

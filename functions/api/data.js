@@ -143,7 +143,7 @@ async function fetchJson(url, timeoutMs = 25000, fresh = false) {
                 Accept: 'application/json',
                 ...(fresh ? { 'Cache-Control': 'no-cache' } : {})
             },
-            cache: fresh ? 'no-store' : 'default',
+            ...(fresh ? { cache: 'no-store' } : {}),
             signal: controller.signal
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);

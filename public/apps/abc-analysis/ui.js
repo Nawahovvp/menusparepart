@@ -734,9 +734,10 @@ function updateActualOrderSummary(baseData) {
 function getStatusClass(status) {
     if (!status || status.trim() === '') return "status-other";
     const s = status.toLowerCase();
-    if (s.includes('pending') || s.includes('รอดำเนินการ')) return "status-pending";
+    if (s.includes('bycase') || s.includes('pending') || s.includes('รอดำเนินการ')) return "status-pending";
+    if (s.includes('ยกเลิก') || s.includes('cancel') || s.includes('rejected') || s.includes('ปฏิเสธ') || s.includes('reject')) return "status-rejected";
+    if (s.includes('order')) return "status-order";
     if (s.includes('approved') || s.includes('อนุมัติ') || s.includes('approve')) return "status-approved";
-    if (s.includes('rejected') || s.includes('ปฏิเสธ') || s.includes('reject')) return "status-rejected";
     if (s.includes('complete') || s.includes('เสร็จสิ้น') || s.includes('completed')) return "status-approved";
     if (s.includes('active') || s.includes('ใช้งาน')) return "status-approved";
     return "status-other";

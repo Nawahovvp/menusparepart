@@ -152,3 +152,253 @@ tbody td {
 #userMenu .menu-plant-label {
   color: #f1f5f9 !important;
 }
+
+/* ==========================================================================
+   Dark Mode Text, Borders, Badges & Data Frame Polish (ABC Analysis)
+   ========================================================================== */
+
+body,
+.container,
+#plantSelection,
+.summary-row,
+.controls,
+#tableSection,
+#pagination {
+  color: #f8fafc !important;
+}
+
+.container h2,
+.container h3,
+.container h4,
+.container label,
+#plantSelection h2,
+#plantSelection h3,
+#plantSelection p {
+  color: #f8fafc !important;
+}
+
+/* Crisp Dark-Mode Borders around Data Frames & Table Cells */
+.container,
+.control-group,
+.plant-card,
+.table-wrapper,
+#tableSection {
+  border-color: rgba(148, 163, 184, 0.28) !important;
+}
+
+table,
+thead th,
+tbody td {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+tbody td {
+  color: #f1f5f9 !important;
+}
+
+tbody td a {
+  color: #7dd3fc !important;
+}
+
+/* Dark-Mode Status Modal & Info Grid */
+.status-info-grid {
+  background: rgba(15, 23, 42, 0.64) !important;
+  border: 1px solid rgba(148, 163, 184, 0.26) !important;
+}
+
+.status-info-label {
+  color: #94a3b8 !important;
+}
+
+.status-info-value {
+  color: #f8fafc !important;
+}
+
+.status-select-btn {
+  background: rgba(15, 23, 42, 0.62) !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  color: #e2e8f0 !important;
+}
+
+.status-select-btn:hover {
+  background: rgba(30, 41, 59, 0.78) !important;
+  border-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+.status-select-btn.active[data-val="Active"] {
+  background: rgba(16, 185, 129, 0.28) !important;
+  border-color: #34d399 !important;
+  color: #6ee7b7 !important;
+}
+
+.status-select-btn.active[data-val="ByCase"] {
+  background: rgba(245, 158, 11, 0.28) !important;
+  border-color: #fbbf24 !important;
+  color: #fde68a !important;
+}
+
+.status-select-btn.active[data-val="ยกเลิก"] {
+  background: rgba(239, 68, 68, 0.28) !important;
+  border-color: #f87171 !important;
+  color: #fecaca !important;
+}
+
+.status-actions {
+  border-top-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+/* Pagination & Action Buttons in Dark Mode */
+#pagination button,
+.page-btn,
+.pagination button {
+  background: rgba(15, 23, 42, 0.62) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #f1f5f9 !important;
+}
+
+#pagination button.active,
+.page-btn.active,
+.pagination button.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.7), rgba(79, 70, 229, 0.7)) !important;
+  border-color: rgba(199, 210, 254, 0.7) !important;
+  color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(203, 213, 225, 0.68) !important;
+}
+
+/* Dark-mode SweetAlert2 dialogs */
+.swal2-popup {
+  background: rgba(15, 23, 42, 0.94) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+}
+.swal2-title,
+.swal2-html-container {
+  color: #f1f5f9 !important;
+}
+
+/* ==========================================================================
+   Luminous Dark-Mode Status, Moving, Stock & Order Badges (ABC Table)
+   ========================================================================== */
+
+/* Status column styled like Call tab's StatusCall (bold underlined luminous text) */
+.status-approved,
+.table-container .status-approved {
+  background: transparent !important;
+  border: none !important;
+  color: #34d399 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-pending,
+.table-container .status-pending {
+  background: transparent !important;
+  border: none !important;
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-rejected,
+.table-container .status-rejected {
+  background: transparent !important;
+  border: none !important;
+  color: #f87171 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-order,
+.table-container .status-order {
+  background: transparent !important;
+  border: none !important;
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.status-other,
+.table-container .status-other {
+  background: transparent !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  font-weight: 600 !important;
+}
+
+.moving-fast,
+.table-container .moving-fast {
+  background: rgba(16, 185, 129, 0.24) !important;
+  border: 1px solid rgba(52, 211, 153, 0.55) !important;
+  color: #6ee7b7 !important;
+}
+
+.moving-medium,
+.table-container .moving-medium {
+  background: rgba(245, 158, 11, 0.24) !important;
+  border: 1px solid rgba(251, 191, 36, 0.55) !important;
+  color: #fde68a !important;
+}
+
+.moving-slow,
+.table-container .moving-slow {
+  background: rgba(249, 115, 22, 0.24) !important;
+  border: 1px solid rgba(251, 146, 60, 0.55) !important;
+  color: #fed7aa !important;
+}
+
+.moving-slowly,
+.table-container .moving-slowly,
+.moving-dead,
+.table-container .moving-dead {
+  background: rgba(148, 163, 184, 0.22) !important;
+  border: 1px solid rgba(148, 163, 184, 0.5) !important;
+  color: #e2e8f0 !important;
+}
+
+.stock-green,
+.table-container .stock-green,
+.order-equal,
+.table-container .order-equal {
+  background: rgba(16, 185, 129, 0.24) !important;
+  border: 1px solid rgba(52, 211, 153, 0.55) !important;
+  color: #6ee7b7 !important;
+}
+
+.stock-red,
+.table-container .stock-red,
+.nava-red,
+.table-container .nava-red,
+.order-more,
+.table-container .order-more {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  color: #fecaca !important;
+}
+
+.nava-orange,
+.table-container .nava-orange,
+.order-less,
+.table-container .order-less {
+  background: rgba(245, 158, 11, 0.24) !important;
+  border: 1px solid rgba(251, 191, 36, 0.55) !important;
+  color: #fde68a !important;
+}
+
+.po-badge,
+.table-container .po-badge,
+.mean-badge,
+.table-container .mean-badge,
+.responsible-user,
+.table-container .responsible-user {
+  background: rgba(56, 189, 248, 0.22) !important;
+  border: 1px solid rgba(125, 211, 252, 0.5) !important;
+  color: #bae6fd !important;
+}
