@@ -31,6 +31,8 @@ function getHubSessionUser() {
             Name: u.Name || 'ไม่ระบุ',
             Position: u['ตำแหน่ง'] || u.Position || '',
             Department: u['หน่วยงาน'] || u.Department || '',
+            Unit: u.Unit || u.Team || '',
+            Status: u.Status || '',
             Plant: u.Plant || ''
         };
     } catch {
@@ -127,13 +129,36 @@ function logout() {
 }
 
 function showUserMenu() {
-    document.getElementById('menuBtn').style.display = 'block';
-    document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
-    document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
+    const menuBtn = document.getElementById('menuBtn');
+    if (menuBtn) menuBtn.style.display = 'flex';
+
+    const cleanName = String(loggedUser.Name || 'ไม่ระบุ').trim();
+    const initialSource = cleanName.replace(/^(นาย|นางสาว|นาง|น\.ส\.|ด\.ช\.|ด\.ญ\.)\s*/, '').trim();
+    const initial = initialSource ? initialSource.charAt(0).toUpperCase() : 'U';
+
+    const avatarEl = document.getElementById('userAvatarInitial');
+    if (avatarEl) avatarEl.textContent = initial;
+
+    const nameEl = document.getElementById('userName');
+    if (nameEl) nameEl.textContent = cleanName;
+
+    const idEl = document.getElementById('userID');
+    if (idEl) idEl.innerHTML = `<i class="fas fa-id-badge"></i> ${loggedUser.IDUser || '-'}`;
+
+    const statusBadge = document.getElementById('userStatusBadge');
+    if (statusBadge) {
+        if (loggedUser.Status && loggedUser.Status !== 'None') {
+            statusBadge.innerHTML = `<i class="fas fa-user-shield"></i> ${loggedUser.Status}`;
+            statusBadge.style.display = 'inline-flex';
+        } else {
+            statusBadge.style.display = 'none';
+        }
+    }
+
     const extraInfo = [];
-    if (loggedUser.Position) extraInfo.push(`ตำแหน่ง: ${loggedUser.Position}`);
+    if (loggedUser.Position) extraInfo.push(loggedUser.Position);
     if (loggedUser.Department) extraInfo.push(`หน่วยงาน: ${loggedUser.Department}`);
-    if (loggedUser.Plant) extraInfo.push(`Plant: ${loggedUser.Plant}`);
+    if (loggedUser.Plant) extraInfo.push(`Plant ${loggedUser.Plant}`);
     const extraEl = document.getElementById('userExtra');
-    if (extraEl) extraEl.textContent = extraInfo.join(' | ');
+    if (extraEl) extraEl.textContent = extraInfo.join(' • ');
 }

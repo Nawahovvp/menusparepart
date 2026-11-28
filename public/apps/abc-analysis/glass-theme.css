@@ -789,3 +789,785 @@ textarea::placeholder {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ==========================================================================
+   ABC Analysis PO / PR / Rebuilt / Rec Modals — Unified Dark Frosted Glass
+   ========================================================================== */
+.po-modal {
+  background: rgba(2, 6, 18, 0.72) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.po-modal-content {
+  background: rgba(12, 18, 34, 0.9) !important;
+  backdrop-filter: blur(24px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(175%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+  animation: abcFadeSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.po-modal-content.po-compact-modal {
+  width: min(640px, 95vw) !important;
+  max-width: 640px !important;
+}
+
+.po-modal-content.po-doc-modal {
+  width: min(920px, 95vw) !important;
+  max-width: 920px !important;
+}
+
+#prModal .po-modal-content {
+  width: min(580px, 95vw) !important;
+  max-width: 580px !important;
+}
+
+.po-modal-header {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.62) 100%) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24) !important;
+  padding: 13px 18px !important;
+  color: #f8fafc !important;
+}
+
+.po-modal-header h3 {
+  color: #f8fafc !important;
+  font-size: 15.5px !important;
+  font-weight: 800 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.po-header-code {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 7px;
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(125, 211, 252, 0.48);
+  color: #bae6fd !important;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+}
+
+.po-modal-header .icon-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  background: rgba(30, 41, 59, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #e2e8f0 !important;
+  box-shadow: none !important;
+  transition: all 0.16s ease !important;
+}
+
+.po-modal-header .icon-btn:hover {
+  background: rgba(239, 68, 68, 0.32) !important;
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+  transform: none !important;
+}
+
+.po-modal-body {
+  padding: 14px 18px 18px !important;
+  background: transparent !important;
+  color: #f1f5f9 !important;
+}
+
+.po-total {
+  background: rgba(15, 23, 42, 0.68) !important;
+  border: 1px solid rgba(56, 189, 248, 0.42) !important;
+  color: #cbd5e1 !important;
+  border-radius: 10px !important;
+  padding: 6px 12px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  margin-bottom: 12px !important;
+  margin-right: 6px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.po-total i {
+  color: #38bdf8;
+}
+
+.po-total span {
+  color: #6ee7b7 !important;
+  font-size: 14px;
+  font-weight: 800;
+  margin-left: 2px;
+}
+
+.po-table-wrap {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(12, 18, 34, 0.56);
+  overflow: hidden;
+}
+
+/* Dark Frosted Tables inside PO / PR / Rebuilt / Rec Modals */
+#poDetailTable,
+#poByNumberDetailTable,
+#prDetailTable,
+#rebuiltDetailTable,
+#recDetailTable {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #f1f5f9 !important;
+}
+
+#prDetailTable,
+#rebuiltDetailTable,
+#recDetailTable {
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  border-radius: 12px !important;
+  background: rgba(12, 18, 34, 0.56) !important;
+}
+
+#poDetailTable thead th,
+#poByNumberDetailTable thead th,
+#prDetailTable thead th,
+#rebuiltDetailTable thead th,
+#recDetailTable thead th {
+  background: rgba(15, 23, 42, 0.92) !important;
+  color: #e2e8f0 !important;
+  border-bottom: 1.5px solid rgba(148, 163, 184, 0.32) !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.14) !important;
+  padding: 9px 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+#poDetailTable thead th:last-child,
+#poByNumberDetailTable thead th:last-child,
+#prDetailTable thead th:last-child,
+#rebuiltDetailTable thead th:last-child,
+#recDetailTable thead th:last-child {
+  border-right: none !important;
+}
+
+#poDetailTable tbody td,
+#poByNumberDetailTable tbody td,
+#prDetailTable tbody td,
+#rebuiltDetailTable tbody td,
+#recDetailTable tbody td {
+  background: rgba(15, 23, 42, 0.38) !important;
+  color: #f1f5f9 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14) !important;
+  border-right: 1px solid rgba(148, 163, 184, 0.12) !important;
+  padding: 8px 12px !important;
+  font-size: 12.5px !important;
+}
+
+#poDetailTable tbody td:last-child,
+#poByNumberDetailTable tbody td:last-child,
+#prDetailTable tbody td:last-child,
+#rebuiltDetailTable tbody td:last-child,
+#recDetailTable tbody td:last-child {
+  border-right: none !important;
+}
+
+#poDetailTable tbody tr:nth-child(even) td,
+#poByNumberDetailTable tbody tr:nth-child(even) td,
+#prDetailTable tbody tr:nth-child(even) td,
+#rebuiltDetailTable tbody tr:nth-child(even) td {
+  background: rgba(30, 41, 59, 0.34) !important;
+}
+
+#poDetailTable tbody tr:hover td,
+#poByNumberDetailTable tbody tr:hover td,
+#prDetailTable tbody tr:hover td,
+#rebuiltDetailTable tbody tr:hover td {
+  background: rgba(56, 189, 248, 0.16) !important;
+}
+
+#poByNumberDetailTable tbody tr.po-highlight-mat-row td {
+  background: rgba(59, 130, 246, 0.22) !important;
+}
+
+#poDetailTable tr:last-child td,
+#poByNumberDetailTable tr:last-child td,
+#prDetailTable tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Badges & Links inside PO Tables */
+.po-number-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.18) !important;
+  border: 1px solid rgba(125, 211, 252, 0.48) !important;
+  color: #7dd3fc !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.po-number-link:hover {
+  background: rgba(56, 189, 248, 0.34) !important;
+  border-color: rgba(186, 230, 253, 0.8) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.po-date-overdue {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.24);
+  border: 1px solid rgba(251, 191, 36, 0.58);
+  color: #fde68a !important;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.po-date-normal {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.po-doc-code {
+  color: #7dd3fc;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.po-mat-code {
+  color: #c4b5fd;
+  font-weight: 700;
+}
+
+.po-short-text {
+  color: #f1f5f9 !important;
+}
+
+.po-qty-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.24);
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  color: #6ee7b7 !important;
+  font-weight: 800;
+  font-size: 12px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.po-lt-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.22);
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  color: #fecaca !important;
+  font-weight: 700;
+  font-size: 11.5px;
+}
+
+.po-empty {
+  color: #94a3b8 !important;
+  text-align: center;
+  padding: 24px 12px;
+  font-size: 13px;
+}
+
+.po-modal-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px !important;
+}
+
+.po-supplier-btn {
+  margin: 0 !important;
+  padding: 9px 16px !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.85), rgba(5, 150, 105, 0.85)) !important;
+  border: 1px solid rgba(110, 231, 183, 0.65) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.28) !important;
+  transition: all 0.16s ease !important;
+}
+
+.po-supplier-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.po-ts-status {
+  font-size: 12.5px;
+  color: #cbd5e1 !important;
+}
+
+/* ==========================================================================
+   ABC Analysis Redesigned Top Header Bar (Matching Hub & Call Glass Theme)
+   ========================================================================== */
+.container {
+  position: relative;
+}
+
+h1,
+h1.abc-app-header {
+  background: linear-gradient(135deg, rgba(12, 18, 34, 0.78) 0%, rgba(30, 41, 59, 0.62) 55%, rgba(49, 46, 129, 0.45) 100%) !important;
+  backdrop-filter: blur(20px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 13px 72px 13px 82px !important;
+  margin: 0 !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 66px;
+}
+
+.abc-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.abc-brand-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.45), rgba(56, 189, 248, 0.32));
+  border: 1px solid rgba(165, 180, 252, 0.55);
+  color: #e0e7ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.abc-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.abc-brand-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  line-height: 1.2;
+}
+
+.abc-brand-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.25px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.abc-plant-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(6, 182, 212, 0.22));
+  border: 1px solid rgba(52, 211, 153, 0.6);
+  color: #a7f3d0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+}
+
+.abc-plant-pill i {
+  font-size: 11.5px;
+  color: #6ee7b7;
+}
+
+.abc-brand-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cbd5e1;
+  line-height: 1.3;
+}
+
+.abc-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(125, 211, 252, 0.38);
+  color: #bae6fd;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+
+.abc-meta-chip i {
+  font-size: 10.5px;
+  color: #38bdf8;
+}
+
+.abc-meta-sep {
+  color: rgba(148, 163, 184, 0.55);
+  font-weight: 700;
+}
+
+.abc-meta-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.abc-meta-date i {
+  color: #fbbf24;
+  font-size: 11.5px;
+}
+
+.abc-meta-date strong {
+  color: #fde68a;
+  font-weight: 700;
+}
+
+/* Harmonize Top-Right User Button & Back Button with Dark Frosted Glass */
+#menuBtn,
+#backBtn {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(30, 41, 59, 0.68) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #e2e8f0 !important;
+  font-size: 18px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Position #menuBtn neatly at top-right of header */
+.container > #menuBtn,
+.container > #backBtn {
+  top: 15px !important;
+  transform: none !important;
+}
+
+#menuBtn:hover,
+#backBtn:hover {
+  background: rgba(56, 189, 248, 0.24) !important;
+  border-color: rgba(125, 211, 252, 0.65) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.28) !important;
+}
+
+#menuBtn.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.72), rgba(29, 78, 216, 0.62)) !important;
+  border-color: rgba(147, 197, 253, 0.85) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.35), 0 6px 16px rgba(37, 99, 235, 0.36) !important;
+}
+
+/* ==========================================================================
+   ABC Analysis User Profile & Plant Switcher Popover (#userMenu)
+   ========================================================================== */
+#userMenu,
+#userMenu.abc-user-popover {
+  position: absolute !important;
+  top: 64px !important;
+  right: 16px !important;
+  width: 326px !important;
+  max-width: calc(100vw - 24px) !important;
+  padding: 20px !important;
+  border-radius: 20px !important;
+  background: rgba(12, 18, 34, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(175%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+  font-family: "Prompt", sans-serif !important;
+  z-index: 10000 !important;
+  box-sizing: border-box !important;
+  animation: abcUserMenuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes abcUserMenuPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.abc-up-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.abc-up-title {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #f8fafc !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.2px;
+}
+
+.abc-up-title i {
+  color: #38bdf8;
+  font-size: 15px;
+}
+
+.abc-up-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #cbd5e1 !important;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.abc-up-close:hover {
+  background: rgba(239, 68, 68, 0.32) !important;
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+  transform: rotate(90deg);
+}
+
+.abc-up-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 16px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.abc-up-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.38);
+  color: #ffffff !important;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#userMenu #userName.abc-up-name {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  color: #f8fafc !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.25;
+}
+
+.abc-up-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.abc-up-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+}
+
+#userMenu #userID.abc-up-badge.id-badge {
+  background: rgba(99, 102, 241, 0.24) !important;
+  border: 1px solid rgba(165, 180, 252, 0.48) !important;
+  color: #e0e7ff !important;
+}
+
+.abc-up-badge.status-badge {
+  background: rgba(16, 185, 129, 0.24) !important;
+  border: 1px solid rgba(52, 211, 153, 0.52) !important;
+  color: #6ee7b7 !important;
+}
+
+#userMenu #userExtra.abc-up-meta {
+  font-size: 12px !important;
+  color: #cbd5e1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  line-height: 1.4;
+}
+
+/* Plant Switcher Card inside Popover */
+.abc-up-plant-slot {
+  margin-bottom: 14px;
+}
+
+.abc-up-plant-box {
+  padding: 11px 12px;
+  border-radius: 13px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+#userMenu .menu-plant-label {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #bae6fd !important;
+  margin-bottom: 7px !important;
+}
+
+#userMenu .menu-plant-label i {
+  color: #38bdf8;
+  font-size: 11px;
+}
+
+#userMenu #menuPlantSelect {
+  width: 100% !important;
+  padding: 8px 11px !important;
+  border-radius: 9px !important;
+  background: rgba(2, 6, 23, 0.65) !important;
+  border: 1px solid rgba(125, 211, 252, 0.36) !important;
+  color: #f8fafc !important;
+  font-family: "Prompt", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+#userMenu #menuPlantSelect:hover {
+  border-color: rgba(125, 211, 252, 0.65) !important;
+}
+
+#userMenu #menuPlantSelect:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.22) !important;
+}
+
+#userMenu #menuPlantSelect option {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Action Buttons inside Popover */
+.abc-up-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#userMenu .abc-up-btn {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 11px !important;
+  font-family: "Prompt", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  transition: all 0.16s ease !important;
+}
+
+#userMenu #helpBtn.abc-up-btn-help {
+  background: rgba(30, 41, 59, 0.72) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+#userMenu #helpBtn.abc-up-btn-help:hover {
+  background: rgba(56, 189, 248, 0.24) !important;
+  border-color: rgba(125, 211, 252, 0.6) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+#userMenu #logoutBtn.abc-up-btn-logout {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.85), rgba(220, 38, 38, 0.85)) !important;
+  border: 1px solid rgba(252, 165, 165, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.28) !important;
+}
+
+#userMenu #logoutBtn.abc-up-btn-logout:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  h1,
+  h1.abc-app-header {
+    padding: 12px 60px 12px 68px !important;
+  }
+  .abc-brand-emblem {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+  .abc-brand-title {
+    font-size: 15px;
+  }
+  .abc-plant-pill {
+    font-size: 11.5px;
+    padding: 2px 9px;
+  }
+  .abc-brand-meta {
+    font-size: 11px;
+    gap: 5px;
+  }
+}

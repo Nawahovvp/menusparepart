@@ -1,4 +1,4 @@
-// Data fetching & hydration
+﻿// Data fetching & hydration
 
 // Helper for Update Toast
 function updateToast(show, message = "กำลังอัปเดตข้อมูล...") {
@@ -1051,8 +1051,7 @@ function processLoadedData(invRaw, usageRaw, mainsapRaw, avgValRaw, statusRaw, l
     const headerH1 = document.querySelector('h1');
     const plantLabel = name.startsWith('คลัง') ? name : `คลัง${name}`;
     if (headerH1) {
-        const suffix = movementHtml ? `<br><span style="font-size:0.7em; font-weight:normal;">${movementHtml}</span>` : "";
-        headerH1.innerHTML = `ABC Analysis & Smart Ordering System ${plantLabel}${suffix}`;
+        if (typeof renderAbcHeader === "function") { renderAbcHeader(plantLabel, movementHtml); } else { const suffix = movementHtml ? `<br><span style="font-size:0.7em; font-weight:normal;">${movementHtml}</span>` : ""; headerH1.innerHTML = `ABC Analysis & Smart Ordering System ${plantLabel}${suffix}`; }
     }
     document.title = `ABC Analysis & Smart Ordering System ${plantLabel}`;
 

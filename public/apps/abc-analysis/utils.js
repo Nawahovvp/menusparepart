@@ -71,3 +71,41 @@ const safeStorage = (type) => {
 const safeLocalStorage = safeStorage('localStorage');
 const safeSessionStorage = safeStorage('sessionStorage');
 
+function renderAbcHeader(plantLabelText, rawMovementHtml) {
+    const headerH1 = document.querySelector('h1');
+    if (!headerH1) return;
+
+    const cleanMovement = (rawMovementHtml || '')
+        .replace(/เคลือนไหว/g, 'เคลื่อนไหว')
+        .replace(/6เดือน/g, '6 เดือน');
+
+    const parts = cleanMovement.split(/<br\s*\/?>/i).map(s => s.trim()).filter(Boolean);
+    const labelTxt = parts[0] || '';
+    const rangeTxt = parts.slice(1).join(' ').replace(/^วันที่\s*:\s*/i, '').trim();
+
+    let metaInnerHtml = '';
+    if (labelTxt && rangeTxt) {
+        metaInnerHtml = `
+            <span class="abc-meta-chip"><i class="fas fa-chart-line"></i> ${labelTxt}</span>
+            <span class="abc-meta-sep">•</span>
+            <span class="abc-meta-date"><i class="far fa-calendar-alt"></i> วันที่: <strong>${rangeTxt}</strong></span>
+        `;
+    } else if (cleanMovement) {
+        metaInnerHtml = `<span class="abc-meta-chip"><i class="fas fa-chart-line"></i> ${cleanMovement}</span>`;
+    }
+
+    headerH1.className = 'abc-app-header';
+    headerH1.innerHTML = `
+        <span class="abc-brand-block">
+            <span class="abc-brand-emblem" aria-hidden="true"><i class="fas fa-chart-pie"></i></span>
+            <span class="abc-brand-copy">
+                <span class="abc-brand-title-row">
+                    <span class="abc-brand-title">ABC Analysis &amp; Smart Ordering System</span>
+                    ${plantLabelText ? `<span class="abc-plant-pill"><i class="fas fa-warehouse"></i> ${plantLabelText}</span>` : ''}
+                </span>
+                ${metaInnerHtml ? `<span class="abc-brand-meta">${metaInnerHtml}</span>` : ''}
+            </span>
+        </span>
+    `;
+}
+

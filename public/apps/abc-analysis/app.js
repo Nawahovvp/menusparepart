@@ -19,95 +19,18 @@
         const menu = document.getElementById('userMenu');
         if (!menu) return;
 
-        // Inject custom styles for a better looking menu
-        if (!document.getElementById('menu-custom-style')) {
-            const style = document.createElement('style');
-            style.id = 'menu-custom-style';
-            style.textContent = `
-                #userMenu {
-                    background-color: #ffffff !important;
-                    color: #333 !important;
-                    border-radius: 12px !important;
-                    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
-                    padding: 24px !important;
-                    width: 320px !important;
-                    border: 1px solid #f0f0f0 !important;
-                    font-family: 'Sarabun', sans-serif !important;
-                    top: 60px !important;
-                    right: 10px !important;
-                    z-index: 10000 !important;
-                }
-                #userMenu #userID {
-                    font-size: 1.1em;
-                    font-weight: 700;
-                    color: #2c3e50;
-                    margin-bottom: 4px;
-                }
-                #userMenu #userName {
-                    font-size: 1em;
-                    color: #34495e;
-                    margin-bottom: 8px;
-                }
-                #userMenu #userExtra {
-                    font-size: 0.85em;
-                    color: #7f8c8d;
-                    margin-bottom: 16px;
-                    padding-bottom: 16px;
-                    border-bottom: 1px solid #eee;
-                }
-                .menu-plant-label {
-                    font-size: 0.9em;
-                    font-weight: 600;
-                    color: #555;
-                    margin-bottom: 8px;
-                    display: block;
-                }
-                #menuPlantSelect {
-                    width: 100%;
-                    padding: 10px 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background-color: #f8f9fa;
-                    font-size: 0.95em;
-                    color: #333;
-                    outline: none;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                #menuPlantSelect:hover {
-                    border-color: #aaa;
-                    background-color: #fff;
-                }
-                #menuPlantSelect:focus {
-                    border-color: #3498db;
-                    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-                }
-                #logoutBtn {
-                    margin-top: 20px;
-                    width: 100%;
-                    padding: 10px;
-                    background-color: #ff4757;
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                }
-                #logoutBtn:hover {
-                    background-color: #ff6b81;
-                }
-            `;
-            document.head.appendChild(style);
-        }
+        // Remove legacy white-card injected style if present
+        const legacyStyle = document.getElementById('menu-custom-style');
+        if (legacyStyle) legacyStyle.remove();
 
         if (document.getElementById('menuPlantSelect')) return;
 
         const container = document.createElement('div');
-        container.style.marginTop = '10px';
+        container.className = 'abc-up-plant-box';
 
         const label = document.createElement('label');
-        label.textContent = 'เลือก Plant / สาขา';
+        label.htmlFor = 'menuPlantSelect';
+        label.innerHTML = '<i class="fas fa-warehouse"></i> เลือก Plant / สาขา';
         label.className = 'menu-plant-label';
 
         const select = document.createElement('select');
@@ -121,33 +44,54 @@
         select.addEventListener('change', () => {
             selectedPlant = select.value;
             inventoryUrl = inventoryUrls[selectedPlant];
+            menu.style.display = 'none';
             loadData(true);
         });
 
         container.appendChild(label);
         container.appendChild(select);
 
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn && menu.contains(logoutBtn)) {
-            menu.insertBefore(container, logoutBtn);
+        const slot = document.getElementById('userMenuPlantSlot');
+        if (slot) {
+            slot.innerHTML = '';
+            slot.appendChild(container);
         } else {
-            menu.appendChild(container);
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn && menu.contains(logoutBtn)) {
+                menu.insertBefore(container, logoutBtn);
+            } else {
+                menu.appendChild(container);
+            }
         }
     }
 
     function bindMenu() {
         const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('userMenuCloseBtn');
         if (menuBtn) {
             menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const menu = document.getElementById('userMenu');
-                if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                if (menu) {
+                    const isOpening = menu.style.display !== 'block';
+                    menu.style.display = isOpening ? 'block' : 'none';
+                    menuBtn.classList.toggle('active', isOpening);
+                }
+            });
+        }
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const menu = document.getElementById('userMenu');
+                if (menu) menu.style.display = 'none';
+                if (menuBtn) menuBtn.classList.remove('active');
             });
         }
         document.addEventListener('click', (e) => {
             const menu = document.getElementById('userMenu');
             if (menu && menu.style.display === 'block' && !menu.contains(e.target)) {
                 menu.style.display = 'none';
+                if (menuBtn) menuBtn.classList.remove('active');
             }
         });
 
@@ -344,8 +288,12 @@ function loadMovementInfo() {
         if (h1 && selectedPlant) {
             const name = plantNames[selectedPlant] || selectedPlant;
             const plantLabel = name.startsWith('คลัง') ? name : `คลัง${name}`;
-            const suffix = html ? `<br><span style="font-size:0.7em; font-weight:normal;">${html}</span>` : "";
-            h1.innerHTML = `ABC Analysis & Smart Ordering System ${plantLabel}${suffix}`;
+            if (typeof renderAbcHeader === 'function') {
+                renderAbcHeader(plantLabel, html);
+            } else {
+                const suffix = html ? `<br><span style="font-size:0.7em; font-weight:normal;">${html}</span>` : "";
+                h1.innerHTML = `ABC Analysis & Smart Ordering System ${plantLabel}${suffix}`;
+            }
         }
         movementInfoReady = true;
         showPlantSelectionIfReady();

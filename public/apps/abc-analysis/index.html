@@ -11,7 +11,7 @@
     <!-- CSS หลักของคุณ (แยกไฟล์แล้ว) -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="progress.css">
-    <link rel="stylesheet" href="glass-theme.css?v=20261128g">
+    <link rel="stylesheet" href="glass-theme.css?v=20261128j">
 
     <!-- ไอคอน + ฟอนต์ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -203,20 +203,45 @@
 
 <body>
     <div class="container">
-        <h1>ABC Analysis & Smart Ordering System</h1>
-        <button id="menuBtn" style="display: none;"><i class="fas fa-user-circle"></i></button>
-        <div id="userMenu">
-            <p id="userID"></p>
-            <p id="userName"></p>
-            <p id="userExtra" style="font-size:12px;color:#555;margin:4px 0 0;"></p>
+        <h1 class="abc-app-header">
+            <span class="abc-brand-block">
+                <span class="abc-brand-emblem" aria-hidden="true"><i class="fas fa-chart-pie"></i></span>
+                <span class="abc-brand-copy">
+                    <span class="abc-brand-title-row">
+                        <span class="abc-brand-title">ABC Analysis &amp; Smart Ordering System</span>
+                        <span class="abc-plant-pill" id="abcHeaderPlantPill" style="display:none;"></span>
+                    </span>
+                    <span class="abc-brand-meta" id="abcHeaderMeta" style="display:none;"></span>
+                </span>
+            </span>
+        </h1>
+        <button id="menuBtn" style="display: none;" title="โปรไฟล์ & เลือกสาขา" aria-label="โปรไฟล์ผู้ใช้งาน"><i class="fas fa-user-circle"></i></button>
+        <div id="userMenu" class="abc-user-popover">
+            <div class="abc-up-header">
+                <span class="abc-up-title"><i class="fas fa-id-card-clip"></i> โปรไฟล์ &amp; สาขา</span>
+                <button type="button" id="userMenuCloseBtn" class="abc-up-close" title="ปิด" aria-label="ปิด"><i class="fas fa-times"></i></button>
+            </div>
 
-            <!-- ✅ ปุ่ม Help -->
-            <button id="helpBtn" class="export-btn"
-                style="width:100%;justify-content:center;margin:8px 0;background:linear-gradient(135deg,#3498db,#2980b9);">
-                <i class="fas fa-circle-info"></i> Help
-            </button>
+            <div class="abc-up-hero">
+                <div class="abc-up-avatar" id="userAvatarInitial">U</div>
+                <div class="abc-up-name" id="userName">-</div>
+                <div class="abc-up-badges">
+                    <span class="abc-up-badge id-badge" id="userID">-</span>
+                    <span class="abc-up-badge status-badge" id="userStatusBadge" style="display:none;"></span>
+                </div>
+                <div class="abc-up-meta" id="userExtra"></div>
+            </div>
 
-            <button id="logoutBtn">Log out</button>
+            <div id="userMenuPlantSlot" class="abc-up-plant-slot"></div>
+
+            <div class="abc-up-actions">
+                <button id="helpBtn" type="button" class="abc-up-btn abc-up-btn-help">
+                    <i class="fas fa-circle-info"></i> คู่มือการใช้งาน (Help)
+                </button>
+                <button id="logoutBtn" type="button" class="abc-up-btn abc-up-btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </button>
+            </div>
         </div>
 
         <div class="loader abc-startup-loader" id="loader" style="display: block;">
@@ -665,24 +690,26 @@
 
         <!-- PO Detail Modal -->
         <div id="poModal" class="po-modal" style="display:none;">
-            <div class="po-modal-content">
+            <div class="po-modal-content po-compact-modal">
                 <div class="po-modal-header">
-                    <h3>รายละเอียด PO: <span id="poMaterialLabel"></span></h3>
+                    <h3><i class="fas fa-file-invoice" style="margin-right:8px; color:#7dd3fc;"></i>รายละเอียด PO: <span id="poMaterialLabel" class="po-header-code"></span></h3>
                     <button id="poModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="po-modal-body">
-                    <div class="po-total">รวมค้างรับ: <span id="poTotalQty">0</span></div>
-                    <table id="poDetailTable">
-                        <thead>
-                            <tr>
-                                <th>กำหนดส่ง</th>
-                                <th>เลขที่ PO</th>
-                                <th>จำนวน</th>
-                                <th>Leadtime</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="po-total"><i class="fas fa-boxes-stacked"></i> รวมค้างรับ: <span id="poTotalQty">0</span></div>
+                    <div class="po-table-wrap">
+                        <table id="poDetailTable">
+                            <thead>
+                                <tr>
+                                    <th>กำหนดส่ง</th>
+                                    <th>เลขที่ PO</th>
+                                    <th>จำนวน</th>
+                                    <th>Leadtime</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                     <div id="poEmpty" class="po-empty">ไม่มีข้อมูล PO</div>
                 </div>
             </div>
@@ -690,31 +717,32 @@
 
         <!-- PO By Number Detail Modal -->
         <div id="poByNumberModal" class="po-modal" style="display:none; z-index: 10001;">
-            <div class="po-modal-content">
+            <div class="po-modal-content po-doc-modal">
                 <div class="po-modal-header">
-                    <h3>รายละเอียด PO: <span id="poByNumberLabel"></span></h3>
+                    <h3><i class="fas fa-receipt" style="margin-right:8px; color:#7dd3fc;"></i>รายละเอียด PO: <span id="poByNumberLabel" class="po-header-code"></span></h3>
                     <button id="poByNumberModalClose" class="icon-btn" title="ปิด"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="po-modal-body">
-                    <table id="poByNumberDetailTable">
-                        <thead>
-                            <tr>
-                                <th>Purchasing Document</th>
-                                <th>Document Date</th>
-                                <th>Material</th>
-                                <th>Short Text</th>
-                                <th>Still to be delivered (qty)</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="po-table-wrap">
+                        <table id="poByNumberDetailTable">
+                            <thead>
+                                <tr>
+                                    <th>Purchasing Document</th>
+                                    <th>Document Date</th>
+                                    <th>Material</th>
+                                    <th>Short Text</th>
+                                    <th>Still to be delivered (qty)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                     <div id="poByNumberEmpty" class="po-empty">ไม่พบข้อมูล PO</div>
-                    <div class="rec-actions" style="margin-top: 10px;">
-                        <button id="poTimestampBtn" class="export-btn"
-                            style="margin-left:0; padding:10px 16px; background:linear-gradient(135deg,#27ae60,#2ecc71);">
-                            <i class="fas fa-clock"></i> Supplier
+                    <div class="rec-actions po-modal-footer-actions">
+                        <button id="poTimestampBtn" class="export-btn po-supplier-btn">
+                            <i class="fas fa-clock"></i> ยืนยันแจ้ง Supplier
                         </button>
-                        <span id="poTimestampStatus" style="margin-left:10px; font-size:13px; color:#555;"></span>
+                        <span id="poTimestampStatus" class="po-ts-status"></span>
                     </div>
                 </div>
             </div>
@@ -1026,14 +1054,14 @@
 
     <!-- ✨ JS เฉพาะ Plant + หลักของระบบ -->
     <script src="state.js"></script>
-    <script src="utils.js"></script>
+    <script src="utils.js?v=20261128i"></script>
     <script src="progress.js"></script>
     <script src="calc.js"></script>
-    <script src="ui.js?v=20261128d"></script></script>
-    <script src="auth.js"></script>
-    <script src="api.js"></script>
+    <script src="ui.js?v=20261128h"></script></script>
+    <script src="auth.js?v=20261128j"></script>
+    <script src="api.js?v=20261128i"></script>
     <script src="plant0301-calculations.js"></script>
-    <script src="app.js?v=20261128g"></script>
+    <script src="app.js?v=20261128j"></script>
 
     <!-- Spinner overlay สำหรับสั่งนอกรอบ -->
     <div id="recOverlaySpinner" class="rec-overlay-spinner" style="display:none;">

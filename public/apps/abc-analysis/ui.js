@@ -821,7 +821,8 @@ function openPoModal(material, poList, leadTimeDays) {
                 : "-";
             // Calculate new delivery date = DocumentDate + Leadtime
             let newDateDisplay = item.DocumentDate || "-";
-            if (item.DocumentDate && lt > 0) {
+            let isOverdue = false;
+            if (item.DocumentDate) {
                 try {
                     let parsed = null;
                     const raw = item.DocumentDate.toString().trim();
@@ -842,19 +843,34 @@ function openPoModal(material, poList, leadTimeDays) {
                         parsed = new Date(raw);
                     }
                     if (parsed && !isNaN(parsed.getTime())) {
-                        parsed.setDate(parsed.getDate() + lt);
+                        parsed.setHours(0, 0, 0, 0);
+                        if (lt > 0) {
+                            parsed.setDate(parsed.getDate() + lt);
+                        }
                         const dd = String(parsed.getDate()).padStart(2, '0');
                         const mm = String(parsed.getMonth() + 1).padStart(2, '0');
                         const yyyy = parsed.getFullYear();
                         newDateDisplay = `${dd}/${mm}/${yyyy}`;
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (parsed < today && !item.isTimestamped) {
+                            isOverdue = true;
+                        }
                     }
                 } catch (e) { /* keep original */ }
             }
+            const dateHtml = isOverdue
+                ? `<span class="po-date-overdue" title="เลยกำหนดส่ง">${newDateDisplay}</span>`
+                : `<span class="po-date-normal">${newDateDisplay}</span>`;
+            const qtyBadge = `<span class="po-qty-pill">${formatNumber(item.Qty || 0)}</span>`;
+            const ltBadge = lt > 0
+                ? `<span class="po-lt-pill">${formatNumber(lt)} วัน</span>`
+                : `<span style="color:#64748b;">-</span>`;
             tr.innerHTML = `
-                <td>${newDateDisplay}</td>
+                <td>${dateHtml}</td>
                 <td>${poLink}</td>
-                <td class="po-qty">${formatNumber(item.Qty || 0)}</td>
-                <td class="po-qty">${lt > 0 ? formatNumber(lt) : "-"}</td>
+                <td class="po-qty">${qtyBadge}</td>
+                <td class="po-qty">${ltBadge}</td>
             `;
             // Bind click on PO number link
             const link = tr.querySelector('.po-number-link');
@@ -955,12 +971,14 @@ function openPoByNumberModal(poNumber) {
             const stillQty = toNum(stillKey ? r[stillKey] : (reqKey ? r[reqKey] : 0));
 
             const tr = document.createElement("tr");
+            const isActiveMat = material && String(document.getElementById("poMaterialLabel")?.textContent || "").trim() === material;
+            if (isActiveMat) tr.className = "po-highlight-mat-row";
             tr.innerHTML = `
-                <td>${doc || "-"}</td>
-                <td>${docDate || "-"}</td>
-                <td>${material || "-"}</td>
-                <td>${shortText || "-"}</td>
-                <td class="po-qty">${formatNumber(stillQty)}</td>
+                <td><span class="po-doc-code">${doc || "-"}</span></td>
+                <td><span class="po-date-normal">${docDate || "-"}</span></td>
+                <td><span class="po-mat-code">${material || "-"}</span></td>
+                <td class="po-short-text">${shortText || "-"}</td>
+                <td class="po-qty"><span class="po-qty-pill">${formatNumber(stillQty)}</span></td>
             `;
             tbody.appendChild(tr);
         });
