@@ -1675,6 +1675,7 @@ async function initProductData() {
       if (allData && allData.length > 0) {
         populatePlantCallFilter(allData);
       }
+      applyHubTscPresetFilter();
       filterAndRenderTable();
     };
 
@@ -1745,7 +1746,54 @@ function openDashboardView(view) {
 
   resetAllFilters();
   resetSortConfig();
+  applyHubTscPresetFilter();
   filterAndRenderTable();
+}
+
+function applyHubTscPresetFilter() {
+  try {
+    const raw = sessionStorage.getItem('hub_tsc_preset_filter');
+    if (!raw) return;
+    const preset = JSON.parse(raw);
+    if (!preset || (preset.ts && Date.now() - preset.ts > 60000)) {
+      sessionStorage.removeItem('hub_tsc_preset_filter');
+      return;
+    }
+    if (preset.view === 'tsc-store') return;
+    sessionStorage.removeItem('hub_tsc_preset_filter');
+
+    if (preset.plantCall && plantCallFilter) {
+      if (!Array.from(plantCallFilter.options).some((o) => o.value === preset.plantCall)) {
+        const opt = document.createElement('option');
+        opt.value = preset.plantCall;
+        opt.textContent = preset.plantCall;
+        plantCallFilter.appendChild(opt);
+      }
+      plantCallFilter.value = preset.plantCall;
+    }
+    if (preset.status) {
+      activeStatusFilter = preset.status;
+    }
+    if (preset.descFilter) {
+      currentDescFilter = preset.descFilter;
+    }
+    if (preset.search && searchInput) {
+      searchInput.value = preset.search;
+    }
+    if (preset.notReturnOnly) {
+      activeNotReturnFilter = true;
+    }
+    if (preset.errorOnly) {
+      isErrorFilterActive = true;
+      if (errorFilterButton) {
+        errorFilterButton.classList.add('active-error-filter');
+        errorFilterButton.style.backgroundColor = '#dc3545';
+        errorFilterButton.style.color = 'white';
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to apply Hub TSC preset filter:', e);
+  }
 }
 
 window.initProductData = initProductData;

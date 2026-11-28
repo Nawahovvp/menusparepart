@@ -1829,3 +1829,559 @@ export function computeWarehouseHealthScore({ stockDayData, callData, abcData })
     factors,
   };
 }
+
+/* ==========================================================================
+   7. Customer Return & Claim Dashboard (6 Submenus: dashboard-tsc)
+   ========================================================================== */
+
+const TSC_PLANT_MAP_3DIGIT = {
+  '318': 'คลังกาแฟ',
+  '301': 'Stock กทม',
+  '369': 'Stock คลังระยอง',
+  '326': 'Stock วิภาวดี 62',
+  '319': 'Stock ขอนแก่น',
+  '309': 'Stock โคราช',
+  '366': 'Stock เชียงใหม่',
+  '304': 'Stock พระราม 3',
+  '312': 'Stock พิษณุโลก',
+  '313': 'Stock ภูเก็ต',
+  '305': 'Stock ราชบุรี',
+  '320': 'Stock ลำปาง',
+  '311': 'Stock ศรีราชา',
+  '307': 'Stock สุราษฎร์',
+  '317': 'ศูนย์ REFURBISH',
+  '367': 'SA ฉะเชิงเทรา',
+  '364': 'SA บางบัวทอง',
+  '324': 'SA ปัตตานี',
+  '363': 'SA ปากเกร็ด',
+  '368': 'SA ร้อยเอ็ด',
+  '323': 'SA ลำลูกกา',
+  '303': 'SA สงขลา',
+  '365': 'SA สมุทรปราการ',
+  '362': 'SA หนองแขม',
+  '315': 'SA อยุธยา',
+  '310': 'SA อุดรธานี1',
+  '322': 'SA อุดรธานี2',
+  '330': 'Stock ประเวศ',
+};
+
+let customerReturnMemoryCache = {
+  ts: 0,
+  allData: null,
+  storeBrandData: null,
+};
+const CUSTOMER_RETURN_CACHE_TTL = 5 * 60 * 1000;
+
+function parseTscDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return new Date(0);
+  const timeMatch = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+  if (timeMatch) {
+    const [, day, month, year, hour, minute, second] = timeMatch;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10));
+  }
+  const dateMatch = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (dateMatch) {
+    const [, day, month, year] = dateMatch;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+  }
+  return new Date(0);
+}
+
+function resolveTscPlantCallName(plantInfo) {
+  const code3 = String(plantInfo?.plantCode || '').replace(/^0+/, '');
+  if (TSC_PLANT_MAP_3DIGIT[code3]) {
+    return TSC_PLANT_MAP_3DIGIT[code3];
+  }
+  return plantInfo?.callPendingUnit || `Stock ${plantInfo?.plantName || ''}`;
+}
+
+function checkSerialMismatch(row) {
+  const rawSerial = String(row?.SerialKeep || '').trim();
+  if (!rawSerial) return false;
+  const serials = rawSerial.split(/[,/\s]+/).map((s) => s.trim()).filter(Boolean);
+  const qtyValue = parseFloat(row?.Qty) || 0;
+  return qtyValue > 0 && serials.length > 0 && serials.length !== qtyValue;
+}
+
+function summarizeProductSubmenu(rows, submenuKey) {
+  const workOrderSet = new Set();
+  let totalQty = 0;
+  let processingQty = 0;
+  let completedQty = 0;
+  let notReturnCount = 0;
+  let notReturnQty = 0;
+  let errorMismatchCount = 0;
+  let checkOrderCount = 0;
+  let latestDeliveryDate = '-';
+  let latestDeliveryTime = 0;
+  const statusCounts = {};
+  const descCounts = {};
+
+  rows.forEach((row) => {
+    const wo = String(row?.WorkOrder || '').trim();
+    if (wo && wo !== '-') workOrderSet.add(wo);
+
+    const qty = parseFloat(row?.Qty) || 0;
+    totalQty += qty;
+
+    const status = String(row?.Status || 'อื่นๆ').trim() || 'อื่นๆ';
+    statusCounts[status] = (statusCounts[status] || 0) + qty;
+
+    const isCompleted = status === 'ส่งลูกค้าแล้ว' || status === 'สำเร็จ';
+    if (isCompleted) {
+      completedQty += qty;
+    } else {
+      processingQty += qty;
+    }
+
+    const retStatus = String(row?.['การคืนซาก'] || '').trim();
+    if (retStatus.includes('ไม่คืน')) {
+      notReturnCount += 1;
+      notReturnQty += qty;
+    }
+
+    if (checkSerialMismatch(row)) {
+      errorMismatchCount += 1;
+    }
+
+    if (String(row?.OrderChk || '').trim() === 'CheckOrder') {
+      checkOrderCount += 1;
+    }
+
+    const delivery = String(row?.DeliveryTSC_Detail || '').trim();
+    if (delivery && delivery !== '-') {
+      const dt = parseTscDate(delivery);
+      const t = dt.getTime();
+      if (!Number.isNaN(t) && t > latestDeliveryTime) {
+        latestDeliveryTime = t;
+        latestDeliveryDate = delivery;
+      }
+    }
+
+    const desc = String(row?.['Spare Part Name'] || '').trim();
+    if (desc) {
+      descCounts[desc] = (descCounts[desc] || 0) + qty;
+    }
+  });
+
+  let latestDeliveryQty = 0;
+  if (latestDeliveryDate !== '-') {
+    rows.forEach((row) => {
+      if (String(row?.DeliveryTSC_Detail || '').trim() === latestDeliveryDate) {
+        latestDeliveryQty += parseFloat(row?.Qty) || 0;
+      }
+    });
+  }
+
+  // Build Description Breakdown Pills (matching product.js customOrderTSC / Access Point)
+  const customOrderTSC = [
+    'เครื่อง S80',
+    'เครื่อง A80',
+    'ADEPTER',
+    'ขาตั้งพลาสติก',
+    'ชุดเสาเหล็ก',
+    'ฝาหลัง รุ่น S80',
+    'สาย RS232',
+  ];
+  const stripForMatch = (text) => String(text || '').replace(/\s+/g, '').toLowerCase();
+  const customOrderMatch = customOrderTSC.map(stripForMatch);
+
+  const descBreakdown = Object.keys(descCounts).map((desc) => {
+    let displayName = desc;
+    if (submenuKey === 'truewifi') {
+      displayName = desc.replace(/TRUE WIFI/gi, '').replace(/\(ฝ\)/g, '').trim();
+    } else if (submenuKey === 'tsc') {
+      displayName = desc.replace(/SMART\s*CARD\s*EDC/gi, '').replace(/\(ฝ\)/g, '').trim().replace(/\s{2,}/g, ' ');
+    }
+    return {
+      desc,
+      displayName: displayName || desc,
+      qty: descCounts[desc] || 0,
+    };
+  });
+
+  if (submenuKey === 'tsc') {
+    descBreakdown.sort((a, b) => {
+      const normA = stripForMatch(a.displayName);
+      const normB = stripForMatch(b.displayName);
+      let idxA = customOrderMatch.indexOf(normA);
+      let idxB = customOrderMatch.indexOf(normB);
+      if (idxA === -1) idxA = customOrderMatch.findIndex((o) => normA.includes(o));
+      if (idxB === -1) idxB = customOrderMatch.findIndex((o) => normB.includes(o));
+      if (idxA === -1) idxA = 999;
+      if (idxB === -1) idxB = 999;
+      if (idxA !== idxB) return idxA - idxB;
+      return a.displayName.localeCompare(b.displayName, 'th');
+    });
+  } else {
+    descBreakdown.sort((a, b) => b.qty - a.qty);
+  }
+
+  // Actionable preview items (prioritize pending / processing / CheckOrder / serial mismatch)
+  const statusPriority = {
+    'รอคืนคลัง': 1,
+    'รอส่งคลัง': 2,
+    'คลังพื้นที่': 3,
+    'รอส่งคืน': 4,
+    'ระหว่างขนส่ง': 5,
+    'รอส่งเคลม': 6,
+    'คลังกลาง': 7,
+    'ส่งลูกค้าแล้ว': 90,
+    'สำเร็จ': 91,
+  };
+
+  const previewRows = [...rows]
+    .sort((a, b) => {
+      const chkA = a.OrderChk === 'CheckOrder' ? 0 : 1;
+      const chkB = b.OrderChk === 'CheckOrder' ? 0 : 1;
+      if (chkA !== chkB) return chkA - chkB;
+      const stA = statusPriority[String(a.Status || '').trim()] || 50;
+      const stB = statusPriority[String(b.Status || '').trim()] || 50;
+      if (stA !== stB) return stA - stB;
+      return parseTscDate(b.DateKeep).getTime() - parseTscDate(a.DateKeep).getTime();
+    })
+    .slice(0, 60)
+    .map((r) => ({
+      WorkOrder: r.WorkOrder || '-',
+      Status: r.Status || '-',
+      OrderChk: r.OrderChk || '-',
+      DateKeep: r.DateKeep || '-',
+      SparePartCode: r['Spare Part Code'] || '-',
+      SparePartName: r['Spare Part Name'] || '-',
+      Qty: parseFloat(r.Qty) || 0,
+      StoreCode: r['Store Code'] || '-',
+      StoreName: r['Store Name'] || '-',
+      PlantCall: r.PlantCall || '-',
+      Plant: r.Plant || '-',
+      ReturnStatus: r['การคืนซาก'] || '-',
+      SerialKeep: r.SerialKeep || '-',
+      TID: r.TID || r.MatCode || '-',
+      DeliveryDetail: r.DeliveryTSC_Detail || '-',
+      hasSerialMismatch: checkSerialMismatch(r),
+    }));
+
+  const completionPct = totalQty > 0 ? Math.round((completedQty / totalQty) * 100) : 0;
+
+  return {
+    workOrderCount: workOrderSet.size,
+    totalQty,
+    processingQty,
+    completedQty,
+    completionPct,
+    notReturnCount,
+    notReturnQty,
+    errorMismatchCount,
+    checkOrderCount,
+    latestDeliveryDate,
+    latestDeliveryQty,
+    statusCounts,
+    descBreakdown,
+    previewRows,
+  };
+}
+
+function summarizeTscStoreSubmenu(brandRows) {
+  const waiting = brandRows.filter((r) => r.Staus === 'รอส่งคลัง');
+  const complete = brandRows.filter((r) => r.Staus === 'ครบ');
+  const incomplete = brandRows.filter((r) => r.Staus === 'ไม่ครบ');
+  const pending = brandRows.filter((r) => r.Staus === 'รอจัดเก็บ');
+
+  const sumPos = (arr) => arr.reduce((s, r) => s + (parseFloat(r['จำนวนเครื่อง']) || 0), 0);
+  const waitingPos = sumPos(waiting);
+  const completePos = sumPos(complete);
+  const pendingPos = sumPos(pending);
+  const incompletePos = incomplete.reduce((s, r) => {
+    const total = parseFloat(r['จำนวนเครื่อง']) || 0;
+    const returned = parseFloat(r['ส่งคืน']) || 0;
+    return s + Math.max(0, total - returned);
+  }, 0);
+
+  const totalBranches = brandRows.length;
+  const totalPos = sumPos(brandRows);
+  const completionPct = totalBranches > 0 ? Math.round((complete.length / totalBranches) * 100) : 0;
+
+  const actionableBranches = brandRows.filter((r) => r.Staus !== 'ครบ');
+  const over14DaysCount = actionableBranches.filter((r) => (parseFloat(r['ผ่านมา(วัน)']) || 0) > 14).length;
+
+  const previewRows = [...brandRows]
+    .sort((a, b) => {
+      const rank = { 'รอจัดเก็บ': 1, 'รอส่งคลัง': 2, 'ไม่ครบ': 3, 'ครบ': 9 };
+      const rA = rank[a.Staus] || 5;
+      const rB = rank[b.Staus] || 5;
+      if (rA !== rB) return rA - rB;
+      return (parseFloat(b['ผ่านมา(วัน)']) || 0) - (parseFloat(a['ผ่านมา(วัน)']) || 0);
+    })
+    .slice(0, 60)
+    .map((r) => ({
+      StoreCode: r['รหัสสาขา'] || '-',
+      StoreName: r['สาขา'] || '-',
+      Province: r['จังหวัด'] || '-',
+      PosQty: parseFloat(r['จำนวนเครื่อง']) || 0,
+      ReturnedQty: parseFloat(r['ส่งคืน']) || 0,
+      UserKeep: r['ผู้ส่งคืน'] || '-',
+      AgingDays: Math.round(parseFloat(r['ผ่านมา(วัน)']) || 0),
+      Status: r.Staus || '-',
+      StoreRemark: r['สถานะร้าน'] || '-',
+      DateCall: r['วันที่ดำเนินการ'] || '-',
+      DateReceipt: r['วันที่คืนคลัง'] || '-',
+    }));
+
+  return {
+    totalBranches,
+    totalPos,
+    completionPct,
+    over14DaysCount,
+    statusMatrix: {
+      pending: { label: 'รอจัดเก็บ', branches: pending.length, pos: pendingPos },
+      waiting: { label: 'รอส่งคลัง', branches: waiting.length, pos: waitingPos },
+      incomplete: { label: 'ไม่ครบ', branches: incomplete.length, pos: incompletePos },
+      complete: { label: 'ครบ', branches: complete.length, pos: completePos },
+    },
+    previewRows,
+  };
+}
+
+export async function fetchCustomerReturnDashboard(plantInfo, forceRefresh = false) {
+  const now = Date.now();
+  let allData = null;
+  let storeBrandData = null;
+
+  if (
+    !forceRefresh &&
+    customerReturnMemoryCache.allData &&
+    customerReturnMemoryCache.storeBrandData &&
+    now - customerReturnMemoryCache.ts < CUSTOMER_RETURN_CACHE_TTL
+  ) {
+    allData = customerReturnMemoryCache.allData;
+    storeBrandData = customerReturnMemoryCache.storeBrandData;
+  } else {
+    const fetchProxy = async (type) => {
+      const res = await fetch(`/api/proxy?type=${encodeURIComponent(type)}`, {
+        credentials: 'same-origin',
+      });
+      if (!res.ok) throw new Error(`Customer Return API (${type}) HTTP ${res.status}`);
+      return res.json();
+    };
+
+    const [rawProduct, rawClaim, rawBrand] = await Promise.all([
+      fetchProxy('product'),
+      fetchProxy('bluetap_claim').catch(() => []),
+      fetchProxy('brand').catch(() => []),
+    ]);
+
+    const data = Array.isArray(rawProduct) ? rawProduct.map((r) => ({ ...r })) : [];
+    const claimData = Array.isArray(rawClaim) ? rawClaim : [];
+
+    // Replicate exact product.js normalization & claim merge logic
+    data.forEach((row) => {
+      const prodValue = String(row.Product || '').trim().toUpperCase();
+      const sparePartCode = String(row['Spare Part Code'] || '').trim().toUpperCase();
+      const sparePartName = String(row['Spare Part Name'] || '').trim().toUpperCase();
+
+      if (prodValue.includes('BLUETAP') || sparePartCode.includes('SUNMI') || sparePartName.includes('SUNMI')) {
+        row.Product = 'Bluetap';
+        const codeTrimmed = String(row['Spare Part Code'] || '').trim();
+        if (codeTrimmed === '30066406' && row['คลังพื้นที่']) {
+          row.Status = row['คลังพื้นที่'];
+        }
+      } else if (prodValue.includes('WIFI') || prodValue.includes('ACCESS') || prodValue.includes('AP')) {
+        row.Product = 'Access Point';
+      } else {
+        row.Product = 'TSC';
+      }
+
+      if (row.Product !== 'Access Point' && row.Status === 'ส่งTSCแล้ว') {
+        row.Status = 'ส่งลูกค้าแล้ว';
+      }
+
+      const isClaimModel = String(row['Spare Part Code'] || '').trim() === '30066406';
+      const currentStatus = String(row.Status || '').trim();
+      if (
+        row.Product === 'Bluetap' &&
+        row.Plant === 'คลังวิภาวดี 62' &&
+        !isClaimModel &&
+        currentStatus !== 'ส่งลูกค้าแล้ว' &&
+        currentStatus !== 'สำเร็จ'
+      ) {
+        row.Status = 'รอส่งเคลม';
+        row.DeliveryTSC_Detail = '-';
+      }
+    });
+
+    if (claimData.length > 0) {
+      const newClaimRows = claimData.map((newRow) => {
+        const claimSpc = String(newRow['Spare Part Code'] || '30066406').trim();
+        const matchedRow = data.find(
+          (r) =>
+            String(r.WorkOrder || '').trim() === String(newRow['WorkOrder No'] || '').trim() &&
+            (String(r['Spare Part Code'] || '').trim() === claimSpc ||
+              String(r['Spare Part Code'] || '').trim() === '30066406')
+        );
+        const oldRow = matchedRow || {};
+        const mergedRow = {
+          ...oldRow,
+          WorkOrder: newRow['WorkOrder No'],
+          'Store Code': newRow['Store Code'],
+          'Store Name': newRow['Store name'],
+          Product: 'Bluetap',
+          'Spare Part Code': claimSpc,
+          'Spare Part Name': newRow['Spare Part Name'] || oldRow['Spare Part Name'] || 'เครื่อง Blue Tap (NFC) (ฝ)',
+          Qty: newRow.QTY || '1',
+          อุปกรณ์: newRow['อุปกรณ์'],
+          อาการ: newRow['อาการ'],
+          รหัสช่าง: newRow['รหัสช่าง'],
+          ชื่อช่าง: newRow['ชื่อช่าง'],
+          การคืนซาก: newRow['การคืนซาก'] || oldRow['การคืนซาก'],
+          'Serial Old': newRow['Serial No'] || oldRow['Serial Old'],
+          DateKeep: oldRow.DateKeep || newRow['วันที่เปิดงาน'] || '-',
+        };
+
+        if (!matchedRow) {
+          mergedRow.Status = 'รอคืนคลัง';
+          if (newRow['Approve Date Time']) {
+            const approveDateStr = String(newRow['Approve Date Time']).trim();
+            mergedRow.DateKeep = approveDateStr.split(' ')[0] || mergedRow.DateKeep;
+          }
+          mergedRow.OrderChk = '-';
+        } else {
+          mergedRow.OrderChk = '-';
+          if (mergedRow['Spare Part Code'] === '30066406') {
+            if (mergedRow['คลังพื้นที่']) {
+              mergedRow.Status = mergedRow['คลังพื้นที่'];
+            } else if (!mergedRow.Status) {
+              mergedRow.Status = 'รอส่งเคลม';
+            }
+          }
+        }
+
+        if (mergedRow.Status === 'รอคืนคลัง' || mergedRow.Status === 'รอส่งคลัง') {
+          const plantId = String(newRow.Plant || '').trim().replace(/^0+/, '');
+          if (TSC_PLANT_MAP_3DIGIT[plantId]) {
+            mergedRow.PlantCall = TSC_PLANT_MAP_3DIGIT[plantId];
+          }
+        }
+        return mergedRow;
+      });
+
+      const finalData = data.filter((row) => {
+        const wo = String(row.WorkOrder || '').trim();
+        const spc = String(row['Spare Part Code'] || '').trim();
+        const isReplacedByClaim = claimData.some((cRow) => {
+          const cWo = String(cRow['WorkOrder No'] || '').trim();
+          const claimSpc = String(cRow['Spare Part Code'] || '30066406').trim();
+          return cWo === wo && (spc === claimSpc || spc === '30066406');
+        });
+        return !isReplacedByClaim;
+      });
+
+      finalData.forEach((row) => {
+        if (row.Product === 'Bluetap' && String(row['Spare Part Code'] || '').trim() === '30066406') {
+          row.OrderChk = 'CheckOrder';
+        }
+      });
+
+      finalData.push(...newClaimRows);
+      allData = finalData;
+    } else {
+      allData = data;
+    }
+
+    storeBrandData = (Array.isArray(rawBrand) ? rawBrand : []).map((row) => ({
+      ...row,
+      จำนวนเครื่อง: row.PosQty || '',
+      ส่งคืน: row.PoskeepQty || '',
+      ผู้ส่งคืน: row.UserKeep || '',
+      'ผ่านมา(วัน)': row['ผ่านมา'] || '',
+      Staus: String(row.Staus || '').trim(),
+      สถานะร้าน: row.Remark || 'ไม่มีข้อมูล',
+      วันที่คืนคลัง: row.DateRecripte || '',
+      วันที่ดำเนินการ: row.DateCall || '',
+    }));
+
+    customerReturnMemoryCache = {
+      ts: now,
+      allData,
+      storeBrandData,
+    };
+  }
+
+  const targetPlantCall = resolveTscPlantCallName(plantInfo);
+  const norm = (s) => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const targetNorm = norm(targetPlantCall);
+  const plantNameNorm = norm(plantInfo?.plantName || '');
+
+  // Check all available PlantCall names in dataset to find best match for user's warehouse
+  const availablePlantCalls = Array.from(new Set(allData.map((r) => String(r?.PlantCall || '').trim()).filter(Boolean)));
+  let matchedPlantCall = targetPlantCall;
+  const exactMatch = availablePlantCalls.find((p) => norm(p) === targetNorm);
+  if (exactMatch) {
+    matchedPlantCall = exactMatch;
+  } else if (plantNameNorm) {
+    const partialMatch = availablePlantCalls.find((p) => norm(p).includes(plantNameNorm));
+    if (partialMatch) matchedPlantCall = partialMatch;
+  }
+
+  const buildScopeSummary = (filterByPlantCall) => {
+    const scopedProductRows = filterByPlantCall
+      ? allData.filter((r) => norm(r?.PlantCall) === norm(matchedPlantCall))
+      : allData;
+
+    const tscRows = scopedProductRows.filter((r) => r.Product === 'TSC');
+    const sunmiRows = scopedProductRows.filter(
+      (r) => r.Product === 'Bluetap' && String(r['Spare Part Code'] || '').trim() === 'SUNMI'
+    );
+    const bluetapClaimRows = scopedProductRows.filter(
+      (r) => r.Product === 'Bluetap' && String(r['Spare Part Code'] || '').trim() === '30066406'
+    );
+    const adapterClaimRows = scopedProductRows.filter(
+      (r) => r.Product === 'Bluetap' && String(r['Spare Part Code'] || '').trim() === '30066303'
+    );
+    const truewifiRows = scopedProductRows.filter((r) => r.Product === 'Access Point');
+
+    const tsc = summarizeProductSubmenu(tscRows, 'tsc');
+    const tscStore = summarizeTscStoreSubmenu(storeBrandData);
+    const sunmi = summarizeProductSubmenu(sunmiRows, 'bluetap');
+    const bluetapClaim = summarizeProductSubmenu(bluetapClaimRows, 'bluetap-claim');
+    const adapterClaim = summarizeProductSubmenu(adapterClaimRows, 'adapter-claim');
+    const truewifi = summarizeProductSubmenu(truewifiRows, 'truewifi');
+
+    const productSubmenus = [tsc, sunmi, bluetapClaim, adapterClaim, truewifi];
+    const masterOverview = {
+      totalWorkOrders: productSubmenus.reduce((s, m) => s + m.workOrderCount, 0),
+      totalQty: productSubmenus.reduce((s, m) => s + m.totalQty, 0),
+      totalProcessingQty: productSubmenus.reduce((s, m) => s + m.processingQty, 0),
+      totalCompletedQty: productSubmenus.reduce((s, m) => s + m.completedQty, 0),
+      totalNotReturnCount: productSubmenus.reduce((s, m) => s + m.notReturnCount, 0),
+      totalErrorMismatch: productSubmenus.reduce((s, m) => s + m.errorMismatchCount, 0),
+      totalCheckOrder: bluetapClaim.checkOrderCount,
+      storePendingBranches:
+        tscStore.statusMatrix.pending.branches +
+        tscStore.statusMatrix.waiting.branches +
+        tscStore.statusMatrix.incomplete.branches,
+      storePendingPos:
+        tscStore.statusMatrix.pending.pos +
+        tscStore.statusMatrix.waiting.pos +
+        tscStore.statusMatrix.incomplete.pos,
+    };
+
+    return {
+      masterOverview,
+      submenus: {
+        tsc,
+        'tsc-store': tscStore,
+        bluetap: sunmi,
+        'bluetap-claim': bluetapClaim,
+        'adapter-claim': adapterClaim,
+        truewifi,
+      },
+    };
+  };
+
+  return {
+    matchedPlantCall,
+    availablePlantCalls,
+    plantScope: buildScopeSummary(true),
+    nationwideScope: buildScopeSummary(false),
+  };
+}
+

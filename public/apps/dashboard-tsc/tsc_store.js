@@ -189,12 +189,36 @@ function tscStore_loadData() {
                 };
             });
 
+            tscStore_applyHubPresetFilter();
             tscStore_filterAndRenderTable();
         })
         .catch(error => {
             console.error("TSC Store Load Error:", error);
             // alert("เกิดข้อผิดพลาดในการโหลดข้อมูล TSC Store");
         });
+}
+
+function tscStore_applyHubPresetFilter() {
+    try {
+        const raw = sessionStorage.getItem('hub_tsc_preset_filter');
+        if (!raw) return;
+        const preset = JSON.parse(raw);
+        if (!preset || (preset.ts && Date.now() - preset.ts > 60000)) {
+            sessionStorage.removeItem('hub_tsc_preset_filter');
+            return;
+        }
+        if (preset.view && preset.view !== 'tsc-store') return;
+        sessionStorage.removeItem('hub_tsc_preset_filter');
+
+        if (preset.status && tscStore_statusFilter) {
+            tscStore_statusFilter.value = preset.status;
+        }
+        if (preset.search && tscStore_searchInput) {
+            tscStore_searchInput.value = preset.search;
+        }
+    } catch (e) {
+        console.warn('Failed to apply Hub TSC Store preset:', e);
+    }
 }
 
 function tscStore_filterByStatus(status) {
