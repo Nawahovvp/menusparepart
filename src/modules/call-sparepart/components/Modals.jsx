@@ -1622,16 +1622,30 @@ export function ActionModal({
 
 // ===== Outside Request (นอกรอบ) Modal =====
 export function OutsideRequestModal({ isOpen, onClose, row, onSubmit }) {
-    const [quantity, setQuantity] = useState(1);
+    const defaultRowQty = useMemo(() => {
+        const parsed = parseInt(String(row?.["จำนวน"] ?? "1").replace(/,/g, ""), 10);
+        return !isNaN(parsed) && parsed >= 1 ? parsed : 1;
+    }, [row]);
+
+    const rowKey = `${row?.["Ticket Number"] || ""}__${row?.["Material"] || ""}`;
+    const [qtyState, setQtyState] = useState({ key: rowKey, val: defaultRowQty });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+
+    const quantity = qtyState.key === rowKey ? qtyState.val : defaultRowQty;
+    const setQuantity = (nextVal) => setQtyState({ key: rowKey, val: nextVal });
 
     if (!isOpen || !row) return null;
 
     const desc = getDesc(row);
     // Parse user object from localStorage
-    const userStr = localStorage.getItem('user');
-    const userObj = userStr ? JSON.parse(userStr) : {};
+    let userObj = {};
+    try {
+        const userStr = localStorage.getItem('user');
+        userObj = userStr ? JSON.parse(userStr) : {};
+    } catch {
+        userObj = {};
+    }
 
     const userName = userObj.Name || localStorage.getItem('userName') || 'ไม่ระบุ';
     const employeeCode = userObj.IDRec || localStorage.getItem('username') || '-';
@@ -1640,9 +1654,15 @@ export function OutsideRequestModal({ isOpen, onClose, row, onSubmit }) {
 
     const customer = `${row["Team"] || "-"} (${row["Brand"] || "-"})`;
     const defaultPhone = "0909082850";
+    const numQty = parseInt(quantity, 10);
+
+    const adjustQty = (delta) => {
+        const base = !isNaN(numQty) && numQty >= 1 ? numQty : 1;
+        setQuantity(Math.max(1, base + delta));
+    };
 
     const handleSubmit = async () => {
-        if (quantity < 1 || isNaN(quantity)) {
+        if (!numQty || numQty < 1 || isNaN(numQty)) {
             alert('กรุณากรอกจำนวนที่ถูกต้อง (อย่างน้อย 1)');
             return;
         }
@@ -1652,7 +1672,7 @@ export function OutsideRequestModal({ isOpen, onClose, row, onSubmit }) {
         const payload = {
             material: row["Material"] || "-",
             description: desc || "-",
-            quantity: quantity,
+            quantity: numQty,
             contact: defaultPhone,
             employeeCode: employeeCode,
             team: customer,
@@ -1670,7 +1690,7 @@ export function OutsideRequestModal({ isOpen, onClose, row, onSubmit }) {
             setIsSuccess(true);
             setTimeout(() => {
                 onClose();
-            }, 500); // Wait 500ms to show success checkmark before closing
+            }, 550);
         } catch (err) {
             console.error('Outside request failed:', err);
             setIsSubmitting(false);
@@ -1679,121 +1699,162 @@ export function OutsideRequestModal({ isOpen, onClose, row, onSubmit }) {
     };
 
     return (
-        <div className="modal" onClick={(e) => e.target.className.includes('modal') && onClose()}>
-            <div className="modal-content compact-modal" style={{ maxWidth: '500px', padding: 0, overflow: 'hidden' }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    padding: '20px',
-                    color: 'white',
-                    position: 'relative'
-                }}>
-                    <span className="close" onClick={onClose} style={{ color: 'white', position: 'absolute', top: '15px', right: '20px', textShadow: 'none' }}>×</span>
-                    <h3 style={{ margin: '0 0 15px 0', textAlign: 'center', fontSize: '18px', fontWeight: 600 }}>
-                        <i className="fas fa-shopping-cart" style={{ marginRight: '8px' }}></i> เบิกอะไหล่นอกรอบ
-                    </h3>
+        <div
+            className="modal outside-req-modal-backdrop"
+            style={{ zIndex: 1200 }}
+            onClick={(e) => e.target === e.currentTarget && !isSubmitting && onClose()}
+        >
+            <div className="premium-modal-content outside-req-dialog">
+                {/* Header */}
+                <div className="premium-modal-header outside-req-header">
+                    <div className="outside-req-title-wrap">
+                        <span className="outside-req-icon-badge" aria-hidden="true">
+                            <i className="fas fa-bolt"></i>
+                        </span>
+                        <div>
+                            <h3 className="outside-req-title">เบิกอะไหล่นอกรอบ</h3>
+                            <span className="outside-req-subtitle">ส่งคำขอเบิกด่วนเข้าคลังอะไหล่</span>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        className="outside-req-close-btn"
+                        onClick={onClose}
+                        disabled={isSubmitting}
+                        aria-label="ปิดหน้าต่าง"
+                        title="ปิด"
+                    >
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
 
-                    <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '10px', marginBottom: '15px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Material:</strong>
-                                <span style={{ textAlign: 'right', flex: 1 }}>{row["Material"] || "-"}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Description:</strong>
-                                <span style={{ textAlign: 'right', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '250px' }} title={desc}>{desc || "-"}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Ticket Number:</strong>
-                                <span style={{ textAlign: 'right', flex: 1 }}>{row["Ticket Number"] || "-"}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Call Type:</strong>
-                                <span style={{ textAlign: 'right', flex: 1 }}>{row["Call Type"] || "-"}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>User:</strong>
-                                <span style={{ textAlign: 'right', flex: 1 }}>{userName}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Plant:</strong>
-                                <span style={{ textAlign: 'right', flex: 1 }}>{userPlant}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>Customer:</strong>
-                                <span style={{ textAlign: 'right', flex: 1, fontWeight: 'bold' }}>{customer}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '5px', borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
-                                <strong style={{ color: '#ffd700' }}>เบอร์ติดต่อ:</strong>
-                                <span style={{ textAlign: 'right', flex: 1, fontWeight: 'bold' }}>{defaultPhone}</span>
-                            </div>
+                {/* Body */}
+                <div className="premium-modal-body outside-req-body">
+                    {/* Highlighted Material Hero Card */}
+                    <div className="outside-mat-hero">
+                        <div className="outside-mat-top">
+                            <span className="outside-mat-tag">MATERIAL</span>
+                            <span className="outside-mat-code">{row["Material"] || "-"}</span>
+                            {row["Call Type"] && row["Call Type"] !== "-" && (
+                                <span className="outside-calltype-pill">{row["Call Type"]}</span>
+                            )}
+                        </div>
+                        <div className="outside-mat-desc" title={desc || "-"}>
+                            {desc || "-"}
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '15px' }}>
-                        <label htmlFor="outside-quantity" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px' }}>จำนวน:</label>
-                        <input
-                            type="number"
-                            id="outside-quantity"
-                            value={quantity}
-                            min="1"
-                            onChange={(e) => setQuantity(parseInt(e.target.value) || '')}
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                border: 'none',
-                                borderRadius: '8px',
-                                background: 'rgba(255,255,255,0.9)',
-                                fontSize: '16px',
-                                color: '#333',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
-                            }}
-                        />
+                    {/* Structured Info Grid */}
+                    <div className="outside-info-grid">
+                        <div className="outside-info-cell">
+                            <span className="outside-info-label">
+                                <i className="fas fa-ticket-alt"></i> Ticket Number
+                            </span>
+                            <strong className="outside-info-val accent-sky">{row["Ticket Number"] || "-"}</strong>
+                        </div>
+
+                        <div className="outside-info-cell">
+                            <span className="outside-info-label">
+                                <i className="fas fa-warehouse"></i> Plant ปลายทาง
+                            </span>
+                            <strong className="outside-info-val accent-amber">{userPlant}</strong>
+                        </div>
+
+                        <div className="outside-info-cell full-span">
+                            <span className="outside-info-label">
+                                <i className="fas fa-store"></i> ทีม / สาขา (Customer)
+                            </span>
+                            <strong className="outside-info-val" title={customer}>{customer}</strong>
+                        </div>
+
+                        <div className="outside-info-cell">
+                            <span className="outside-info-label">
+                                <i className="fas fa-user-check"></i> ผู้ขอเบิก
+                            </span>
+                            <strong className="outside-info-val">{userName}</strong>
+                        </div>
+
+                        <div className="outside-info-cell">
+                            <span className="outside-info-label">
+                                <i className="fas fa-phone-alt"></i> เบอร์ติดต่อคลัง
+                            </span>
+                            <strong className="outside-info-val">{defaultPhone}</strong>
+                        </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+                    {/* Quantity Stepper Box */}
+                    <div className="outside-qty-card">
+                        <div className="outside-qty-info">
+                            <label htmlFor="outside-quantity" className="outside-qty-label">
+                                จำนวนที่ต้องการเบิก
+                            </label>
+                            <span className="outside-qty-hint">
+                                {row["จำนวน"] ? `ยอดขอในใบงาน: ${row["จำนวน"]} ชิ้น` : 'ระบุจำนวนชิ้น (อย่างน้อย 1)'}
+                            </span>
+                        </div>
+
+                        <div className="outside-qty-stepper">
+                            <button
+                                type="button"
+                                className="qty-step-btn"
+                                onClick={() => adjustQty(-1)}
+                                disabled={isSubmitting || isSuccess || (numQty <= 1)}
+                                aria-label="ลดจำนวน"
+                            >
+                                <i className="fas fa-minus"></i>
+                            </button>
+                            <input
+                                type="number"
+                                id="outside-quantity"
+                                className="outside-qty-input"
+                                value={quantity}
+                                min="1"
+                                disabled={isSubmitting || isSuccess}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setQuantity(val === '' ? '' : Math.max(1, parseInt(val, 10) || 1));
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSubmit();
+                                    }
+                                }}
+                            />
+                            <button
+                                type="button"
+                                className="qty-step-btn"
+                                onClick={() => adjustQty(1)}
+                                disabled={isSubmitting || isSuccess}
+                                aria-label="เพิ่มจำนวน"
+                            >
+                                <i className="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="outside-req-actions">
                         <button
+                            type="button"
+                            className="outside-btn-cancel"
                             onClick={onClose}
-                            style={{
-                                padding: '10px 20px',
-                                background: '#dc3545',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontWeight: 'bold',
-                                fontSize: '14px'
-                            }}
+                            disabled={isSubmitting}
                         >
                             ยกเลิก
                         </button>
                         <button
+                            type="button"
+                            className={`outside-btn-submit ${isSuccess ? 'is-success' : ''}`}
                             onClick={handleSubmit}
                             disabled={isSubmitting || isSuccess}
-                            style={{
-                                padding: '10px 20px',
-                                background: isSuccess ? '#198754' : (isSubmitting ? '#6c757d' : '#28a745'),
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: (isSubmitting || isSuccess) ? 'not-allowed' : 'pointer',
-                                fontWeight: 'bold',
-                                fontSize: '14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                transition: 'all 0.3s ease',
-                                minWidth: '90px',
-                                justifyContent: 'center'
-                            }}
                         >
                             {isSubmitting ? (
-                                <><i className="fas fa-spinner fa-spin"></i> กำลังบันทึก...</>
+                                <><i className="fas fa-spinner fa-spin"></i> กำลังส่งคำขอ...</>
                             ) : isSuccess ? (
-                                <><i className="fas fa-check"></i> สำเร็จ</>
+                                <><i className="fas fa-check-circle"></i> ส่งคำขอสำเร็จ</>
                             ) : (
-                                "ยืนยัน"
+                                <><i className="fas fa-paper-plane"></i> ยืนยันเบิกนอกรอบ</>
                             )}
                         </button>
                     </div>

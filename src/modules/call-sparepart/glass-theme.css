@@ -1082,3 +1082,371 @@ body.theme-day {
     padding: 0;
   }
 }
+
+/* ==========================================================================
+   Outside Request Modal (เบิกอะไหล่นอกรอบ) — Unified Dark Frosted Glass
+   ========================================================================== */
+.outside-req-dialog {
+  max-width: 480px !important;
+  width: calc(100% - 28px) !important;
+  padding: 0 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: rgba(12, 18, 34, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(175%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+  animation: outsideModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes outsideModalPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.outside-req-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 18px !important;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(13, 148, 136, 0.42) 100%) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22) !important;
+}
+
+.outside-req-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.outside-req-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.38), rgba(6, 182, 212, 0.28));
+  border: 1px solid rgba(94, 234, 212, 0.55);
+  color: #99f6e4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.25);
+  flex-shrink: 0;
+}
+
+.outside-req-title {
+  margin: 0 !important;
+  font-size: 16.5px !important;
+  font-weight: 800 !important;
+  color: #f8fafc !important;
+  line-height: 1.2;
+}
+
+.outside-req-subtitle {
+  display: block;
+  font-size: 11.5px;
+  color: #cbd5e1 !important;
+  margin-top: 2px;
+}
+
+.outside-req-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(30, 41, 59, 0.72) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  color: #cbd5e1 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.outside-req-close-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.32) !important;
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+}
+
+.outside-req-body {
+  padding: 16px 18px 18px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Material Hero Banner */
+.outside-mat-hero {
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.42), rgba(15, 23, 42, 0.65));
+  border: 1px solid rgba(96, 165, 250, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.outside-mat-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.outside-mat-tag {
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(56, 189, 248, 0.22);
+  border: 1px solid rgba(125, 211, 252, 0.45);
+  color: #bae6fd !important;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.outside-mat-code {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff !important;
+  letter-spacing: 0.3px;
+}
+
+.outside-calltype-pill {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(168, 85, 247, 0.24);
+  border: 1px solid rgba(192, 132, 252, 0.52);
+  color: #e9d5ff !important;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.outside-mat-desc {
+  font-size: 12.5px;
+  color: #e2e8f0 !important;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* 2-Column Info Grid */
+.outside-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.outside-info-cell {
+  padding: 9px 11px;
+  border-radius: 11px;
+  background: rgba(15, 23, 42, 0.56);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.outside-info-cell.full-span {
+  grid-column: 1 / -1;
+}
+
+.outside-info-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.outside-info-label i {
+  color: #64748b;
+  font-size: 10px;
+}
+
+.outside-info-val {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f1f5f9 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outside-info-val.accent-sky {
+  color: #7dd3fc !important;
+}
+
+.outside-info-val.accent-amber {
+  color: #fde68a !important;
+}
+
+/* Quantity Stepper Card */
+.outside-qty-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: rgba(15, 23, 42, 0.68);
+  border: 1px solid rgba(45, 212, 191, 0.36);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.outside-qty-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.outside-qty-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc !important;
+  margin: 0 !important;
+}
+
+.outside-qty-hint {
+  font-size: 11px;
+  color: #94a3b8 !important;
+}
+
+.outside-qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(2, 6, 23, 0.55);
+  padding: 4px;
+  border-radius: 11px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+}
+
+.qty-step-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(30, 41, 59, 0.8);
+  color: #f1f5f9;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qty-step-btn:hover:not(:disabled) {
+  background: rgba(20, 184, 166, 0.35);
+  border-color: rgba(94, 234, 212, 0.65);
+  color: #ffffff;
+}
+
+.qty-step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.outside-qty-input {
+  width: 58px !important;
+  height: 32px !important;
+  padding: 0 4px !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #5eead4 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.outside-qty-input::-webkit-outer-spin-button,
+.outside-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Action Footer Buttons */
+.outside-req-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.outside-btn-cancel {
+  padding: 10px 16px;
+  border-radius: 11px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  color: #e2e8f0;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.outside-btn-cancel:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #fecaca;
+}
+
+.outside-btn-submit {
+  padding: 10px 18px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.85), rgba(13, 148, 136, 0.85));
+  border: 1px solid rgba(110, 231, 183, 0.7);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.32);
+  transition: all 0.18s ease;
+}
+
+.outside-btn-submit:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.44);
+}
+
+.outside-btn-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.outside-btn-submit.is-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #a7f3d0;
+}
+
+@media (max-width: 480px) {
+  .outside-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .outside-qty-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .outside-qty-stepper {
+    justify-content: space-between;
+  }
+  .outside-qty-input {
+    flex: 1;
+  }
+}
