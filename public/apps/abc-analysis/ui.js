@@ -1,4 +1,4 @@
-// ใส่ URL ของ Web App ที่ได้จากการ Deploy Google Apps Script ที่นี่
+﻿// ใส่ URL ของ Web App ที่ได้จากการ Deploy Google Apps Script ที่นี่
 const STATUS_UPDATE_ENDPOINT = statusGasUrl;
 
 // Help modal
@@ -1610,20 +1610,20 @@ function renderTable() {
     <td class="nav-col">${navanakornHtml}</td>
     <td>${unrestrictedHtml}</td>
     <td class="subtotal-col"><span class="${subtotalClass}">${subtotalDisplay}</span></td>
-    <td class="val-col" title="มูลค่า ${formatCurrency(r.Value)} บาท"><span class="val-num">${formatNumber(Math.round(Number(r.Value) || 0))}</span></td>
+    <td><span class="${Number(r.Value || 0) === 0 ? 'nava-red' : 'badge-value'}">${formatCurrency(r.Value)}</span></td>
     <td class="lt-col">${((selectedPlant === "0301" || selectedPlant === "0326") && r.LeadTimeDays) ? formatNumber(r.LeadTimeDays) : ''}</td>
     <td>${fmtUsage(r.Qty6Month)}</td>
     <td>${fmtUsage(r.Qty4Month)}</td>
     <td>${fmtUsage(r.Qty3Month)}</td>
     <td>${fmtUsage(r.Qty2Month)}</td>
     <td>${thirtyDayHtml}</td>
-    <td class="sale-col">${Number(r.Sale || 0) > 0 ? `<span class="sale-badge">${formatNumber(r.Sale)}</span>` : ""}</td>
+    <td class="sale-col">${Number(r.Sale || 0) > 0 ? `<span class="badge-sale">${formatNumber(r.Sale)}</span>` : ""}</td>
     <td>${r.AvgMonthly.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
     <td>${meanHtml}</td>
     <td>${Number(r.SafetyStock || 0).toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
     <td>${Number(r.ROP || 0).toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
    <td>${dosHtml}</td>
-   <td class="pr-cell pr-col">${(r.PrOutstanding || 0) > 0 ? `<span class="pr-badge">${formatNumber(r.PrOutstanding)}</span>` : formatNumber(r.PrOutstanding || 0)}</td>
+   <td class="pr-cell pr-col">${(r.PrOutstanding || 0) > 0 ? `<span class="badge-pr">${formatNumber(r.PrOutstanding)}</span>` : formatNumber(r.PrOutstanding || 0)}</td>
    <td class="po-cell po-col">${poHtml}</td>
    <td class="earliest-po-col date-cell">${r.EarliestPoDate || ""}</td>
    <td class="earliest-po-col">${r.EarliestPoNumber || ""}</td>

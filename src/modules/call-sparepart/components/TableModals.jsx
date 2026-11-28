@@ -144,18 +144,22 @@ export function PoDetailsModal({ isOpen, onClose, material, description, poRawDa
                                                 <td style={{ ...cellStyle, textAlign: 'center' }}>
                                                     {isOverdue ? (
                                                         <span style={{
-                                                            background: '#fff3cd', color: '#856404',
-                                                            padding: '2px 8px', borderRadius: '4px',
-                                                            border: '1px solid #ffeeba', fontWeight: '600'
-                                                        }}>
+                                                            background: 'rgba(245, 158, 11, 0.24)',
+                                                            color: '#fde68a',
+                                                            padding: '2px 8px',
+                                                            borderRadius: '6px',
+                                                            border: '1px solid rgba(251, 191, 36, 0.58)',
+                                                            fontWeight: 700,
+                                                            display: 'inline-block'
+                                                        }} title="เลยกำหนดส่ง">
                                                             {calculatedDelivDateStr}
                                                         </span>
                                                     ) : calculatedDelivDateStr}
                                                 </td>
-                                                <td style={{ ...cellStyle, color: '#007bff' }}>{doc}</td>
+                                                <td style={{ ...cellStyle, color: '#7dd3fc', fontWeight: 600 }}>{doc}</td>
                                                 <td style={{ ...cellStyle }}>{supplier}</td>
-                                                <td style={{ ...cellStyle, textAlign: 'center', fontWeight: 'bold', color: 'var(--success-color)' }}>{qty}</td>
-                                                <td style={{ ...cellStyle, textAlign: 'center', color: 'var(--danger-color)', fontWeight: 'bold' }}>{leadtime}</td>
+                                                <td style={{ ...cellStyle, textAlign: 'center', fontWeight: 'bold', color: '#6ee7b7' }}>{qty}</td>
+                                                <td style={{ ...cellStyle, textAlign: 'center', color: '#fca5a5', fontWeight: 'bold' }}>{leadtime}</td>
                                             </tr>
                                         );
                                     })}
@@ -193,7 +197,7 @@ export function PoDetailsModal({ isOpen, onClose, material, description, poRawDa
                                 return (
                                     <div key={i} className="mobile-deck-card">
                                         <div className="deck-top">
-                                            <span className="deck-mat" style={{ color: '#007bff' }}>{doc}</span>
+                                            <span className="deck-mat" style={{ color: '#7dd3fc' }}>{doc}</span>
                                             <div className="deck-pills">
                                                 <span className="deck-pill green">จำนวน: {qty}</span>
                                                 {leadtime !== '-' && <span className="deck-pill dark-red">LT: {leadtime}</span>}
@@ -201,7 +205,7 @@ export function PoDetailsModal({ isOpen, onClose, material, description, poRawDa
                                         </div>
                                         <div className="deck-foot" style={{ borderTop: 'none', paddingTop: 0 }}>
                                             <span className="deck-desc">{supplier}</span>
-                                            <span className="deck-ans-date" style={isOverdue ? { color: '#856404', background: '#fff3cd', padding: '0 4px', borderRadius: 4, fontWeight: 700 } : undefined}>
+                                            <span className="deck-ans-date" style={isOverdue ? { color: '#fde68a', background: 'rgba(245, 158, 11, 0.24)', border: '1px solid rgba(251, 191, 36, 0.58)', padding: '1px 6px', borderRadius: 6, fontWeight: 700 } : undefined}>
                                                 ส่ง: {calculatedDelivDateStr}
                                             </span>
                                         </div>

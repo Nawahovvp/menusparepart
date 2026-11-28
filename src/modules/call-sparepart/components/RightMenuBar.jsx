@@ -3,21 +3,21 @@ import { formatStockAnswerLabel } from '../utils/helpers';
 import { getCusLogo } from '../utils/cusLogos';
 
 const STATUS_COLORS = {
-    "รอของเข้า": "var(--danger-color)",
-    "สำเร็จ": "var(--success-color)",
-    "ระหว่างขนส่ง": "var(--success-color)",
-    "เบิกนวนคร": "var(--info-color)",
-    "เบิกวิภาวดี": "#fd7e14",
-    "เบิกศูนย์อะไหล่": "var(--info-color)",
-    "รอตรวจสอบ": "var(--danger-color)",
-    "ดำเนินการแล้ว": "var(--success-color)",
-    "เกินLeadtime": "var(--danger-color)",
-    "ดึงจากคลังอื่น": "#3f51b5",
-    "เปิดรหัสใหม่": "#6f42c1",
-    "ขอซื้อขอซ่อม": "#20c997",
-    "SPACIAL": "#6c757d",
-    "รอทดแทน": "#ffc107",
-    "แจ้งCodeผิด": "#e83e8c"
+    "รอของเข้า": "#fca5a5",
+    "สำเร็จ": "#6ee7b7",
+    "ระหว่างขนส่ง": "#6ee7b7",
+    "เบิกนวนคร": "#7dd3fc",
+    "เบิกวิภาวดี": "#fdba74",
+    "เบิกศูนย์อะไหล่": "#7dd3fc",
+    "รอตรวจสอบ": "#fca5a5",
+    "ดำเนินการแล้ว": "#6ee7b7",
+    "เกินLeadtime": "#fca5a5",
+    "ดึงจากคลังอื่น": "#a5b4fc",
+    "เปิดรหัสใหม่": "#d8b4fe",
+    "ขอซื้อขอซ่อม": "#5eead4",
+    "SPACIAL": "#cbd5e1",
+    "รอทดแทน": "#fde047",
+    "แจ้งCodeผิด": "#f9a8d4"
 };
 
 function DrawerFilterGroup({ title, icon, options, activeValue, onSelect, useStatusColors, defaultOpen = true, sectioned = false, noWaitingByKey, percentByKey, formatLabel }) {

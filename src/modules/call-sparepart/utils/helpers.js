@@ -94,7 +94,7 @@ export function getDeptGroups(pendingUnit) {
 export function formatStockAnswerLabel(value) {
     const text = String(value ?? '').trim();
     if (text === 'ดำเนินการแล้ว') return 'Done';
-    if (text === 'รอตรวจสอบ') return 'Pending';
+    if (text === 'รอตรวจสอบ') return 'Wait';
     return text;
 }
 

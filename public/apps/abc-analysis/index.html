@@ -11,7 +11,7 @@
     <!-- CSS หลักของคุณ (แยกไฟล์แล้ว) -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="progress.css">
-    <link rel="stylesheet" href="glass-theme.css?v=20261128a">
+    <link rel="stylesheet" href="glass-theme.css?v=20261128g">
 
     <!-- ไอคอน + ฟอนต์ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -219,11 +219,23 @@
             <button id="logoutBtn">Log out</button>
         </div>
 
-        <div class="loader" id="loader" style="display: none;">
-            <div id="progress-container">
-                <div id="progress-bar"></div>
+        <div class="loader abc-startup-loader" id="loader" style="display: block;">
+            <div class="abc-loader-card">
+                <div class="abc-loader-rings" aria-hidden="true">
+                    <span class="abc-ring abc-ring-1"></span>
+                    <span class="abc-ring abc-ring-2"></span>
+                    <span class="abc-ring abc-ring-3"></span>
+                    <span class="abc-ring-core"><i class="fas fa-cubes"></i></span>
+                </div>
+                <div class="abc-loader-title">กำลังเตรียมระบบวิเคราะห์ ABC อะไหล่</div>
+                <div class="abc-loader-sub" id="progress-text">กำลังเชื่อมต่อฐานข้อมูลพนักงานและคลังสินค้า...</div>
+                <div id="progress-container" class="abc-progress-track">
+                    <div id="progress-bar" class="abc-progress-fill"></div>
+                </div>
+                <div class="abc-loader-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
             </div>
-            <div id="progress-text">Initializing...</div>
         </div>
         <button id="backBtn"><i class="fas fa-arrow-left"></i></button>
 
@@ -1017,11 +1029,11 @@
     <script src="utils.js"></script>
     <script src="progress.js"></script>
     <script src="calc.js"></script>
-    <script src="ui.js?v=20261128a"></script></script>
+    <script src="ui.js?v=20261128d"></script></script>
     <script src="auth.js"></script>
     <script src="api.js"></script>
     <script src="plant0301-calculations.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=20261128g"></script>
 
     <!-- Spinner overlay สำหรับสั่งนอกรอบ -->
     <div id="recOverlaySpinner" class="rec-overlay-spinner" style="display:none;">

@@ -3,14 +3,14 @@ import { DEPT_GROUPS, getDeptGroups, formatStockAnswerLabel } from '../utils/hel
 import { getCusLogo } from '../utils/cusLogos';
 
 const GROUP_TAG_COLORS = {
-    Stock: { bg: '#eff6ff', border: '#93c5fd', color: '#1d4ed8' },
-    วิศวกรรม: { bg: '#f3e8ff', border: '#c4b5fd', color: '#5b21b6' },
-    Repair: { bg: '#fff7ed', border: '#fdba74', color: '#c2410c' },
-    จัดซื้อ: { bg: '#ecfdf5', border: '#6ee7b7', color: '#047857' },
-    ลูกค้า: { bg: '#fdf2f8', border: '#f9a8d4', color: '#be185d' },
-    Sale: { bg: '#f5f3ff', border: '#c4b5fd', color: '#6d28d9' },
-    จัดส่ง: { bg: '#f1f5f9', border: '#cbd5e1', color: '#334155' },
-    อื่นๆ: { bg: '#f8fafc', border: '#cbd5e1', color: '#475569' }
+    Stock: { bg: 'rgba(59, 130, 246, 0.24)', border: 'rgba(96, 165, 250, 0.6)', color: '#bfdbfe', activeBg: 'rgba(37, 99, 235, 0.72)' },
+    วิศวกรรม: { bg: 'rgba(168, 85, 247, 0.24)', border: 'rgba(192, 132, 252, 0.6)', color: '#e9d5ff', activeBg: 'rgba(147, 51, 234, 0.72)' },
+    Repair: { bg: 'rgba(249, 115, 22, 0.24)', border: 'rgba(251, 146, 60, 0.6)', color: '#fed7aa', activeBg: 'rgba(234, 88, 12, 0.72)' },
+    จัดซื้อ: { bg: 'rgba(16, 185, 129, 0.24)', border: 'rgba(52, 211, 153, 0.6)', color: '#a7f3d0', activeBg: 'rgba(5, 150, 105, 0.72)' },
+    ลูกค้า: { bg: 'rgba(236, 72, 153, 0.24)', border: 'rgba(244, 114, 182, 0.6)', color: '#fbcfe8', activeBg: 'rgba(219, 39, 119, 0.72)' },
+    Sale: { bg: 'rgba(139, 92, 246, 0.24)', border: 'rgba(167, 139, 250, 0.6)', color: '#ddd6fe', activeBg: 'rgba(124, 58, 237, 0.72)' },
+    จัดส่ง: { bg: 'rgba(56, 189, 248, 0.24)', border: 'rgba(125, 211, 252, 0.6)', color: '#bae6fd', activeBg: 'rgba(2, 132, 199, 0.72)' },
+    อื่นๆ: { bg: 'rgba(148, 163, 184, 0.22)', border: 'rgba(203, 213, 225, 0.5)', color: '#e2e8f0', activeBg: 'rgba(71, 85, 105, 0.78)' }
 };
 
 export default function ControlPanel({
@@ -123,25 +123,45 @@ export default function ControlPanel({
         [otherPendingGroups]
     );
 
+    const togglePendingGroup = (group) => {
+        const groupKeys = group.items.map(([k]) => k);
+        if (groupKeys.length === 0) return;
+        const allSelected = groupKeys.every((k) => selectedPendingUnits.includes(k));
+        if (allSelected) {
+            onPendingUnitChange(selectedPendingUnits.filter((item) => !groupKeys.includes(item)));
+        } else {
+            const merged = Array.from(new Set([...selectedPendingUnits, ...groupKeys]));
+            onPendingUnitChange(merged);
+        }
+    };
+
     const renderPendingGroupBox = (group, isStock = false) => {
         const tagStyle = GROUP_TAG_COLORS[group.key] || GROUP_TAG_COLORS['อื่นๆ'];
+        const groupKeys = group.items.map(([k]) => k);
+        const isAllGroupSelected = groupKeys.length > 0 && groupKeys.every((k) => selectedPendingUnits.includes(k));
+        const isSomeGroupSelected = !isAllGroupSelected && groupKeys.some((k) => selectedPendingUnits.includes(k));
         return (
             <div
                 key={group.key}
                 className={`quick-unit-group-box ${isStock ? 'is-stock-box' : ''}`}
             >
-                <span
-                    className="quick-unit-group-tag"
+                <button
+                    type="button"
+                    className={`quick-unit-group-tag clickable-group-tag ${isAllGroupSelected ? 'active' : ''} ${isSomeGroupSelected ? 'partial' : ''}`}
                     style={{
-                        backgroundColor: tagStyle.bg,
-                        borderColor: tagStyle.border,
-                        color: tagStyle.color
+                        backgroundColor: isAllGroupSelected ? tagStyle.activeBg : tagStyle.bg,
+                        borderColor: isAllGroupSelected ? '#ffffff' : tagStyle.border,
+                        color: isAllGroupSelected ? '#ffffff' : tagStyle.color,
+                        cursor: 'pointer'
                     }}
-                    title={`กลุ่ม ${group.label} (${group.total})`}
+                    onClick={() => togglePendingGroup(group)}
+                    title={isAllGroupSelected
+                        ? `ยกเลิกกรองกลุ่ม ${group.label} ทั้งหมด`
+                        : `คลิกเพื่อแสดงค้างหน่วยงานทั้งหมดในกลุ่ม ${group.label} (${group.total} รายการ)`}
                 >
                     <span>{group.label}</span>
                     <span className="quick-unit-group-total">{group.total}</span>
-                </span>
+                </button>
                 <div className="quick-unit-chips">
                     {group.items.map(([key, count]) => {
                         const isActive = selectedPendingUnits.includes(key);

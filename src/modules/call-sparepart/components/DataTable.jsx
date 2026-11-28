@@ -341,14 +341,14 @@ export default function DataTable({
                                         {/* Rebuilt */}
                                         <td data-column="Rebuilt" style={{ textAlign: 'center' }}>
                                             {row['Rebuilt'] && String(row['Rebuilt']).trim() !== '-' && String(row['Rebuilt']).trim() !== '0' ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#0d6efd', color: '#fff', cursor: 'pointer' }}
+                                                <span className="request-pill call-soft-pill pill-blue clickable"
                                                     title="คลิกเพื่อดูสต็อกพื้นที่อื่นของอะไหล่ทดแทน"
                                                     onClick={(e) => { e.stopPropagation(); onRebuiltClick?.(row); }}>{row['Rebuilt']}</span>
                                             ) : ''}
                                         </td>
                                         <td data-column="จำนวน" style={{ textAlign: 'center' }}>
                                             {row['จำนวน'] !== undefined && row['จำนวน'] !== null && row['จำนวน'] !== '' ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#8b0000', color: '#fff' }}>
+                                                <span className="request-pill call-soft-pill pill-red">
                                                     {row['จำนวน']}
                                                 </span>
                                             ) : ''}
@@ -356,60 +356,64 @@ export default function DataTable({
                                         {/* PR */}
                                         <td data-column="PR" style={{ textAlign: 'center' }}>
                                             {prVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#e83e8c', color: '#fff', cursor: 'pointer' }}
+                                                <span className="request-pill call-soft-pill pill-pink clickable"
                                                     onClick={(e) => { e.stopPropagation(); onPrClick?.(row); }}>{row['PR']}</span>
                                             ) : ''}
                                         </td>
                                         {/* PO */}
                                         <td data-column="PO" style={{ textAlign: 'center' }}>
                                             {poVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#0d6efd', color: '#fff', cursor: 'pointer' }}
+                                                <span className="request-pill call-soft-pill pill-sky clickable"
                                                     onClick={(e) => { e.stopPropagation(); onPoClick?.(row); }}>{row['PO']}</span>
                                             ) : ''}
                                         </td>
                                         {/* Nawa */}
                                         <td data-column="Nawa" style={{ textAlign: 'center' }}>
                                             {nawaVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: 'var(--success-color)', color: '#fff', cursor: 'pointer' }}
+                                                <span className="request-pill call-soft-pill pill-green clickable"
                                                     onClick={(e) => { e.stopPropagation(); onNawaClick?.(row); }}>{row['Nawa']}</span>
                                             ) : ''}
                                         </td>
                                         {/* Vipa */}
                                         <td data-column="Vipa" style={{ textAlign: 'center' }}>
                                             {vipaVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#fd7e14', color: '#fff' }}>{row['Vipa']}</span>
+                                                <span className="request-pill call-soft-pill pill-amber">{row['Vipa']}</span>
                                             ) : ''}
                                         </td>
                                         {/* Request */}
                                         <td data-column="Request" style={{ textAlign: 'center' }}>
-                                            {requestVal > 0 ? (<span className="request-pill">{row['Request']}</span>) : ''}
+                                            {requestVal > 0 ? (<span className="request-pill call-soft-pill pill-teal">{row['Request']}</span>) : ''}
                                         </td>
                                         {/* EngQty (ช่าง) */}
                                         <td data-column="EngQty" style={{ textAlign: 'center' }}>
                                             {pf(row['EngQty']) > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: row['hasMatchingEngTeam'] ? '#fd7e14' : '#17a2b8', color: '#fff', cursor: 'pointer' }}
+                                                <span className={`request-pill call-soft-pill ${row['hasMatchingEngTeam'] ? 'pill-amber' : 'pill-cyan'} clickable`}
                                                     onClick={(e) => { e.stopPropagation(); onEngClick?.(row); }}>{row['EngQty']}</span>
                                             ) : ''}
                                         </td>
                                         {/* QtyPlant */}
                                         <td data-column="QtyPlant" style={{ textAlign: 'center' }}>
                                             {qtyPlantVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#6f42c1', color: '#fff' }}>{row['QtyPlant']}</span>
+                                                <span className="request-pill call-soft-pill pill-purple">{row['QtyPlant']}</span>
                                             ) : ''}
                                         </td>
                                         {/* OtherPlant */}
                                         <td data-column="OtherPlant" style={{ textAlign: 'center' }}>
                                             {otherPlantVal > 0 ? (
-                                                <span className="request-pill" style={{ backgroundColor: '#e91e63', color: '#fff', cursor: 'pointer' }}
+                                                <span className="request-pill call-soft-pill pill-rose clickable"
                                                     onClick={(e) => { e.stopPropagation(); onOtherPlantClick?.(row); }}>{row['OtherPlant']}</span>
                                             ) : ''}
                                         </td>
                                         {/* StatusCall (StatusX) */}
-                                        <td data-column="StatusCall" className={row._isManualStatusX ? 'manual-indicator' : ''} style={{
-                                            cursor: 'pointer', textDecoration: 'underline',
-                                            color: getStatusColor(statusXVal), fontWeight: 'bold'
-                                        }} onClick={(e) => { e.stopPropagation(); onStatusXClick?.(row); }}>
-                                            {statusXVal}
+                                        <td data-column="StatusCall" className={row._isManualStatusX ? 'manual-indicator' : ''} onClick={(e) => { e.stopPropagation(); onStatusXClick?.(row); }} style={{ cursor: 'pointer' }}>
+                                            <span style={{
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline',
+                                                color: getStatusColor(statusXVal),
+                                                fontWeight: 'bold'
+                                            }}>
+                                                {statusXVal}
+                                            </span>
                                             {row._isManualStatusX && <span className="manual-pill">Manual</span>}
                                         </td>
                                         {spans['วันที่ตอบ'] > 0 && (
@@ -418,11 +422,10 @@ export default function DataTable({
                                         {spans['UserAns'] > 0 && (
                                             <td data-column="UserAns" {...mergedProps('UserAns')}>
                                                 {row['UserAns'] ? (
-                                                    <span className="request-pill" style={{
-                                                        backgroundColor: row['คลังตอบ'] === 'ดำเนินการแล้ว' ? 'var(--success-color)' :
-                                                            row['คลังตอบ'] === 'รอตรวจสอบ' ? 'var(--danger-color)' : '#6c757d',
-                                                        color: '#fff'
-                                                    }}>{row['UserAns']}</span>
+                                                    <span className={`request-pill call-soft-pill ${
+                                                        row['คลังตอบ'] === 'ดำเนินการแล้ว' ? 'pill-green' :
+                                                        row['คลังตอบ'] === 'รอตรวจสอบ' ? 'pill-red' : 'pill-slate'
+                                                    }`}>{row['UserAns']}</span>
                                                 ) : ''}
                                             </td>
                                         )}
@@ -433,13 +436,20 @@ export default function DataTable({
                                             </td>
                                         )}
                                         {/* คลังตอบ */}
-                                        {spans['คลังตอบ'] > 0 && (
-                                            <td data-column="คลังตอบ" {...mergedProps('คลังตอบ')} style={{
-                                                color: row['คลังตอบ'] === 'รอตรวจสอบ' ? 'var(--danger-color)' :
-                                                    row['คลังตอบ'] === 'ดำเนินการแล้ว' ? 'var(--success-color)' : 'inherit',
-                                                fontWeight: ['รอตรวจสอบ', 'ดำเนินการแล้ว'].includes(row['คลังตอบ']) ? 'bold' : 'normal'
-                                            }}>{formatStockAnswerLabel(row['คลังตอบ'])}</td>
-                                        )}
+                                        {spans['คลังตอบ'] > 0 && (() => {
+                                            const ansRaw = String(row['คลังตอบ'] || '').trim();
+                                            const ansLabel = formatStockAnswerLabel(ansRaw);
+                                            const ansPillClass = ansRaw === 'รอตรวจสอบ' ? 'pill-red'
+                                                : ansRaw === 'ดำเนินการแล้ว' ? 'pill-green'
+                                                : '';
+                                            return (
+                                                <td data-column="คลังตอบ" {...mergedProps('คลังตอบ')} style={{ textAlign: 'center' }}>
+                                                    {ansPillClass ? (
+                                                        <span className={`call-soft-pill ${ansPillClass}`}>{ansLabel}</span>
+                                                    ) : ansLabel}
+                                                </td>
+                                            );
+                                        })()}
                                         {/* Detail */}
                                         {spans['detail'] > 0 && (
                                             <td data-column="detail" {...mergedProps('detail')}>
@@ -604,17 +614,17 @@ export default function DataTable({
                                                         {engVal > 0 && <span className="deck-pill cyan" onClick={(e) => { e.stopPropagation(); onEngClick?.(row); }}>ช่าง:{row['EngQty']}</span>}
                                                         {qtyPlantVal > 0 && <span className="deck-pill purple">คลัง:{row['QtyPlant']}</span>}
                                                         {otherPlantVal > 0 && <span className="deck-pill magenta" onClick={(e) => { e.stopPropagation(); onOtherPlantClick?.(row); }}>อื่น:{row['OtherPlant']}</span>}
-                                                        {row['คลังตอบ'] && (
-                                                            <span
-                                                                className="deck-ans-text"
-                                                                style={{
-                                                                    color: row['คลังตอบ'] === 'รอตรวจสอบ' ? 'var(--danger-color)' :
-                                                                        row['คลังตอบ'] === 'ดำเนินการแล้ว' ? 'var(--success-color)' : '#475569'
-                                                                }}
-                                                            >
-                                                                {formatStockAnswerLabel(row['คลังตอบ'])}
-                                                            </span>
-                                                        )}
+                                                        {row['คลังตอบ'] && (() => {
+                                                            const ansRaw = String(row['คลังตอบ'] || '').trim();
+                                                            const ansLabel = formatStockAnswerLabel(ansRaw);
+                                                            if (ansRaw === 'รอตรวจสอบ') {
+                                                                return <span className="deck-pill dark-red">{ansLabel}</span>;
+                                                            }
+                                                            if (ansRaw === 'ดำเนินการแล้ว') {
+                                                                return <span className="deck-pill green">{ansLabel}</span>;
+                                                            }
+                                                            return <span className="deck-ans-text">{ansLabel}</span>;
+                                                        })()}
                                                         {row['UserAns'] && <span className="deck-ans-user">{row['UserAns']}</span>}
                                                     </div>
                                                     {idx === group.items.length - 1 && (
@@ -667,11 +677,21 @@ function formatAnswerDate(value) {
 function cleanTeamPlant(tp) { return (tp || "").replace(/Stock\s*/gi, '').trim(); }
 function getStatusColor(status) {
     const c = {
-        "รอของเข้า": "var(--danger-color)", "เกินLeadtime": "#8b0000", "ดึงจากคลังอื่น": "#3f51b5",
-        "เปิดรหัสใหม่": "#6f42c1", "สำเร็จ": "var(--success-color)", "ระหว่างขนส่ง": "var(--success-color)",
-        "เบิกนวนคร": "var(--info-color)", "เบิกศูนย์อะไหล่": "var(--info-color)", "เบิกวิภาวดี": "#fd7e14",
-        "เบิกทดแทน": "#0891b2", "มีอะไหล่ในทีม": "#059669",
-        "ขอซื้อขอซ่อม": "#20c997", "SPACIAL": "#6c757d", "รอทดแทน": "#ffc107", "แจ้งCodeผิด": "var(--danger-color)"
+        "รอของเข้า": "#f87171",
+        "เกินLeadtime": "#fb7185",
+        "ดึงจากคลังอื่น": "#818cf8",
+        "เปิดรหัสใหม่": "#c084fc",
+        "สำเร็จ": "#34d399",
+        "ระหว่างขนส่ง": "#6ee7b7",
+        "เบิกนวนคร": "#38bdf8",
+        "เบิกศูนย์อะไหล่": "#67e8f9",
+        "เบิกวิภาวดี": "#fb923c",
+        "เบิกทดแทน": "#22d3ee",
+        "มีอะไหล่ในทีม": "#a3e635",
+        "ขอซื้อขอซ่อม": "#2dd4bf",
+        "SPACIAL": "#cbd5e1",
+        "รอทดแทน": "#fde047",
+        "แจ้งCodeผิด": "#f472b6"
     };
-    return c[status] || "#6c757d";
+    return c[status] || "#94a3b8";
 }

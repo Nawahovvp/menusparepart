@@ -226,8 +226,9 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
     }, [data]);
 
     const normAllocMat = normalizeMaterial(allocMaterial);
-    const parsedAllocQty = parseFloat(String(allocQty).replace(/,/g, ''));
-    const isAllocationMode = Boolean(normAllocMat && !isNaN(parsedAllocQty) && parsedAllocQty > 0);
+    const hasQtyInput = String(allocQty).trim() !== '';
+    const parsedAllocQty = hasQtyInput ? (parseFloat(String(allocQty).replace(/,/g, '')) || 0) : 0;
+    const isAllocationMode = Boolean(normAllocMat);
 
     const summaryData = useMemo(() => {
         if (!data || data.length === 0) return null;
@@ -329,8 +330,15 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
             ? exactRows
             : data.filter((row) => normalizeMaterial(row["Material"] || "").includes(normAllocMat));
 
-        // Sort by ผ่านมา (DayRepair) descending, then Ticket Number ascending
-        const sortedRows = [...matchedRows].sort((a, b) => {
+        const matchedDesc = matchedRows.length > 0
+            ? (String(getDesc(matchedRows[0]) || "").trim() || "-")
+            : "-";
+        const matchedMatCode = matchedRows.length > 0
+            ? (String(matchedRows[0]["Material"] || "").replace(/^'/, '').trim() || allocMaterial)
+            : allocMaterial;
+
+        // First allocate globally in urgency order: DayRepair descending, then Ticket ascending
+        const urgencySorted = [...matchedRows].sort((a, b) => {
             const dayA = parseFloat(a["DayRepair"]) || 0;
             const dayB = parseFloat(b["DayRepair"]) || 0;
             if (dayB !== dayA) return dayB - dayA;
@@ -340,49 +348,58 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
         const remainingEng = new Map();
         engByMatTeam.forEach((val, key) => remainingEng.set(key, val.qty));
 
-        let remainingPool = parsedAllocQty;
+        let remainingPool = Math.max(0, parsedAllocQty);
         let totalAllocated = 0;
         let totalDeductedEng = 0;
-        let totalRequested = 0;
-        const rows = [];
+        let totalPendingQty = 0;
+        let allocatedTicketCount = 0;
+        const allEvaluated = [];
 
-        for (const row of sortedRows) {
+        for (const row of urgencySorted) {
             const matKey = normalizeMaterial(row["Material"] || "");
             const material = String(row["Material"] || "").replace(/^'/, '').trim() || "-";
             const description = String(getDesc(row) || "").trim() || "-";
-            const storeName = String(row["Brand"] || row["Store Name"] || "").trim() || "-";
+            const storeName = String(row["Brand"] ?? row["Store Name"] ?? row["StoreName"] ?? row["สาขา"] ?? row["ร้าน"] ?? "").trim() || "-";
             const ticket = String(row["Ticket Number"] || "").trim() || "-";
             const tp = getCleanTeamPlant(row["TeamPlant"]) || "ไม่ระบุ";
             const team = String(row["Team"] || "").trim() || "ไม่ระบุ";
-            const dayRepair = !isNaN(parseFloat(row["DayRepair"])) ? Math.floor(parseFloat(row["DayRepair"])) : 0;
+            const rawDays = parseFloat(String(row["DayRepair"] ?? row["ผ่านมา"] ?? "0").replace(/,/g, ""));
+            const dayRepair = !isNaN(rawDays) ? Math.floor(rawDays) : 0;
             const reqQty = parseFloat(String(row["จำนวน"] ?? "1").replace(/,/g, "")) || 1;
+
+            totalPendingQty += reqQty;
 
             const engKey = `${matKey}__${team}`;
             const availEng = remainingEng.get(engKey) || 0;
             const deductedEng = Math.min(reqQty, availEng);
-            const netNeed = Math.max(0, reqQty - deductedEng);
-
-            if (netNeed > 0 && remainingPool <= 0) {
-                continue;
-            }
-
             if (deductedEng > 0) {
                 remainingEng.set(engKey, availEng - deductedEng);
             }
 
-            const allocatedQty = netNeed > 0 ? Math.min(netNeed, remainingPool) : 0;
+            const netNeed = Math.max(0, reqQty - deductedEng);
+            const allocatedQty = (hasQtyInput && netNeed > 0 && remainingPool > 0)
+                ? Math.min(netNeed, remainingPool)
+                : 0;
             remainingPool -= allocatedQty;
 
-            totalRequested += reqQty;
             totalDeductedEng += deductedEng;
             totalAllocated += allocatedQty;
 
-            let allocStatus = 'ได้เบิกครบ';
-            if (netNeed === 0) allocStatus = 'ใช้จากช่างในทีม';
-            else if (allocatedQty < netNeed) allocStatus = `ได้เบิกบางส่วน (${allocatedQty}/${netNeed})`;
+            if (hasQtyInput && allocatedQty <= 0) {
+                continue;
+            }
+            if (allocatedQty > 0) allocatedTicketCount += 1;
 
-            rows.push({
-                key: `${ticket}_${matKey}_${rows.length}`,
+            const allocStatus = hasQtyInput
+                ? (allocatedQty >= netNeed ? 'เบิกได้ครบ' : `เบิกได้บางส่วน (${allocatedQty}/${netNeed})`)
+                : 'ระบุจำนวนเพื่อคำนวณเบิก';
+
+            const withdrawDisplay = allocatedQty > 0
+                ? allocatedQty.toLocaleString()
+                : 'รอระบุจำนวน';
+
+            allEvaluated.push({
+                key: `${ticket}_${matKey}_${allEvaluated.length}`,
                 ticket,
                 storeName,
                 dayRepair,
@@ -393,24 +410,116 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                 reqQty,
                 deductedEng,
                 allocatedQty,
+                withdrawDisplay,
+                stillPending: Math.max(0, reqQty - (allocatedQty + deductedEng)),
                 allocStatus,
                 sampleRow: row
             });
-
-            if (remainingPool <= 0) break;
         }
 
+        // Group by ศูนย์พื้นที่ -> Team, order groups by max DayRepair descending, and within each Team sort DayRepair descending
+        const tpBuckets = new Map();
+        allEvaluated.forEach((item) => {
+            if (!tpBuckets.has(item.teamPlant)) {
+                tpBuckets.set(item.teamPlant, {
+                    teamPlant: item.teamPlant,
+                    maxDay: item.dayRepair,
+                    teams: new Map()
+                });
+            }
+            const tpGroup = tpBuckets.get(item.teamPlant);
+            if (item.dayRepair > tpGroup.maxDay) tpGroup.maxDay = item.dayRepair;
+
+            if (!tpGroup.teams.has(item.team)) {
+                tpGroup.teams.set(item.team, {
+                    team: item.team,
+                    maxDay: item.dayRepair,
+                    items: []
+                });
+            }
+            const teamGroup = tpGroup.teams.get(item.team);
+            if (item.dayRepair > teamGroup.maxDay) teamGroup.maxDay = item.dayRepair;
+            teamGroup.items.push(item);
+        });
+
+        const sortedTpGroups = [...tpBuckets.values()].sort((a, b) =>
+            (b.maxDay - a.maxDay) || a.teamPlant.localeCompare(b.teamPlant, 'th', { numeric: true, sensitivity: 'base' })
+        );
+
+        const groupedRows = [];
+        let groupCounter = 0;
+        sortedTpGroups.forEach((tpObj) => {
+            const sortedTeams = [...tpObj.teams.values()].sort((a, b) =>
+                (b.maxDay - a.maxDay) || a.team.localeCompare(b.team, 'th', { numeric: true, sensitivity: 'base' })
+            );
+            // Each team adds 1 summary header row ("รวมเบิกได้") + its detail items
+            const tpTotalRows = sortedTeams.reduce((s, t) => s + t.items.length + 1, 0);
+            let tpPrinted = false;
+
+            sortedTeams.forEach((teamObj) => {
+                // Sort items inside Team by ผ่านมา (วัน) descending
+                teamObj.items.sort((a, b) => (b.dayRepair - a.dayRepair) || a.ticket.localeCompare(b.ticket));
+                const teamReqTotal = teamObj.items.reduce((s, x) => s + x.reqQty, 0);
+                const teamAllocTotal = teamObj.items.reduce((s, x) => s + x.allocatedQty, 0);
+                const teamEngTotal = teamObj.items.reduce((s, x) => s + x.deductedEng, 0);
+                const currentGroupIdx = groupCounter++;
+                const teamSpan = teamObj.items.length + 1;
+
+                const teamWithdrawDisplay = hasQtyInput
+                    ? teamAllocTotal.toLocaleString()
+                    : '-';
+
+                // Insert Team summary row ("รวมเบิกได้") at top of Team block
+                groupedRows.push({
+                    key: `team_sum_${tpObj.teamPlant}_${teamObj.team}_${currentGroupIdx}`,
+                    isTeamSummary: true,
+                    teamPlant: tpObj.teamPlant,
+                    team: teamObj.team,
+                    storeName: 'รวมเบิกได้',
+                    teamGroupIdx: currentGroupIdx,
+                    tpRowSpan: !tpPrinted ? tpTotalRows : 0,
+                    teamRowSpan: teamSpan,
+                    isLastInTeam: false,
+                    teamReqTotal,
+                    teamAllocTotal,
+                    teamEngTotal,
+                    withdrawDisplay: teamWithdrawDisplay
+                });
+                tpPrinted = true;
+
+                teamObj.items.forEach((item, idxInTeam) => {
+                    groupedRows.push({
+                        ...item,
+                        isTeamSummary: false,
+                        teamGroupIdx: currentGroupIdx,
+                        tpRowSpan: 0,
+                        teamRowSpan: 0,
+                        isLastInTeam: idxInTeam === teamObj.items.length - 1,
+                        teamReqTotal,
+                        teamAllocTotal,
+                        teamEngTotal
+                    });
+                });
+            });
+        });
+
+        const detailRowsCount = groupedRows.filter((r) => !r.isTeamSummary).length;
+
         return {
+            hasQtyInput,
+            matchedMatCode,
+            matchedDesc,
             inputQty: parsedAllocQty,
-            totalMatchedTickets: sortedRows.length,
-            allocatedTickets: rows.length,
-            totalRequested,
+            totalMatchedTickets: urgencySorted.length,
+            allocatedTickets: allocatedTicketCount,
+            detailRowsCount,
+            totalRequested: totalPendingQty,
             totalDeductedEng,
             totalAllocated,
             remainingPool,
-            rows
+            rows: groupedRows
         };
-    }, [isAllocationMode, data, normAllocMat, parsedAllocQty, engByMatTeam]);
+    }, [isAllocationMode, hasQtyInput, data, normAllocMat, parsedAllocQty, engByMatTeam, allocMaterial]);
 
     const handlePrint = () => {
         const printContent = document.getElementById('summary-print-area');
@@ -438,21 +547,37 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
         let filename = `Call_Summary_${dateStr}.csv`;
 
         if (isAllocationMode && allocationData?.rows?.length) {
-            const headers = ['ลำดับ', 'ศูนย์พื้นที่', 'Material', 'Team', 'Store Name', 'ผ่านมา(วัน)', 'ขอเบิก', 'หักช่าง', 'ได้เบิก', 'หมายเหตุ'];
+            const headers = ['ศูนย์พื้นที่', 'Team', 'Store Name', 'ผ่านมา (วัน)', 'เบิกได้'];
+            const totalWithdrawText = allocationData.hasQtyInput
+                ? allocationData.totalAllocated.toLocaleString()
+                : '-';
             lines = [
                 headers.map(escapeCsv).join(','),
-                ...allocationData.rows.map((r, idx) => [
-                    idx + 1,
-                    r.teamPlant,
-                    r.material,
-                    r.team,
-                    r.storeName,
-                    r.dayRepair,
-                    r.reqQty,
-                    r.deductedEng,
-                    r.allocatedQty,
-                    r.allocStatus
-                ].map(escapeCsv).join(','))
+                ...allocationData.rows.map((r) => {
+                    if (r.isTeamSummary) {
+                        return [
+                            r.tpRowSpan > 0 ? r.teamPlant : '',
+                            r.teamRowSpan > 0 ? r.team : '',
+                            'รวมเบิกได้',
+                            '',
+                            r.withdrawDisplay
+                        ].map(escapeCsv).join(',');
+                    }
+                    return [
+                        '',
+                        '',
+                        r.ticket && r.ticket !== '-' ? `${r.storeName} (${r.ticket})` : r.storeName,
+                        `${r.dayRepair} วัน`,
+                        r.withdrawDisplay
+                    ].map(escapeCsv).join(',');
+                }),
+                [
+                    `รวมทั้งหมด (${allocationData.detailRowsCount} รายการ)`,
+                    '',
+                    '',
+                    '',
+                    totalWithdrawText
+                ].map(escapeCsv).join(',')
             ];
             filename = `Call_Allocation_${normAllocMat}_${dateStr}.csv`;
         } else if (summaryData?.flatRows?.length) {
@@ -495,7 +620,7 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                             type="button"
                             className="action-button premium-button"
                             onClick={handleExportCsv}
-                            disabled={!summaryData?.flatRows?.length}
+                            disabled={isAllocationMode ? !allocationData?.rows?.length : !summaryData?.flatRows?.length}
                             title="Export CSV"
                             aria-label="Export CSV"
                             style={{ padding: '6px 10px', fontSize: '14px' }}
@@ -520,20 +645,21 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                         <div style={{ textAlign: 'center', padding: '32px' }}>ไม่มีข้อมูล</div>
                     ) : (
                         <div id="summary-print-area">
-                            {/* Allocation Calculator Bar */}
+                            {/* Allocation Calculator Bar (Dark Frosted Glass) */}
                             <div style={{
                                 display: 'flex',
                                 flexWrap: 'wrap',
                                 alignItems: 'center',
                                 gap: '8px',
-                                padding: '9px 12px',
+                                padding: '10px 14px',
                                 marginBottom: '12px',
-                                borderRadius: '10px',
-                                background: '#f8fbff',
-                                border: '1px solid #bfdbfe'
+                                borderRadius: '12px',
+                                background: 'rgba(15, 23, 42, 0.62)',
+                                border: '1px solid rgba(148, 163, 184, 0.28)',
+                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)'
                             }}>
-                                <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e3a8a', display: 'inline-flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}>
-                                    <i className="fas fa-calculator" style={{ color: '#2563eb' }}></i>
+                                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#bae6fd', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                                    <i className="fas fa-calculator" style={{ color: '#38bdf8' }}></i>
                                     คำนวณจัดสรรเบิก:
                                 </span>
                                 <input
@@ -543,11 +669,13 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                     value={allocMaterial}
                                     onChange={(e) => setAllocMaterial(e.target.value)}
                                     style={{
-                                        padding: '5px 10px',
+                                        padding: '6px 10px',
                                         borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
+                                        border: '1px solid rgba(148, 163, 184, 0.35)',
+                                        background: 'rgba(12, 18, 34, 0.72)',
+                                        color: '#f8fafc',
                                         fontSize: '12.5px',
-                                        width: '155px',
+                                        width: '165px',
                                         fontWeight: 600
                                     }}
                                 />
@@ -563,11 +691,13 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                     value={allocQty}
                                     onChange={(e) => setAllocQty(e.target.value)}
                                     style={{
-                                        padding: '5px 10px',
+                                        padding: '6px 10px',
                                         borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
+                                        border: '1px solid rgba(148, 163, 184, 0.35)',
+                                        background: 'rgba(12, 18, 34, 0.72)',
+                                        color: '#f8fafc',
                                         fontSize: '12.5px',
-                                        width: '92px',
+                                        width: '96px',
                                         fontWeight: 700
                                     }}
                                 />
@@ -576,11 +706,11 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                         type="button"
                                         onClick={() => { setAllocMaterial(''); setAllocQty(''); }}
                                         style={{
-                                            padding: '5px 10px',
+                                            padding: '6px 11px',
                                             borderRadius: '8px',
-                                            border: '1px solid #cbd5e1',
-                                            background: '#ffffff',
-                                            color: '#475569',
+                                            border: '1px solid rgba(248, 113, 113, 0.5)',
+                                            background: 'rgba(239, 68, 68, 0.22)',
+                                            color: '#fecaca',
                                             fontSize: '12px',
                                             fontWeight: 600,
                                             cursor: 'pointer'
@@ -590,11 +720,31 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                     </button>
                                 )}
                                 {isAllocationMode && allocationData && (
-                                    <span style={{ fontSize: '12px', color: '#0f766e', fontWeight: 700, marginLeft: 'auto' }}>
-                                        จัดสรรได้ {allocationData.totalAllocated.toLocaleString()} / {allocationData.inputQty.toLocaleString()} ชิ้น
-                                        {allocationData.totalDeductedEng > 0 ? ` (หักช่าง ${allocationData.totalDeductedEng.toLocaleString()})` : ''}
-                                        {allocationData.remainingPool > 0 ? ` • คงเหลือ ${allocationData.remainingPool.toLocaleString()}` : ''}
-                                    </span>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginLeft: 'auto', fontSize: '12px' }}>
+                                        {allocationData.matchedDesc && allocationData.matchedDesc !== '-' && (
+                                            <span style={{ color: '#cbd5e1', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${allocationData.matchedMatCode} — ${allocationData.matchedDesc}`}>
+                                                <strong style={{ color: '#7dd3fc' }}>{allocationData.matchedMatCode}</strong>: {allocationData.matchedDesc}
+                                            </span>
+                                        )}
+                                        <span style={{
+                                            padding: '3px 9px',
+                                            borderRadius: '6px',
+                                            background: allocationData.hasQtyInput ? 'rgba(16, 185, 129, 0.22)' : 'rgba(56, 189, 248, 0.2)',
+                                            border: allocationData.hasQtyInput ? '1px solid rgba(52, 211, 153, 0.5)' : '1px solid rgba(125, 211, 252, 0.45)',
+                                            color: allocationData.hasQtyInput ? '#6ee7b7' : '#bae6fd',
+                                            fontWeight: 700,
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            {allocationData.hasQtyInput ? (
+                                                <>
+                                                    เบิกได้ {allocationData.totalAllocated.toLocaleString()} / {allocationData.inputQty.toLocaleString()} ชิ้น
+                                                    {allocationData.remainingPool > 0 ? ` • เหลือ ${allocationData.remainingPool.toLocaleString()}` : ''}
+                                                </>
+                                            ) : (
+                                                <>กรอกช่อง "จำนวน" เพื่อคำนวณโควตาเบิก</>
+                                            )}
+                                        </span>
+                                    </div>
                                 )}
                             </div>
 
@@ -605,20 +755,21 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                 marginBottom: '12px'
                             }}>
                                 <div className="stat-card" style={{
-                                    background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-                                    color: 'white',
+                                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.52), rgba(29, 78, 216, 0.38))',
+                                    border: '1px solid rgba(96, 165, 250, 0.45)',
+                                    color: '#f8fafc',
                                     padding: '10px 12px',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px'
                                 }}>
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0, color: '#bfdbfe' }}>
                                         <i className="fas fa-phone-alt"></i>
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '11px', opacity: 0.9 }}>{isAllocationMode ? 'Ticket ที่ได้เบิก' : 'จำนวน Call'}</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15 }}>
+                                        <div style={{ fontSize: '11px', color: '#cbd5e1' }}>{isAllocationMode ? 'รายการที่เบิกได้ / ค้างทั้งหมด' : 'จำนวน Call'}</div>
+                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15, color: '#ffffff' }}>
                                             {isAllocationMode && allocationData
                                                 ? `${allocationData.allocatedTickets} / ${allocationData.totalMatchedTickets}`
                                                 : summaryData.totalCalls.toLocaleString()}
@@ -627,42 +778,44 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                 </div>
 
                                 <div className="stat-card" style={{
-                                    background: 'linear-gradient(135deg, #0d9488, #0f766e)',
-                                    color: 'white',
+                                    background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.52), rgba(15, 118, 110, 0.38))',
+                                    border: '1px solid rgba(45, 212, 191, 0.45)',
+                                    color: '#f8fafc',
                                     padding: '10px 12px',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px'
                                 }}>
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
-                                        <i className={isAllocationMode ? 'fas fa-user-cog' : 'fas fa-users'}></i>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0, color: '#99f6e4' }}>
+                                        <i className={isAllocationMode ? 'fas fa-boxes' : 'fas fa-users'}></i>
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '11px', opacity: 0.9 }}>{isAllocationMode ? 'หักจากช่างในทีม' : 'Material / Team'}</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15 }}>
+                                        <div style={{ fontSize: '11px', color: '#cbd5e1' }}>{isAllocationMode ? 'ค้างอยู่รวมทั้งหมด' : 'Material / Team'}</div>
+                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15, color: '#ffffff' }}>
                                             {isAllocationMode && allocationData
-                                                ? `${allocationData.totalDeductedEng.toLocaleString()} ชิ้น`
+                                                ? `${allocationData.totalRequested.toLocaleString()} ชิ้น`
                                                 : `${summaryData.totalMaterialCount.toLocaleString()} / ${summaryData.teamCount}`}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="stat-card" style={{
-                                    background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                                    color: 'white',
+                                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.52), rgba(109, 40, 217, 0.38))',
+                                    border: '1px solid rgba(192, 132, 252, 0.45)',
+                                    color: '#f8fafc',
                                     padding: '10px 12px',
                                     borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px'
                                 }}>
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0, color: '#e9d5ff' }}>
                                         <i className="fas fa-cubes"></i>
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: '11px', opacity: 0.9 }}>{isAllocationMode ? 'เบิกจ่ายจริง / คงเหลือ' : 'จำนวนรวมทั้งหมด'}</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15 }}>
+                                        <div style={{ fontSize: '11px', color: '#cbd5e1' }}>{isAllocationMode ? 'เบิกได้รวม / ของเหลือ' : 'จำนวนรวมทั้งหมด'}</div>
+                                        <div style={{ fontSize: '18px', fontWeight: '800', lineHeight: 1.15, color: '#ffffff' }}>
                                             {isAllocationMode && allocationData
                                                 ? `${allocationData.totalAllocated.toLocaleString()} / ${allocationData.remainingPool.toLocaleString()}`
                                                 : `${summaryData.grandTotalQty.toLocaleString()} ชิ้น`}
@@ -671,118 +824,148 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                 </div>
                             </div>
 
-                            <div style={{
-                                background: '#ffffff',
-                                borderRadius: '10px',
-                                border: '1px solid #e2e8f0',
-                                overflow: 'hidden'
-                            }}>
+                            <div className="compact-table-wrapper summary-compact-wrap" style={{ overflow: 'hidden' }}>
                                 <div style={{ maxHeight: '58vh', overflow: 'auto' }}>
                                     {isAllocationMode && allocationData ? (
                                         allocationData.rows.length === 0 ? (
-                                            <div style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                                            <div style={{ textAlign: 'center', padding: '24px', color: '#94a3b8', fontSize: '12px' }}>
                                                 ไม่พบรายการ Material "{allocMaterial}" ในตารางที่กรองปัจจุบัน
                                             </div>
                                         ) : (
-                                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+                                            <table className="summary-mini-table">
                                                 <thead>
-                                                    <tr style={{ background: '#f1f5f9', color: '#1e293b' }}>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 8px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'center', width: '40px' }}>#</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap' }}>ศูนย์พื้นที่</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap' }}>Material</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap' }}>Team</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left' }}>Store Name</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 8px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'center', whiteSpace: 'nowrap', width: '74px' }}>ผ่านมา ▼</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 8px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'right', whiteSpace: 'nowrap', width: '66px' }}>ขอเบิก</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 8px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'right', whiteSpace: 'nowrap', width: '66px' }}>หักช่าง</th>
-                                                        <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', textAlign: 'right', whiteSpace: 'nowrap', width: '76px' }}>ได้เบิก</th>
+                                                    <tr>
+                                                        <th style={{ width: '105px', textAlign: 'left' }}>ศูนย์พื้นที่</th>
+                                                        <th style={{ width: '105px', textAlign: 'left' }}>Team</th>
+                                                        <th style={{ textAlign: 'left' }}>Store Name</th>
+                                                        <th style={{ width: '92px', textAlign: 'center' }}>ผ่านมา (วัน) ▼</th>
+                                                        <th style={{ width: '110px', textAlign: 'center' }}>เบิกได้</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {allocationData.rows.map((r, idx) => (
-                                                        <tr key={r.key} className="summary-row-hover" style={{ background: idx % 2 === 0 ? '#ffffff' : '#f8fafc' }} title={`Ticket: ${r.ticket}`}>
-                                                            <td style={{ padding: '5px 8px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', textAlign: 'center', color: '#64748b', fontWeight: 600 }}>{idx + 1}</td>
-                                                            <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', fontWeight: 600, color: '#1e3a8a', whiteSpace: 'nowrap' }}>{r.teamPlant}</td>
-                                                            <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }} title={r.description}>{r.material}</td>
-                                                            <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>{r.team}</td>
-                                                            <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', color: '#334155' }}>{r.storeName}</td>
-                                                            <td style={{ padding: '5px 8px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', textAlign: 'center', fontWeight: 700, color: r.dayRepair > 7 ? '#dc2626' : '#334155', whiteSpace: 'nowrap' }}>{r.dayRepair} วัน</td>
-                                                            <td style={{ padding: '5px 8px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', textAlign: 'right', fontWeight: 600 }}>{r.reqQty.toLocaleString()}</td>
-                                                            <td style={{ padding: '5px 8px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', textAlign: 'right', fontWeight: 700, color: r.deductedEng > 0 ? '#ea580c' : '#cbd5e1' }}>
-                                                                {r.deductedEng > 0 ? r.deductedEng.toLocaleString() : '-'}
-                                                            </td>
-                                                            <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', textAlign: 'right', fontWeight: 800, color: r.allocatedQty > 0 ? '#16a34a' : '#0d9488', whiteSpace: 'nowrap' }} title={r.allocStatus}>
-                                                                {r.allocatedQty > 0 ? r.allocatedQty.toLocaleString() : 'จากช่าง'}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                    <tr style={{ background: '#eff6ff', fontWeight: 800 }}>
-                                                        <td colSpan={6} style={{ padding: '7px 10px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#1e3a8a' }}>
-                                                            รวมจัดสรร ({allocationData.allocatedTickets} รายการ)
+                                                    {allocationData.rows.map((r) => {
+                                                        const isEvenGroup = r.teamGroupIdx % 2 === 0;
+                                                        const rowBg = r.isTeamSummary
+                                                            ? 'rgba(30, 58, 138, 0.36)'
+                                                            : (isEvenGroup ? 'rgba(15, 23, 42, 0.42)' : 'rgba(30, 41, 59, 0.36)');
+                                                        const rowClass = [
+                                                            'summary-row-hover',
+                                                            r.isTeamSummary ? 'team-sum-row' : '',
+                                                            r.isLastInTeam ? 'team-end-row' : ''
+                                                        ].filter(Boolean).join(' ');
+
+                                                        return (
+                                                            <tr key={r.key} className={rowClass} style={{ background: rowBg }} title={r.isTeamSummary ? `สรุปยอดทีม ${r.team}` : `Ticket: ${r.ticket} • ${r.allocStatus}`}>
+                                                                {r.tpRowSpan > 0 && (
+                                                                    <td
+                                                                        rowSpan={r.tpRowSpan}
+                                                                        className="tp-group-cell"
+                                                                    >
+                                                                        {r.teamPlant}
+                                                                    </td>
+                                                                )}
+                                                                {r.teamRowSpan > 0 && (
+                                                                    <td
+                                                                        rowSpan={r.teamRowSpan}
+                                                                        className="team-group-cell"
+                                                                        style={{ background: isEvenGroup ? 'rgba(15, 23, 42, 0.54)' : 'rgba(30, 41, 59, 0.48)' }}
+                                                                    >
+                                                                        <div>{r.team}</div>
+                                                                    </td>
+                                                                )}
+                                                                {r.isTeamSummary ? (
+                                                                    <>
+                                                                        <td style={{ fontWeight: 700, color: '#fde68a' }}>
+                                                                            รวมเบิกได้
+                                                                        </td>
+                                                                        <td></td>
+                                                                        <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                                                            <span className="mini-pill team-sum-pill">
+                                                                                {r.withdrawDisplay}
+                                                                            </span>
+                                                                        </td>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <td className="store-cell">
+                                                                            <span className="store-name-txt">{r.storeName}</span>
+                                                                            {r.ticket && r.ticket !== '-' && (
+                                                                                <span className="ticket-sub-txt">({r.ticket})</span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                                                            <span className={r.dayRepair > 7 ? 'mini-pill red' : 'days-normal'}>
+                                                                                {r.dayRepair} วัน
+                                                                            </span>
+                                                                        </td>
+                                                                        <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                                                            {r.allocatedQty > 0 ? (
+                                                                                <span className={`mini-pill ${r.stillPending > 0 ? 'sky' : 'green'}`}>
+                                                                                    {r.allocatedQty.toLocaleString()}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="mini-pill muted" title="กรอกช่อง 'จำนวน' ด้านบนเพื่อคำนวณเบิกได้">
+                                                                                    รอระบุจำนวน
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                    </>
+                                                                )}
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                    <tr className="summary-total-row">
+                                                        <td colSpan={4} style={{ textAlign: 'right', color: '#bae6fd' }}>
+                                                            รวมเบิกได้ทั้งหมด ({allocationData.detailRowsCount} รายการ{allocationData.totalMatchedTickets > allocationData.detailRowsCount ? ` จากค้างทั้งหมด ${allocationData.totalMatchedTickets}` : ''})
                                                         </td>
-                                                        <td style={{ padding: '7px 8px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#334155' }}>
-                                                            {allocationData.totalRequested.toLocaleString()}
-                                                        </td>
-                                                        <td style={{ padding: '7px 8px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#ea580c' }}>
-                                                            {allocationData.totalDeductedEng.toLocaleString()}
-                                                        </td>
-                                                        <td style={{ padding: '7px 10px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#16a34a' }}>
-                                                            {allocationData.totalAllocated.toLocaleString()}
+                                                        <td style={{ textAlign: 'center', color: '#6ee7b7' }}>
+                                                            {allocationData.hasQtyInput ? allocationData.totalAllocated.toLocaleString() : '-'}
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         )
                                     ) : (
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+                                    <table className="summary-mini-table">
                                         <thead>
-                                            <tr style={{ background: '#f1f5f9', color: '#1e293b' }}>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap', width: '110px' }}>Material ▲</th>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left' }}>Description</th>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap', width: '115px' }}>ศูนย์พื้นที่</th>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'left', whiteSpace: 'nowrap', width: '120px' }}>Team</th>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', borderRight: '1px solid #e2e8f0', textAlign: 'center', whiteSpace: 'nowrap', width: '70px' }}>ช่าง</th>
-                                                <th style={{ position: 'sticky', top: 0, zIndex: 5, background: '#f1f5f9', padding: '7px 10px', borderBottom: '2px solid #cbd5e1', textAlign: 'right', whiteSpace: 'nowrap', width: '80px' }}>จำนวนรวม</th>
+                                            <tr>
+                                                <th style={{ width: '105px', textAlign: 'left' }}>Material ▲</th>
+                                                <th style={{ textAlign: 'left' }}>Description</th>
+                                                <th style={{ width: '105px', textAlign: 'left' }}>ศูนย์พื้นที่</th>
+                                                <th style={{ width: '110px', textAlign: 'left' }}>Team</th>
+                                                <th style={{ width: '62px', textAlign: 'center' }}>ช่าง</th>
+                                                <th style={{ width: '78px', textAlign: 'right' }}>จำนวนรวม</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {summaryData.flatRows.map((r) => {
-                                                const groupBg = r.matIdx % 2 === 0 ? '#ffffff' : '#f8fafc';
+                                                const groupBg = r.matIdx % 2 === 0 ? 'rgba(15, 23, 42, 0.42)' : 'rgba(30, 41, 59, 0.34)';
                                                 return (
                                                     <tr key={r.key} className="summary-row-hover" style={{ background: groupBg }}>
                                                         {r.matRowSpan > 0 && (
                                                             <>
                                                                 <td
                                                                     rowSpan={r.matRowSpan}
-                                                                    style={{
-                                                                        padding: '5px 10px',
-                                                                        borderBottom: '1px solid #cbd5e1',
-                                                                        borderRight: '1px solid #e2e8f0',
-                                                                        fontWeight: 700,
-                                                                        color: '#0f172a',
-                                                                        background: r.matIdx % 2 === 0 ? '#f8fbff' : '#f1f5f9',
-                                                                        verticalAlign: 'middle',
-                                                                        whiteSpace: 'nowrap'
-                                                                    }}
+                                                                    className="tp-group-cell"
+                                                                    style={{ verticalAlign: 'middle' }}
                                                                 >
                                                                     <div
-                                                                        style={{ cursor: 'pointer', textDecoration: 'underline', color: '#1d4ed8' }}
-                                                                        title="คลิกเพื่อนำรหัสไปคำนวณจัดสรรเบิก"
+                                                                        style={{ cursor: 'pointer', textDecoration: 'underline', color: '#7dd3fc', fontWeight: 700 }}
+                                                                        title="คลิกเพื่อดูรายละเอียดและคำนวณจัดสรรเบิก"
                                                                         onClick={() => setAllocMaterial(r.material)}
                                                                     >
                                                                         {r.material}
                                                                     </div>
                                                                     {r.matRowSpan > 1 && (
-                                                                        <div style={{ fontSize: '10.5px', fontWeight: 600, color: '#2563eb' }}>รวม {r.matTotalQty.toLocaleString()}</div>
+                                                                        <div className="team-sub-stat" style={{ color: '#93c5fd' }}>รวม {r.matTotalQty.toLocaleString()}</div>
                                                                     )}
                                                                 </td>
                                                                 <td
                                                                     rowSpan={r.matRowSpan}
                                                                     style={{
-                                                                        padding: '5px 10px',
-                                                                        borderBottom: '1px solid #cbd5e1',
-                                                                        borderRight: '1px solid #e2e8f0',
-                                                                        color: '#334155',
+                                                                        borderBottom: '1px solid rgba(148, 163, 184, 0.28)',
+                                                                        borderRight: '1px solid rgba(148, 163, 184, 0.18)',
+                                                                        color: '#e2e8f0',
                                                                         verticalAlign: 'middle'
                                                                     }}
                                                                 >
@@ -790,37 +973,37 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                                                                 </td>
                                                             </>
                                                         )}
-                                                        <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', fontWeight: 600, color: '#1e3a8a', whiteSpace: 'nowrap' }}>
+                                                        <td style={{ fontWeight: 600, color: '#bae6fd', whiteSpace: 'nowrap' }}>
                                                             {r.teamPlant}
                                                         </td>
-                                                        <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>
+                                                        <td style={{ fontWeight: 600, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
                                                             {r.team}
                                                         </td>
-                                                        <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', borderRight: '1px solid #f1f5f9', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                                                        <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                                                             {r.teamEngQty > 0 ? (
                                                                 <span
-                                                                    className="request-pill"
-                                                                    style={{ backgroundColor: '#fd7e14', color: '#fff', cursor: onEngClick ? 'pointer' : 'default' }}
+                                                                    className="mini-pill amber"
+                                                                    style={{ cursor: onEngClick ? 'pointer' : 'default' }}
                                                                     title={r.teamEngTitle || `อะไหล่ในทีม ${r.team}`}
                                                                     onClick={() => onEngClick?.(r.sampleRow)}
                                                                 >
                                                                     {r.teamEngQty.toLocaleString()}
                                                                 </span>
                                                             ) : (
-                                                                <span style={{ color: '#cbd5e1' }}>-</span>
+                                                                <span style={{ color: '#64748b' }}>-</span>
                                                             )}
                                                         </td>
-                                                        <td style={{ padding: '5px 10px', borderBottom: '1px solid #edf2f7', textAlign: 'right', fontWeight: 800, color: '#1d4ed8', whiteSpace: 'nowrap' }}>
+                                                        <td style={{ textAlign: 'right', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>
                                                             {r.totalQty.toLocaleString()}
                                                         </td>
                                                     </tr>
                                                 );
                                             })}
-                                            <tr style={{ background: '#eff6ff', fontWeight: 800 }}>
-                                                <td colSpan={5} style={{ padding: '7px 10px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#1e3a8a' }}>
+                                            <tr className="summary-total-row">
+                                                <td colSpan={5} style={{ textAlign: 'right', color: '#bae6fd' }}>
                                                     รวมทั้งหมด
                                                 </td>
-                                                <td style={{ padding: '7px 10px', borderTop: '2px solid #93c5fd', textAlign: 'right', color: '#1d4ed8', whiteSpace: 'nowrap' }}>
+                                                <td style={{ textAlign: 'right', color: '#93c5fd', whiteSpace: 'nowrap' }}>
                                                     {summaryData.grandTotalQty.toLocaleString()}
                                                 </td>
                                             </tr>
@@ -834,16 +1017,149 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                 </div>
             </div>
             <style>{`
-                .summary-row-hover:hover {
-                    background-color: #f1f8ff !important;
+                .summary-mini-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 11.5px;
+                    line-height: 1.25;
+                    color: #f1f5f9;
                 }
-                .summary-row-hover:hover td {
-                    background-color: #f1f8ff !important;
+                .summary-mini-table thead th {
+                    position: sticky;
+                    top: 0;
+                    zIndex: 5;
+                    z-index: 5;
+                    background: rgba(15, 23, 42, 0.94);
+                    color: #f8fafc;
+                    font-size: 11px;
+                    font-weight: 700;
+                    padding: 5px 8px;
+                    border-bottom: 1.5px solid rgba(148, 163, 184, 0.35);
+                    border-right: 1px solid rgba(148, 163, 184, 0.16);
+                    white-space: nowrap;
+                }
+                .summary-mini-table thead th:last-child {
+                    border-right: none;
+                }
+                .summary-mini-table tbody td {
+                    padding: 3.5px 8px;
+                    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+                    border-right: 1px solid rgba(148, 163, 184, 0.14);
+                    vertical-align: middle;
+                }
+                .summary-mini-table tbody td:last-child {
+                    border-right: none;
+                }
+                .summary-mini-table tr.team-end-row > td {
+                    border-bottom: 1.5px solid rgba(148, 163, 184, 0.38);
+                }
+                .summary-mini-table td.tp-group-cell {
+                    background: rgba(15, 23, 42, 0.64);
+                    border-bottom: 1.5px solid rgba(148, 163, 184, 0.42);
+                    border-right: 1px solid rgba(148, 163, 184, 0.24);
+                    font-weight: 700;
+                    color: #bae6fd;
+                    vertical-align: top;
+                    white-space: nowrap;
+                    padding: 5px 8px;
+                }
+                .summary-mini-table td.team-group-cell {
+                    border-bottom: 1.5px solid rgba(148, 163, 184, 0.38);
+                    border-right: 1px solid rgba(148, 163, 184, 0.22);
+                    font-weight: 700;
+                    color: #f1f5f9;
+                    vertical-align: top;
+                    white-space: nowrap;
+                    padding: 5px 8px;
+                }
+                .summary-mini-table .team-sub-stat {
+                    font-size: 10px;
+                    font-weight: 600;
+                    color: #94a3b8;
+                    margin-top: 1px;
+                }
+                .summary-mini-table td.store-cell {
+                    color: #e2e8f0;
+                    max-width: 280px;
+                }
+                .summary-mini-table .store-name-txt {
+                    color: #f1f5f9;
+                    font-weight: 500;
+                }
+                .summary-mini-table .ticket-sub-txt {
+                    margin-left: 5px;
+                    font-size: 10px;
+                    color: #94a3b8;
+                }
+                .summary-mini-table .days-normal {
+                    color: #e2e8f0;
+                    font-weight: 600;
+                    font-size: 11px;
+                }
+                .summary-mini-table .mini-pill {
+                    display: inline-block;
+                    padding: 1px 6px;
+                    border-radius: 5px;
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    line-height: 1.25;
+                    min-width: 22px;
+                    text-align: center;
+                }
+                .summary-mini-table .mini-pill.red {
+                    background: rgba(239, 68, 68, 0.24);
+                    border: 1px solid rgba(248, 113, 113, 0.55);
+                    color: #fecaca;
+                }
+                .summary-mini-table .mini-pill.amber {
+                    background: rgba(245, 158, 11, 0.22);
+                    border: 1px solid rgba(251, 191, 36, 0.52);
+                    color: #fde68a;
+                }
+                .summary-mini-table .mini-pill.green {
+                    background: rgba(16, 185, 129, 0.26);
+                    border: 1px solid rgba(52, 211, 153, 0.6);
+                    color: #6ee7b7;
+                }
+                .summary-mini-table .mini-pill.sky {
+                    background: rgba(56, 189, 248, 0.24);
+                    border: 1px solid rgba(125, 211, 252, 0.58);
+                    color: #bae6fd;
+                }
+                .summary-mini-table .mini-pill.teal {
+                    background: rgba(20, 184, 166, 0.24);
+                    border: 1px solid rgba(45, 212, 191, 0.55);
+                    color: #99f6e4;
+                }
+                .summary-mini-table .mini-pill.muted {
+                    background: rgba(148, 163, 184, 0.15);
+                    border: 1px solid rgba(148, 163, 184, 0.3);
+                    color: #94a3b8;
+                    font-weight: 600;
+                }
+                .summary-mini-table .mini-pill.team-sum-pill {
+                    background: rgba(245, 158, 11, 0.28);
+                    border: 1px solid rgba(251, 191, 36, 0.68);
+                    color: #fde68a;
+                    font-weight: 800;
+                    font-size: 11px;
+                }
+                .summary-mini-table tr.team-sum-row > td {
+                    border-bottom: 1px solid rgba(147, 197, 253, 0.32);
+                }
+                .summary-mini-table tr.summary-total-row td {
+                    background: rgba(15, 23, 42, 0.82);
+                    border-top: 1.5px solid rgba(96, 165, 250, 0.55);
+                    padding: 6px 8px;
+                    font-weight: 800;
+                }
+                .summary-row-hover:hover {
+                    background-color: rgba(56, 189, 248, 0.16) !important;
                 }
                 .premium-button {
-                    background: rgba(255,255,255,0.2);
+                    background: rgba(255,255,255,0.16);
                     color: white;
-                    border: 1px solid rgba(255,255,255,0.3);
+                    border: 1px solid rgba(255,255,255,0.28);
                     padding: 8px 16px;
                     border-radius: 10px;
                     font-weight: 500;
@@ -851,7 +1167,7 @@ export function SummaryModal({ isOpen, onClose, data = [], engData = [], onEngCl
                     transition: all 0.2s;
                 }
                 .premium-button:hover {
-                    background: rgba(255,255,255,0.3);
+                    background: rgba(255,255,255,0.28);
                     transform: translateY(-1px);
                 }
                 @media print {

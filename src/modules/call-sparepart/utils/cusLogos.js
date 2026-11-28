@@ -18,7 +18,8 @@ const CUS_LOGO_RULES = [
     { match: ['สเวนเซ่นส์', 'swensen'], logo: '/logos/swensens.png', shortName: "Swensen's" },
     { match: ['ลูกค้ารายย่อย'], logo: '/logos/retail.svg', shortName: 'ลูกค้ารายย่อย' },
     { match: ['ยาโยอิ', 'yayoi'], logo: '/logos/yayoi.png', shortName: 'Yayoi' },
-    { match: ['oishi', 'โออิชิ'], logo: '/logos/oishi.png', shortName: 'Oishi' }
+    { match: ['oishi', 'โออิชิ'], logo: '/logos/oishi.png', shortName: 'Oishi' },
+    { match: ['ซีพีเอฟ เทรดดิ้ง', 'ซีพีเอฟ', 'cpf trading', 'cpf'], logo: '/logos/cpf-trading.svg', shortName: 'CPF Trading' }
 ];
 
 export function getCusLogo(companyName) {

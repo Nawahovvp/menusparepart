@@ -1,7 +1,8 @@
 export const MENU_ITEMS = [
   {
     id: 'spareparts-request',
-    type: 'none',
+    type: 'external',
+    externalUrl: 'https://sparepartpartsgov5.vercel.app/',
     title: 'ค้นหาอะไหล่',
     subtitle: 'Spare Parts Search & Request',
     color1: '#f59e0b',

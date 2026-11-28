@@ -246,9 +246,23 @@ body.theme-day {
 }
 
 .quick-unit-group-tag {
-  background: rgba(30, 41, 59, 0.72) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
-  color: #f1f5f9 !important;
+  background: rgba(30, 41, 59, 0.72);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #f1f5f9;
+  transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease;
+}
+
+.quick-unit-group-tag.clickable-group-tag:hover {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+
+.quick-unit-group-tag.clickable-group-tag.active {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45), 0 4px 12px rgba(0, 0, 0, 0.32) !important;
+}
+
+.quick-unit-group-tag.clickable-group-tag.partial {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
 }
 
 .quick-unit-chip {
@@ -610,4 +624,461 @@ body.theme-day {
 /* Standalone Spare Summary PRG & pill text legibility */
 .compact-table td span {
   color: #f8fafc !important;
+}
+
+/* ==========================================================================
+   Filter Drawer / Popup (.right-drawer) — Unified Dark Frosted Glass Theme
+   ========================================================================== */
+.right-drawer {
+  background: rgba(12, 18, 34, 0.88) !important;
+  backdrop-filter: blur(22px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(175%) !important;
+  border-left: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: -14px 0 40px rgba(0, 0, 0, 0.48) !important;
+  color: #f8fafc !important;
+}
+
+.right-drawer-header {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 58, 138, 0.55)) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24) !important;
+}
+
+.right-drawer-title,
+.right-drawer-title span {
+  color: #f8fafc !important;
+}
+
+.right-drawer-title i {
+  color: #7dd3fc !important;
+}
+
+.right-drawer-close {
+  background: rgba(30, 41, 59, 0.72) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #e2e8f0 !important;
+}
+
+.right-drawer-close:hover {
+  background: rgba(239, 68, 68, 0.32) !important;
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+}
+
+.drawer-reset-all-btn {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  color: #fecaca !important;
+}
+
+.drawer-reset-all-btn:hover {
+  background: rgba(239, 68, 68, 0.36) !important;
+  border-color: rgba(252, 165, 165, 0.8) !important;
+  color: #ffffff !important;
+}
+
+.drawer-accordion {
+  background: rgba(15, 23, 42, 0.56) !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.drawer-accordion-header {
+  background: rgba(30, 41, 59, 0.58) !important;
+  color: #f8fafc !important;
+}
+
+.drawer-accordion-header:hover {
+  background: rgba(51, 65, 85, 0.68) !important;
+}
+
+.drawer-accordion-title,
+.drawer-accordion-title span {
+  color: #f8fafc !important;
+}
+
+.drawer-accordion-title i {
+  color: #7dd3fc !important;
+}
+
+.drawer-active-dot {
+  background: #38bdf8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+}
+
+.drawer-accordion-arrow {
+  color: #cbd5e1 !important;
+}
+
+.drawer-accordion-body {
+  background: rgba(12, 18, 34, 0.38) !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+.drawer-clear-section {
+  background: rgba(30, 41, 59, 0.56) !important;
+  border: 1px dashed rgba(148, 163, 184, 0.42) !important;
+  color: #e2e8f0 !important;
+}
+
+.drawer-clear-section:hover {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border-color: rgba(248, 113, 113, 0.6) !important;
+  color: #fecaca !important;
+}
+
+.drawer-sub-section + .drawer-sub-section {
+  border-top-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+.drawer-sub-label {
+  color: #94a3b8 !important;
+}
+
+/* Filter Chips inside Drawer */
+.right-drawer .drawer-filter-chip {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  color: #f1f5f9;
+}
+
+.right-drawer .drawer-filter-chip .drawer-chip-label {
+  color: inherit !important;
+}
+
+.right-drawer .drawer-filter-chip:hover {
+  background: rgba(51, 65, 85, 0.85) !important;
+  border-color: rgba(186, 230, 253, 0.55);
+}
+
+.right-drawer .drawer-filter-chip .drawer-chip-count {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+}
+
+.right-drawer .drawer-filter-chip.clear {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.42), rgba(5, 150, 105, 0.32)) !important;
+  border-color: rgba(110, 231, 183, 0.68) !important;
+  color: #d1fae5 !important;
+}
+
+.right-drawer .drawer-filter-chip.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.78), rgba(29, 78, 216, 0.72)) !important;
+  border-color: rgba(147, 197, 253, 0.9) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.38) !important;
+}
+
+.right-drawer .drawer-filter-chip.active .drawer-chip-count {
+  background: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+}
+
+/* Customer Chips inside Drawer */
+.right-drawer .drawer-cus-chip {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #f8fafc !important;
+}
+
+.right-drawer .drawer-cus-chip span {
+  color: #f8fafc !important;
+}
+
+.right-drawer .drawer-cus-chip:hover {
+  background: rgba(51, 65, 85, 0.85) !important;
+  border-color: rgba(147, 197, 253, 0.6) !important;
+}
+
+.right-drawer .drawer-cus-chip.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.78), rgba(29, 78, 216, 0.72)) !important;
+  border-color: rgba(147, 197, 253, 0.9) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.38) !important;
+}
+
+/* Active filter strip buttons in ControlPanel */
+.active-filter-chip button {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #f8fafc !important;
+}
+
+.active-filter-chip button:hover {
+  background: rgba(239, 68, 68, 0.75) !important;
+  color: #ffffff !important;
+}
+
+.active-filters-clear-all {
+  color: #fca5a5 !important;
+}
+
+/* ==========================================================================
+   Call Sparepart Soft Glassmorphic Table Badges (matching ABC Analysis tone)
+   Columns: ศูนย์พื้นที่, ทดแทน, จำนวน, PR, PO, นวนคร, วิภาวดี, นอกรอบ, ช่าง, คลังพื้นที่, พื้นที่อื่น, ผู้แจ้ง
+   ========================================================================== */
+.table-container .call-soft-pill,
+.table-container td[data-column="Rebuilt"] .call-soft-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px !important;
+  min-width: 22px;
+  border-radius: 6px !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: none !important;
+}
+
+.table-container .call-soft-pill.clickable {
+  cursor: pointer;
+  transition: transform 0.14s ease, filter 0.14s ease;
+}
+
+.table-container .call-soft-pill.clickable:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.16);
+}
+
+/* ศูนย์พื้นที่ & ผู้แจ้ง (ทั่วไป) */
+.table-container .call-soft-pill.pill-slate {
+  background: rgba(148, 163, 184, 0.22) !important;
+  border: 1px solid rgba(203, 213, 225, 0.45) !important;
+  color: #e2e8f0 !important;
+}
+
+/* ศูนย์พื้นที่ Mismatch (ค้าง กทม แต่ไม่ใช่ กทม/SA) */
+.table-container .teamplant-mismatch-pill,
+.mobile-deck-card .teamplant-mismatch-pill {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border: 1px solid rgba(248, 113, 113, 0.58) !important;
+  color: #fecaca !important;
+  border-radius: 6px !important;
+  padding: 2px 7px !important;
+  font-size: 10.5px !important;
+}
+
+/* ทดแทน (Blue) */
+.table-container .call-soft-pill.pill-blue,
+.table-container td[data-column="Rebuilt"] .call-soft-pill.pill-blue,
+.mobile-deck-card .deck-pill.blue {
+  background: rgba(59, 130, 246, 0.26) !important;
+  border: 1px solid rgba(96, 165, 250, 0.58) !important;
+  color: #bfdbfe !important;
+}
+
+/* จำนวน & ผู้แจ้งรอตรวจสอบ (Red) */
+.table-container .call-soft-pill.pill-red,
+.mobile-deck-card .deck-pill.dark-red {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  color: #fecaca !important;
+}
+
+/* PR (Pink) */
+.table-container .call-soft-pill.pill-pink,
+.mobile-deck-card .deck-pill.pink {
+  background: rgba(236, 72, 153, 0.25) !important;
+  border: 1px solid rgba(244, 114, 182, 0.58) !important;
+  color: #fbcfe8 !important;
+}
+
+/* PO (Sky Blue) */
+.table-container .call-soft-pill.pill-sky {
+  background: rgba(56, 189, 248, 0.24) !important;
+  border: 1px solid rgba(125, 211, 252, 0.55) !important;
+  color: #bae6fd !important;
+}
+
+/* นวนคร & ผู้แจ้งดำเนินการแล้ว (Emerald Green) */
+.table-container .call-soft-pill.pill-green,
+.mobile-deck-card .deck-pill.green {
+  background: rgba(16, 185, 129, 0.24) !important;
+  border: 1px solid rgba(52, 211, 153, 0.55) !important;
+  color: #6ee7b7 !important;
+}
+
+/* วิภาวดี & ช่างตรงทีม (Amber / Orange) */
+.table-container .call-soft-pill.pill-amber,
+.mobile-deck-card .deck-pill.orange {
+  background: rgba(245, 158, 11, 0.25) !important;
+  border: 1px solid rgba(251, 191, 36, 0.58) !important;
+  color: #fde68a !important;
+}
+
+/* นอกรอบ (Teal) */
+.table-container .call-soft-pill.pill-teal,
+.mobile-deck-card .deck-pill.teal {
+  background: rgba(20, 184, 166, 0.25) !important;
+  border: 1px solid rgba(45, 212, 191, 0.58) !important;
+  color: #99f6e4 !important;
+}
+
+/* ช่างทั่วไป (Cyan) */
+.table-container .call-soft-pill.pill-cyan,
+.mobile-deck-card .deck-pill.cyan {
+  background: rgba(6, 182, 212, 0.25) !important;
+  border: 1px solid rgba(34, 211, 238, 0.58) !important;
+  color: #a5f3fc !important;
+}
+
+/* คลังพื้นที่ (Purple) */
+.table-container .call-soft-pill.pill-purple,
+.mobile-deck-card .deck-pill.purple {
+  background: rgba(168, 85, 247, 0.26) !important;
+  border: 1px solid rgba(192, 132, 252, 0.58) !important;
+  color: #e9d5ff !important;
+}
+
+/* พื้นที่อื่น & เกินLeadtime (Rose / Magenta) */
+.table-container .call-soft-pill.pill-rose,
+.mobile-deck-card .deck-pill.magenta {
+  background: rgba(244, 63, 94, 0.25) !important;
+  border: 1px solid rgba(251, 113, 133, 0.58) !important;
+  color: #fecdd3 !important;
+}
+
+/* มีอะไหล่ในทีม (Lime) */
+.table-container .call-soft-pill.pill-lime {
+  background: rgba(132, 204, 22, 0.25) !important;
+  border: 1px solid rgba(163, 230, 53, 0.58) !important;
+  color: #d9f99d !important;
+}
+
+/* รอทดแทน (Yellow) */
+.table-container .call-soft-pill.pill-yellow {
+  background: rgba(234, 179, 8, 0.25) !important;
+  border: 1px solid rgba(250, 204, 21, 0.58) !important;
+  color: #fef08a !important;
+}
+
+/* ==========================================================================
+   Top-Right Header Action Buttons & Quick Settings Popover (Dark Glass Theme)
+   ========================================================================== */
+.app-header .header-actions {
+  gap: 8px;
+}
+
+.app-header .header-icon-group {
+  background: rgba(15, 23, 42, 0.48);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 3px;
+  border-radius: 12px;
+  gap: 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.app-header .header-divider {
+  background: rgba(148, 163, 184, 0.26) !important;
+  height: 20px;
+  margin: 0 2px;
+}
+
+.app-header .header-refresh-btn {
+  background: rgba(30, 41, 59, 0.65) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+.app-header .header-icon-group .header-refresh-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-header .header-refresh-btn:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.22) !important;
+  border-color: rgba(125, 211, 252, 0.6) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
+}
+
+.app-header .header-refresh-btn.active,
+.app-header .header-refresh-btn.is-loading {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.72), rgba(29, 78, 216, 0.62)) !important;
+  border-color: rgba(147, 197, 253, 0.85) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.35), 0 4px 12px rgba(37, 99, 235, 0.36) !important;
+}
+
+.app-header .header-icon-badge {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.9) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.45);
+}
+
+/* Quick Settings Popover (Top-Right Gear Menu) */
+.quick-setting-popover {
+  background: rgba(12, 18, 34, 0.9) !important;
+  backdrop-filter: blur(22px) saturate(175%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(175%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+.quick-setting-popover .sheet-title,
+.quick-setting-popover .sheet-user .name,
+.quick-setting-popover .sheet-toggle-title {
+  color: #f8fafc !important;
+}
+
+.quick-setting-popover .sheet-user .meta,
+.quick-setting-popover .sheet-toggle-desc {
+  color: #cbd5e1 !important;
+}
+
+.quick-setting-popover .sheet-close {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #e2e8f0 !important;
+}
+
+.quick-setting-popover .sheet-close:hover {
+  background: rgba(239, 68, 68, 0.32) !important;
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  color: #fecaca !important;
+}
+
+.quick-setting-popover .sheet-toggle-row {
+  background: rgba(15, 23, 42, 0.62) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+
+.quick-setting-popover .sheet-badge {
+  background: rgba(99, 102, 241, 0.24) !important;
+  border-color: rgba(165, 180, 252, 0.48) !important;
+  color: #e0e7ff !important;
+}
+
+.quick-setting-popover .sheet-badge.success {
+  background: rgba(16, 185, 129, 0.24) !important;
+  border-color: rgba(52, 211, 153, 0.5) !important;
+  color: #6ee7b7 !important;
+}
+
+.quick-setting-popover .header-button.ghost {
+  background: rgba(30, 41, 59, 0.68) !important;
+  border: 1px solid rgba(148, 163, 184, 0.32) !important;
+  color: #f1f5f9 !important;
+}
+
+.quick-setting-popover .header-button.ghost:hover {
+  background: rgba(56, 189, 248, 0.24) !important;
+  border-color: rgba(125, 211, 252, 0.58) !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+  .app-header .header-icon-group {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
 }

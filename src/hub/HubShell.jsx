@@ -191,6 +191,13 @@ export default function HubShell({
       return;
     }
 
+    if (item.type === 'external' && item.externalUrl) {
+      setPreviewedMenu(item);
+      applyAdaptiveTheme(item);
+      window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
     // Only enabled apps (internal React modules or same-origin embedded apps) have an action
     if (item.type !== 'internal' && item.type !== 'embedded') {
       return;
@@ -439,7 +446,11 @@ export default function HubShell({
                 const hasActiveChild = isGroup && item.children.some((c) => activeMenu?.id === c.id);
                 const isActive = activeMenu?.id === item.id || hasActiveChild;
                 const isGroupOpen = isGroup && (Boolean(expandedGroups[item.id]) || Boolean(q) || hasActiveChild);
-                const hasAction = isGroup || item.type === 'internal' || item.type === 'embedded';
+                const hasAction =
+                  isGroup ||
+                  item.type === 'internal' ||
+                  item.type === 'embedded' ||
+                  Boolean(item.type === 'external' && item.externalUrl);
 
                 const visibleChildren = isGroup
                   ? item.children.filter((child) => {
@@ -638,14 +649,18 @@ export default function HubShell({
                 type="button"
                 className="stage-hero-icon"
                 title={
-                  previewedMenu?.type === 'internal' || previewedMenu?.type === 'embedded'
+                  previewedMenu?.type === 'internal' ||
+                  previewedMenu?.type === 'embedded' ||
+                  previewedMenu?.type === 'external'
                     ? `คลิกเพื่อเปิด ${previewedMenu.title}`
                     : previewedMenu?.title || 'เลือกเมนูจากแถบด้านซ้าย'
                 }
                 aria-label="คลิกที่โลโก้เพื่อเปิดระบบนี้"
                 style={{
                   cursor:
-                    previewedMenu?.type === 'internal' || previewedMenu?.type === 'embedded'
+                    previewedMenu?.type === 'internal' ||
+                    previewedMenu?.type === 'embedded' ||
+                    previewedMenu?.type === 'external'
                       ? 'pointer'
                       : 'default',
                 }}

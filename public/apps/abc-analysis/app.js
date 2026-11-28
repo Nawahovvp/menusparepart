@@ -262,9 +262,15 @@
     }
 
     async function init() {
+        const startupLoader = document.getElementById('loader');
+        if (startupLoader) startupLoader.style.display = 'block';
+        if (typeof updateProgress === 'function') {
+            updateProgress(8, 'กำลังตรวจสอบสิทธิ์และรายชื่อสาขา...');
+        }
         // These sheets are independent; waiting for them one after another delays startup.
         await Promise.all([loadUsers(), loadEmployees()]);
         if (!checkLogin()) {
+            if (startupLoader) startupLoader.style.display = 'none';
             showLogin();
         } else {
             renderMenuPlantSelect();
@@ -276,8 +282,19 @@
                     inventoryUrl = inventoryUrls[selectedPlant];
                 }
             }
+            if (!selectedPlant && select && select.options.length > 0) {
+                selectedPlant = select.options[0].value;
+                select.value = selectedPlant;
+                inventoryUrl = inventoryUrls[selectedPlant];
+            }
+            if (typeof updateProgress === 'function') {
+                updateProgress(18, 'กำลังดึงข้อมูลสต็อกและการเคลื่อนไหว...');
+            }
+            // Yield a frame so the smooth loader paints before heavy cache/DOM work
+            await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 40)));
             // Let loadData paint the last saved snapshot immediately, then refresh in background.
             if (selectedPlant) loadData(false);
+            else if (startupLoader) startupLoader.style.display = 'none';
         }
         loadMovementInfo();
         bindHelpModal();
