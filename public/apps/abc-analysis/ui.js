@@ -1610,7 +1610,7 @@ function renderTable() {
     <td class="nav-col">${navanakornHtml}</td>
     <td>${unrestrictedHtml}</td>
     <td class="subtotal-col"><span class="${subtotalClass}">${subtotalDisplay}</span></td>
-    <td><span class="value">${formatCurrency(r.Value)}</span></td>
+    <td class="val-col" title="มูลค่า ${formatCurrency(r.Value)} บาท"><span class="val-num">${formatNumber(Math.round(Number(r.Value) || 0))}</span></td>
     <td class="lt-col">${((selectedPlant === "0301" || selectedPlant === "0326") && r.LeadTimeDays) ? formatNumber(r.LeadTimeDays) : ''}</td>
     <td>${fmtUsage(r.Qty6Month)}</td>
     <td>${fmtUsage(r.Qty4Month)}</td>
