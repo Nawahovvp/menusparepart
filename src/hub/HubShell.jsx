@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MENU_ITEMS, DEFAULT_HUB_ICON, USER_AVATAR_SVG } from './menuConfig';
+import HubDashboard from './HubDashboard';
 
 const STORAGE_KEYS = {
   THEME: 'plant_hub_theme_v1',
@@ -28,7 +29,6 @@ export default function HubShell({
   const [previewedMenu, setPreviewedMenu] = useState(
     () => MENU_ITEMS.find((m) => m.type === 'internal') || MENU_ITEMS[0]
   );
-  const [isStageVisible, setIsStageVisible] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [embedLoading, setEmbedLoading] = useState(false);
 
@@ -77,29 +77,28 @@ export default function HubShell({
     };
   }, [isInternalActive]);
 
-  // Sync sidebar mini body class
+  // Sync sidebar mini & orb-collapsed body classes
   useEffect(() => {
     document.body.classList.toggle('sidebar-mini', isSidebarMini);
-    return () => document.body.classList.remove('sidebar-mini');
-  }, [isSidebarMini]);
+    document.body.classList.toggle('sidebar-orb-collapsed', !isSidebarVisible);
+    return () => {
+      document.body.classList.remove('sidebar-mini');
+      document.body.classList.remove('sidebar-orb-collapsed');
+    };
+  }, [isSidebarMini, isSidebarVisible]);
 
   const showStagePreview = useCallback(() => {
     if (isAppActive) return;
     clearTimeout(stageHideTimerRef.current);
-    setIsStageVisible(true);
   }, [isAppActive]);
 
   const scheduleHideStagePreview = useCallback(() => {
     clearTimeout(stageHideTimerRef.current);
-    stageHideTimerRef.current = setTimeout(() => {
-      setIsStageVisible(false);
-    }, 260);
   }, []);
 
   const collapseSidebarToOrb = useCallback(() => {
     if (!isSidebarVisible) return;
     clearTimeout(stageHideTimerRef.current);
-    setIsStageVisible(false);
     setIsCollapsingToOrb(true);
 
     clearTimeout(collapseTimerRef.current);
@@ -124,9 +123,9 @@ export default function HubShell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMenu?.id]);
 
-  // Clicking outside sidebar collapses it to the floating orb
+  // Clicking outside sidebar collapses it to the floating orb when overlaying an active app
   useEffect(() => {
-    if (!isSidebarVisible || settingsOpen) return;
+    if (!isSidebarVisible || settingsOpen || !isAppActive) return;
     const handleDocClick = (e) => {
       if (
         sidebarRef.current?.contains(e.target) ||
@@ -144,7 +143,7 @@ export default function HubShell({
       clearTimeout(timer);
       document.removeEventListener('click', handleDocClick);
     };
-  }, [isSidebarVisible, settingsOpen, collapseSidebarToOrb]);
+  }, [isSidebarVisible, settingsOpen, isAppActive, collapseSidebarToOrb]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -378,20 +377,18 @@ export default function HubShell({
                 </div>
               </div>
 
-              {activeMenu && (
-                <button
-                  type="button"
-                  className="sidebar-orb-min-btn"
-                  title="หุบเมนูเป็นวงกลมมุมซ้ายบน"
-                  aria-label="หุบเมนูเป็นวงกลมมุมซ้ายบน"
-                  onClick={collapseSidebarToOrb}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M8 12h8" />
-                  </svg>
-                </button>
-              )}
+              <button
+                type="button"
+                className="sidebar-orb-min-btn"
+                title="หุบเมนูเป็นวงกลมมุมซ้ายบน"
+                aria-label="หุบเมนูเป็นวงกลมมุมซ้ายบน"
+                onClick={collapseSidebarToOrb}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M8 12h8" />
+                </svg>
+              </button>
             </div>
 
             <div
@@ -629,70 +626,14 @@ export default function HubShell({
           </aside>
         )}
 
-        {/* Welcome / Interactive Stage Preview (only when no active module) */}
+        {/* Pro Warehouse Operations Command Center Dashboard (when no active module) */}
         {!isAppActive && (
-          <section
-            className={`welcome-stage${isStageVisible ? ' is-stage-visible' : ''}`}
-            aria-label="หน้าจอพรีวิวเมนู"
-          >
-            <div
-              ref={stageCardRef}
-              className="stage-card glass-panel"
-              onMouseEnter={showStagePreview}
-              onMouseLeave={scheduleHideStagePreview}
-            >
-              <div className="stage-badge">
-                <span className="stage-badge-dot"></span>
-                <span>{plantLabel}</span>
-              </div>
-              <button
-                type="button"
-                className="stage-hero-icon"
-                title={
-                  previewedMenu?.type === 'internal' ||
-                  previewedMenu?.type === 'embedded' ||
-                  previewedMenu?.type === 'external'
-                    ? `คลิกเพื่อเปิด ${previewedMenu.title}`
-                    : previewedMenu?.title || 'เลือกเมนูจากแถบด้านซ้าย'
-                }
-                aria-label="คลิกที่โลโก้เพื่อเปิดระบบนี้"
-                style={{
-                  cursor:
-                    previewedMenu?.type === 'internal' ||
-                    previewedMenu?.type === 'embedded' ||
-                    previewedMenu?.type === 'external'
-                      ? 'pointer'
-                      : 'default',
-                }}
-                onClick={() => previewedMenu && handleSelectItem(previewedMenu)}
-                dangerouslySetInnerHTML={{ __html: previewedMenu ? previewedMenu.icon : DEFAULT_HUB_ICON }}
-              />
-              <h2>{previewedMenu ? previewedMenu.title : 'เลือกเมนูจากแถบด้านซ้าย'}</h2>
-              {previewedMenu?.type === 'group' && previewedMenu.children?.length > 0 && (
-                <div className="stage-subgrid">
-                  {previewedMenu.children.map((child) => (
-                    <button
-                      key={child.id}
-                      type="button"
-                      className="stage-subbtn"
-                      style={{
-                        '--item-c1': child.color1,
-                        '--item-c2': child.color2,
-                        '--item-glow': child.glow,
-                      }}
-                      onClick={() => handleSelectItem(child)}
-                    >
-                      <span
-                        className="stage-subbtn-icon"
-                        dangerouslySetInnerHTML={{ __html: child.icon }}
-                      />
-                      <span className="stage-subbtn-label">{child.title}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
+          <HubDashboard
+            user={user}
+            hubTheme={hubTheme}
+            onOpenMenuById={handleSelectItem}
+            showToast={showToast}
+          />
         )}
 
         {/* Settings Popover Modal */}

@@ -324,11 +324,38 @@ function App({ externalUser = null, onExternalLogout = null } = {}) {
     if (!availableFilters?.pendingUnit || Object.keys(availableFilters.pendingUnit).length === 0) return;
 
     appliedDefaultUnitUserRef.current = userKey;
+
+    // Check if opened via Deep-Link from Hub Operations Dashboard
+    try {
+      const presetRaw = sessionStorage.getItem('hub_call_preset_filter');
+      if (presetRaw) {
+        sessionStorage.removeItem('hub_call_preset_filter');
+        const preset = JSON.parse(presetRaw);
+        if (preset && Date.now() - (preset.ts || 0) < 60000) {
+          if (preset.pendingUnit) {
+            setPendingUnitFilter([preset.pendingUnit]);
+          } else if (userDefaultPendingUnit) {
+            setPendingUnitFilter([userDefaultPendingUnit]);
+          }
+          if (preset.dashboardFilter) {
+            setDashboardFilter(preset.dashboardFilter);
+          }
+          if (preset.searchTerm) {
+            setSearchTerm(preset.searchTerm);
+          }
+          setCurrentPage(1);
+          return;
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+
     if (userDefaultPendingUnit) {
       setPendingUnitFilter([userDefaultPendingUnit]);
       setCurrentPage(1);
     }
-  }, [isLoggedIn, currentUser, availableFilters?.pendingUnit, userDefaultPendingUnit, setPendingUnitFilter]);
+  }, [isLoggedIn, currentUser, availableFilters?.pendingUnit, userDefaultPendingUnit, setPendingUnitFilter, setDashboardFilter, setSearchTerm]);
 
   const secondaryFilterCount = [
     teamPlantFilter,

@@ -1179,5 +1179,41 @@ function processLoadedData(invRaw, usageRaw, mainsapRaw, avgValRaw, statusRaw, l
         renderPagination();
     } else {
         setDefaultAndCalculate();
+        try {
+            const presetRaw = sessionStorage.getItem('hub_abc_preset_filter');
+            if (presetRaw) {
+                const preset = JSON.parse(presetRaw);
+                if (preset && Date.now() - (preset.ts || 0) < 120000) {
+                    if (!options.isCache) {
+                        sessionStorage.removeItem('hub_abc_preset_filter');
+                    }
+                    const statusEl = document.getElementById("statusFilter");
+                    const searchEl = document.getElementById("searchInput");
+                    if (preset.search && searchEl) {
+                        searchEl.value = preset.search;
+                    }
+                    if (preset.tab === 'installOrder') {
+                        mode = 'onlyOrder';
+                        if (statusEl) statusEl.value = 'ติดตั้ง';
+                    } else if (preset.tab === 'installCallOrder') {
+                        mode = 'onlyOrder';
+                        if (statusEl) statusEl.value = 'ติดตั้งเรียกเข้า';
+                    } else if (preset.tab === 'callOrder') {
+                        mode = 'onlyOrder';
+                        if (statusEl) statusEl.value = 'เรียกเข้า';
+                    } else if (preset.tab === 'allOrder') {
+                        mode = 'onlyOrder';
+                    } else if (preset.tab === 'overstockReturn') {
+                        mode = 'returnable';
+                    } else if (preset.tab === 'shortageFastMed') {
+                        if (statusEl) statusEl.value = 'นวนคร';
+                        movingFilter = 'Fast';
+                    }
+                    applyFiltersAndRender();
+                }
+            }
+        } catch (err) {
+            console.warn('Preset filter apply error:', err);
+        }
     }
 }
