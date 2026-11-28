@@ -494,9 +494,6 @@ export default function HubShell({
                         </span>
                       ) : (
                         <>
-                          {hasAction && !isActive && (
-                            <span className="nav-internal-badge">พร้อมใช้</span>
-                          )}
                           {isActive && <span className="nav-active-dot" title="กำลังเปิดใช้งาน"></span>}
                         </>
                       )}

@@ -90,7 +90,13 @@ export async function onRequestPost({ request, env, waitUntil }) {
         })());
     }
 
-    const sessionCookie = await createSessionCookie(request, env, user);
+    let sessionCookie;
+    try {
+        sessionCookie = await createSessionCookie(request, env, user);
+    } catch (error) {
+        console.error('Session creation failed:', error);
+        return jsonResponse({ error: 'Server auth is not configured' }, 500);
+    }
     return jsonResponse(user, 200, {
         'Set-Cookie': sessionCookie
     });

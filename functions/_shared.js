@@ -3,7 +3,7 @@ const SESSION_COOKIE_NAME = 'csp_session';
 const SESSION_TTL_SECONDS = 24 * 60 * 60;
 const APP_REQUEST_HEADER = 'x-requested-with';
 const APP_REQUEST_VALUE = 'CallSparePartApp';
-const DEFAULT_SESSION_SECRET = 'callsparepart-session-secret-v1';
+const MIN_SESSION_SECRET_LENGTH = 32;
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
@@ -28,7 +28,11 @@ function base64UrlToBytes(base64Url) {
 }
 
 function getSessionSecret(env) {
-    return env?.SESSION_SECRET || env?.AUTH_SECRET || DEFAULT_SESSION_SECRET;
+    const secret = env?.SESSION_SECRET || env?.AUTH_SECRET;
+    if (!secret || String(secret).length < MIN_SESSION_SECRET_LENGTH) {
+        throw new Error('SESSION_SECRET is not configured (min 32 characters)');
+    }
+    return String(secret);
 }
 
 async function getHmacKey(secret) {
